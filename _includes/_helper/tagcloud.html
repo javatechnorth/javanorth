@@ -1,0 +1,40 @@
+<style>
+.tag-cloud-tags { text-align: left; }
+.tags-all { margin-top: 20px; }
+.tags-list { margin: 0; padding: 0; list-style: none; }
+.tags-list-item { line-height: 12px;}
+.tags-list-count { color: #bbb; }
+.tags-list-count:before { display: inline; content: " ("; }
+.tags-list-count:after { display: inline; content: ") "; }
+.tags-list-child { padding-left: 10px; }
+</style>
+<div class="tags-all">
+  <ul id="ul-list" class="tags-list">
+    {% assign tags = site.tags %}
+    {% for tag in tags %}
+    <li id="{{ tag[0] }}" class="tags-list-item">
+      {% assign posts = tag[1] %}
+      {% assign tag_url_encode = tag[0] | url_encode | replace: '+', '%20' %}
+      <a class="tags-list-link" href="{{ '/tag/#/' | relative_url | append: tag_url_encode }}">{{ tag[0] }}</a>
+      <span class="tags-list-count">{{ posts.size }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+<script src="/assets/js/src/jquery.min.js"></script>
+<script>
+var li_list = $(".tags-list-item"), arr = [];
+for (var i = 0; i < li_list.length; i ++) {
+        arr[i] = li_list[i].id;
+}
+var resultArray = arr.sort(
+  function compareFunction(param1, param2) {
+    return param1.localeCompare(param2,"zh");
+  }
+);
+var str = ''
+for (var i = 0; i < arr.length; i++) {
+  str += $("#" + resultArray[i]).prop("outerHTML");
+}
+$("#ul-list").html(str);
+</script>
