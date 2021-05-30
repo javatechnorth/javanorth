@@ -332,7 +332,7 @@ post_wordcount:
 wechat_subscriber:
   enabled: true
   qcode: /assets/images/wechat-qcode.jpg
-  description: 欢迎订阅 Java 极客技术，这里分享关于 Java 的一切。
+  description: 欢迎订阅 Java 技术指北，这里分享关于 Java 的一切。
 
 # Declare license on posts
 post_copyright:
