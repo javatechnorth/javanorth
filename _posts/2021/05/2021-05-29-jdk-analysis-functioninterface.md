@@ -102,7 +102,7 @@ public interface Consumer<T> {
 ```
 accept为核心接口方法，andThen为方便复杂组合场景提供的默认方法。function包的整个代码逻辑都很简洁易懂，部分Operator继承了Function，指北君就不一一赘述了。
 
-##FunctionInterface
+## FunctionInterface
 上一节，指北君给小伙伴讲了java.util.function中的43把剑，并让大家做到心中有剑，这一节指北君将和小伙伴一同研究怎么造一柄自己的剑呢。
 FunctoinInterface注解就是来帮小伙伴铸造武器的工具，并且对我们的造剑质量把关。FunctionInterface用于显式声明接口为函数式接口，编译器会按照函数式接口的约束进行检查。
 先看看注解的定义：
@@ -154,7 +154,7 @@ public class Demo {
 }
 ```
 
-##Lambda表达式
+## Lambda表达式
 听指北君讲了这么多，大家也做到了心中有剑以及掌握铸剑技能，这时候是不是想找个对手来练练呢？那就轮到我们的Lambda表达式登场了。
 在渊源章节，指北君就介绍过函数式编程脱胎于λ演算，所以我们的战场就是Lambda。
 下面是一段简单的Lambda代码示例：
@@ -194,7 +194,7 @@ Lambda表达式用法：
 
 其他的代码遵循基本的Java语法，小伙伴们现在就可以大展拳脚，只要是函数式接口或者具备函数式接口条件的地方都可以传入Lambda表达式。
 
-##双冒号操作符
+## 双冒号操作符
 经过上一节的实践，小伙伴们是不是很兴奋了，可能有些小伙伴会问，Java类中的的方法也是函数，我可不可以在传入Lambda表达式的地方传入方法呢？类似下面这种效果：
 ```java
     List<String> list = new ArrayList<String>();
