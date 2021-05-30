@@ -158,7 +158,7 @@ Zab 协议包括两种基本的模式：**崩溃恢复** 和 **消息广播**
 
 当集群中的 Learner 完成了初始化状态同步，那么整个 zk 集群就进入到了正常工作模式 了。
 
-![](assets/images/2021/sevenluo/zab广播.jpg)
+![](/assets/images/2021/sevenluo/zab广播.jpg)
 
 
 
@@ -233,7 +233,7 @@ zk 集群中的每一台主机，在不同的阶段会处于不同的状态。�
 
 前一个数字表示投票者，后一个数字表示被选举者。票箱中只会记录每一个投票者的最后一次投票记录，如果投票者更新自己的选票，则其他服务器收到该新选票后会在自己的票箱中更新该服务器的选票。
 
-![](assets/images/2021/sevenluo/zab-leader选举.jpg)
+![](/assets/images/2021/sevenluo/zab-leader选举.jpg)
 
 
 
