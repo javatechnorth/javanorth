@@ -78,7 +78,14 @@ final void lock() {
     // 将 1 作为参数，调用 AQS 的 acquire 方法获取锁
     acquire(1);
 }
+```
 
+acquire() 方法主要是干了 3 件事情
+1. tryAcquire() 尝试获取锁
+2. 获取锁失败后，调用 addWaiter() 方法将线程封装成 Node，加入同步队列
+3. acquireQueued() 将队列中的节点按自旋的方式尝试获取锁
+
+```java
 //AbstractQueuedSynchronizer.acquire()
 public final void acquire(int arg) {
     //尝试获取锁，true：直接返回，false：调用 addWaiter()
@@ -88,7 +95,11 @@ public final void acquire(int arg) {
         acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
         selfInterrupt();
 }
+```
 
+tryAcquire() 尝试获取锁，如果线程本身持有锁，则将这个线程重入锁
+
+```java
 //FairSync.tryAcquire()
 protected final boolean tryAcquire(int acquires) {
     //当前线程
@@ -118,17 +129,25 @@ protected final boolean tryAcquire(int acquires) {
     //当前线程获取锁失败
     return false;
 }
+```
 
+hasQueuedPredecessors() 这个方法比较有绅士风度，在 tryAcquire() 方法中被第一个调用，它谦让比自己排队长的线程。
+
+```java
 //AbstractQueuedSynchronizer.hasQueuedPredecessors()
 public final boolean hasQueuedPredecessors() {
-        Node t = tail;
-        Node h = head;
-        Node s;
-        // 如果第一个节点获取到了锁，第二个节点不是当前线程，返回 true，否则返回 false
-        return h != t &&
-            ((s = h.next) == null || s.thread != Thread.currentThread());
-    }
+    Node t = tail;
+    Node h = head;
+    Node s;
+    // 如果首节点获取到了锁，第二个节点不是当前线程，返回 true，否则返回 false
+    return h != t &&
+        ((s = h.next) == null || s.thread != Thread.currentThread());
+}
+```
 
+addWaiter() 方法就是将获取锁失败的线程加入到同步队列尾部
+
+```java
 //AbstractOwnableSynchronizer.addWaiter()
 private Node addWaiter(Node mode) {
     //将当前线程封装成一个节点
@@ -148,6 +167,7 @@ private Node addWaiter(Node mode) {
     enq(node);
     return node;
 }
+
 //AbstractQueuedSynchronizer.enq()
 private Node enq(final Node node) {
     //自旋
@@ -168,7 +188,11 @@ private Node enq(final Node node) {
         }
     }
 }
+```
 
+acquireQueued() 方法当节点为首节点的时候，再次调用 tryAcquire() 获取锁，否则就阻塞线程，等待被唤醒。
+
+```java
 //AbstractQueuedSynchronizer.acquireQueued()
 final boolean acquireQueued(final Node node, int arg) {
     //失败标识
@@ -180,10 +204,10 @@ final boolean acquireQueued(final Node node, int arg) {
         for (;;) {
             //获取前一个节点
             final Node p = node.predecessor();
-            //如果前一个节点是第一个节点，轮到当前线程获取锁
+            //如果前一个节点是首节点，轮到当前线程获取锁
             //tryAcquire() 尝试获取锁
             if (p == head && tryAcquire(arg)) {
-                //获取锁成功，将当前节点设置为第一个节点
+                //获取锁成功，将当前节点设置为首节点
                 setHead(node);
                 //将前一个节点的 Next 设置为 null
                 p.next = null;
@@ -203,6 +227,12 @@ final boolean acquireQueued(final Node node, int arg) {
             cancelAcquire(node);
     }
 }
+```
+
+shouldParkAfterFailedAcquire() 线程是否需要被阻塞，更改线程的 waitStatus 为 SIGNAL。parkAndCheckInterrupt() 实现真正的阻塞线程
+
+
+```java
 //AbstractQueuedSynchronizer.shouldParkAfterFailedAcquire()
 private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
     //前一个节点的 waitStatus 状态，默认状态为 0，第一次进入必然走 else
@@ -240,7 +270,7 @@ private final boolean parkAndCheckInterrupt() {
 
 ### 非公平锁
 
-用默认的构造方式创建一个非公平锁。
+用默认的构造方式创建一个非公平锁。lock() 方法上来就尝试抢占锁，失败则调用 acquire() 方法。
 
 ```java
 //NonfairSync.lock()
@@ -253,7 +283,11 @@ final void lock() {
         //设置失败，参考上一节公平锁的 acquire()
         acquire(1);
 }
+```
 
+nonfairTryAcquire() 就没有绅士风度了，没有了公平锁 hasQueuedPredecessors() 方法。
+
+```java
 //NonfairSync.tryAcquire()
 protected final boolean tryAcquire(int acquires) {
     //调用 ReentrantLock 的 nonfairTryAcquire()
@@ -315,7 +349,7 @@ public final boolean release(int arg) {
     //调用 Sync 的 tryRelease()
     if (tryRelease(arg)) {
         Node h = head;
-        //第一个节点不是 null，第一个节点的 waitStatus 是 SIGNAL
+        //首节点不是 null，首节点的 waitStatus 是 SIGNAL
         if (h != null && h.waitStatus != 0)
             unparkSuccessor(h);
         return true;
