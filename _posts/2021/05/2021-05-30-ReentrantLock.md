@@ -36,10 +36,10 @@ public ReentrantLock(boolean fair) {
 NonfairSync 类和 FairSync 类继承了 Sync 类，它们三个都是 ReentrantLock 的内部类。
 
 AbstractQueuedSynchronizer，简称 AQS，拥有三个核心组件：
-1. state：volatile 修饰，线程是否可以获取锁
-2. Node：内部队列，双向链表形式，没有抢到锁的对象就进入这个队列
-    主要字段有：pre 前一个节点，next 下一个节点，thread 线程，waitStatus 线程的状态
-3. exclusiveOwnerThread：当前抢到锁的线程
+1. state：volatile 修饰，线程是否可以获取锁。
+2. Node：内部队列，双向链表形式，没有抢到锁的对象就进入这个队列。
+    主要字段有：pre 前一个节点，next 下一个节点，thread 线程，waitStatus 线程的状态。
+3. exclusiveOwnerThread：当前抢到锁的线程。
 
 如下图，简单的了解一下 AQS。
 
@@ -81,9 +81,9 @@ final void lock() {
 ```
 
 acquire() 方法主要是干了 3 件事情
-1. tryAcquire() 尝试获取锁
-2. 获取锁失败后，调用 addWaiter() 方法将线程封装成 Node，加入同步队列
-3. acquireQueued() 将队列中的节点按自旋的方式尝试获取锁
+1. tryAcquire() 尝试获取锁。
+2. 获取锁失败后，调用 addWaiter() 方法将线程封装成 Node，加入同步队列。
+3. acquireQueued() 将队列中的节点按自旋的方式尝试获取锁。
 
 ```java
 //AbstractQueuedSynchronizer.acquire()
@@ -97,7 +97,7 @@ public final void acquire(int arg) {
 }
 ```
 
-tryAcquire() 尝试获取锁，如果线程本身持有锁，则将这个线程重入锁
+tryAcquire() 尝试获取锁，如果线程本身持有锁，则将这个线程重入锁。
 
 ```java
 //FairSync.tryAcquire()
@@ -145,7 +145,7 @@ public final boolean hasQueuedPredecessors() {
 }
 ```
 
-addWaiter() 方法就是将获取锁失败的线程加入到同步队列尾部
+addWaiter() 方法就是将获取锁失败的线程加入到同步队列尾部。
 
 ```java
 //AbstractOwnableSynchronizer.addWaiter()
@@ -229,7 +229,7 @@ final boolean acquireQueued(final Node node, int arg) {
 }
 ```
 
-shouldParkAfterFailedAcquire() 线程是否需要被阻塞，更改线程的 waitStatus 为 SIGNAL。parkAndCheckInterrupt() 实现真正的阻塞线程
+shouldParkAfterFailedAcquire() 线程是否需要被阻塞，更改线程的 waitStatus 为 SIGNAL。parkAndCheckInterrupt() 实现真正的阻塞线程。
 
 
 ```java
@@ -262,11 +262,11 @@ private final boolean parkAndCheckInterrupt() {
 ```
 
 以上就是公平锁获取锁的全部过程，总结一下公平锁获取锁的过程：
-1. 当前线程调用 tryAcquire() 获取锁，成功则返回
-2. 调用 addWaiter()，将线程封装成 Node 节点加入同步队列
-3. acquireQueued() 自旋尝试获取锁，成功则返回
-4. shouldParkAfterFailedAcquire() 将线程设置为等待唤醒状态，阻塞当前线程
-5. 如果线程被唤醒，尝试获取锁，成功则返回，失败则继续阻塞
+1. 当前线程调用 tryAcquire() 获取锁，成功则返回。
+2. 调用 addWaiter()，将线程封装成 Node 节点加入同步队列。
+3. acquireQueued() 自旋尝试获取锁，成功则返回。
+4. shouldParkAfterFailedAcquire() 将线程设置为等待唤醒状态，阻塞当前线程。
+5. 如果线程被唤醒，尝试获取锁，成功则返回，失败则继续阻塞。
 
 ### 非公平锁
 
@@ -320,12 +320,12 @@ final boolean nonfairTryAcquire(int acquires) {
 ```
 
 以上就是非公平锁获取锁，总结一下非公平锁获取锁的过程：
-1. lock() 第一次尝试获取锁，成功则返回
-2. nonfairTryAcquire() 再次尝试获取锁， 
-3. 失败则调用 addWaiter() 封装线程为 Node 节点加入同步队列
-4. acquireQueued() 自旋尝试获取锁，成功则返回
-5. shouldParkAfterFailedAcquire() 将线程设置为等待唤醒状态，阻塞当前线程
-6. 如果线程被唤醒，尝试获取锁，成功则返回，失败则继续阻塞
+1. lock() 第一次尝试获取锁，成功则返回。
+2. nonfairTryAcquire() 再次尝试获取锁。
+3. 失败则调用 addWaiter() 封装线程为 Node 节点加入同步队列。
+4. acquireQueued() 自旋尝试获取锁，成功则返回。
+5. shouldParkAfterFailedAcquire() 将线程设置为等待唤醒状态，阻塞当前线程。
+6. 如果线程被唤醒，尝试获取锁，成功则返回，失败则继续阻塞。
 
 ### 公平锁和非公平锁对比
 
@@ -399,7 +399,7 @@ private void unparkSuccessor(Node node) {
 }
 ```
 
-释放锁的逻辑就是 state 必须被减去 1 直到为 0，才可以唤醒下一个线程
+释放锁的逻辑就是 state 必须被减去 1 直到为 0，才可以唤醒下一个线程。
 
 ### 总结
 
