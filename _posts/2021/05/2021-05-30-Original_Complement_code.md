@@ -2,7 +2,7 @@
 layout: post
 title: 小白都能理解的原码反码补码教程
 tagline: by IT可乐
-categories: JDK 源码解读
+categories: 底层技术
 tags: 
     - IT可乐
 ---
