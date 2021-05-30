@@ -1,3 +1,11 @@
+---
+layout: post
+title:  Zookeeper基础Paxos算法详解
+tagline: by 程序员七哥
+categories: 分布式系统
+tags: 
+    - zookeepr
+---
 
 
 大家好，我是指北君。今天，我想学习下zookeeper，毕竟微服务这么火，立志不当最菜程序员的我也不能掉队。
@@ -6,7 +14,8 @@
 
 今天就给大家聊下，对于这个zk理论的学习。
 
--------------
+
+<!--more-->
 
 ## Paxos算法
 
