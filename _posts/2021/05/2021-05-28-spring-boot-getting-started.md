@@ -2,7 +2,7 @@
 layout: post
 title:  Spring Boot 入门指南
 tagline: by feng
-categories: Spring Boot
+categories: "Spring Boot"
 tags: 
     - feng
 ---
@@ -10,6 +10,8 @@ tags:
 ### 什么是Spring Boot
 
 Spring Boot 是 Spring 开源组织下的一个子项目，也是 Spring 组件一站式解决方案，主要是为了简化使用 Spring 框架的难度和简化 Spring 框架复杂的XML配置。使用 Spring Boot 可以很容易创建一个独立运行的、基于 Spring 的生产级应用程序，而且Spring Boot 对 Spring 平台和第三方库做了一些版本适配，这样我们就可以尽快的上手。
+
+<!--more-->
 
 使用 Spring Boot 来不仅可以创建基于 war 方式部署的传统Java应用程序，也可以通过创建独立的不依赖任何容器（如 tomcat 等）的应用，只需使用 “java -jar” 就能启动。Spring Boot 还提供了一个运行 "spring scripts " 的命令行工具。
 
@@ -42,7 +44,7 @@ Spring Boot 的设计目标
 
 来看下 HelloApplication 入口类的内容, HelloApplication 里面定义了一个 main 函数，一个基本的 @SpringBootApplication 注解。后续的文章会详细解释一下 @SpringBootApplication 注解。现在我们只要知道有了 @SpringBootApplication 注解，所有的 Spring Boot 项目依赖都可以扫描加入进来。
 
-```Java
+```java
 @SpringBootApplication
 public class HelloApplication {
     public static void main(String[] args) {
@@ -97,7 +99,8 @@ public class HelloApplication {
 ### 第三步
 
 修改 HelloApplication 主类，添加一个/hello 的请求
-```Java
+
+```java
 @RestController
 @SpringBootApplication
 public class HelloApplication {
@@ -162,6 +165,6 @@ jar tvf hello-0.0.1-SNAPSHOT.jar
 
 从上面的示例可以看出开始一个新的 Spring Boot 项目非常简单，Spring Boot 提供了专门的创建向导项目，简化了大量的 Spring 项目的创建难度。全程下来不到5分钟，我们就完成了项目的创建和 hello world 的输出演示。
 
-后续的文章会给大家讲解 Spring Boot 的更多的细节，给大家带来更详细的技术文章，包括源码分析、一些有趣的实现等。关注公众号【Java技术指北】第一时间获取最新 Spring Boot 的相关技能。
+后续的文章会给大家讲解 Spring Boot 的更多的细节，给大家带来更详细的技术文章，包括源码分析、面试题讲解、一些有趣的实现等。关注公众号【Java技术指北】第一时间获取最新 Spring Boot 的相关技能。
 
 [EOF]
