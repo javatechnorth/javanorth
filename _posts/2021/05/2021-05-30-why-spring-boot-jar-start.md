@@ -2,7 +2,7 @@
 layout: post
 title:  Spring Boot 为什么可以使用 Jar 包启动？
 tagline: by feng
-categories: "Spring Boot"
+categories: "Spring-Boot"
 tags: 
     - feng
 ---
@@ -94,7 +94,7 @@ Spring-Boot-Layers-Index: BOOT-INF/layers.idx
 
 Spring Boot 的启动原理如下图所示：
 
-![Spring Boot Start jar 1](../../../assets/images/2021/feng/spring-boot-jar-start-1.png)
+![Spring Boot Start jar 1](/assets/images/2021/feng/spring-boot-jar-start-1.png)
 
 ### 5. 源码分析
 
@@ -102,7 +102,7 @@ Spring Boot 的启动原理如下图所示：
 
 JarLauncher 类是针对 Spring Boot jar 包的启动类， 完整的类图如下所示：
 
-![Spring Boot Start jar 2](../../../assets/images/2021/feng/spring-boot-start-2.png)
+![Spring Boot Start jar 2](/assets/images/2021/feng/spring-boot-start-2.png)
 
 其中的 WarLauncher 类，是针对 Spring Boot war 包的启动类。 启动类 `org.springframework.boot.loader.JarLauncher` 并非为项目中引入类，而是 `spring-boot-maven-plugin` 插件 repackage 追加进去的。
 接下来我们先来看一下 JarLauncher 的源码，比较简单，如下图所示：
