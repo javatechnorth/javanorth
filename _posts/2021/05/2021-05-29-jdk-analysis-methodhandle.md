@@ -15,6 +15,7 @@ MethodHandle是Java7引入的一种机制，主要是为了JVM支持动态语言
 <!--more-->
 
 ## 一个MethodHandle调用示例
+首先，让指北君给大家演示一下最基本的MethodHandle使用。
 
 ### 第一步：创建查找对象：Lookup
 
@@ -49,7 +50,11 @@ Lookup的findVirtual查找成员方法
 
 以上就是一个简单的调用示例。
 
-## MethodType
+## 核心代码解读
+上面我们展示了一个最进本MethodHandle方式的方法调用，下面我们将对其中用到的主要类进行介绍。这些主要的类包含MethodType，MethodHandle，MethodHandles及Lookup。
+
+### MethodType
+首先，我们来看看Methodtype，MethodType是用来封装方法输入输出类型的，包含方法的返回和方法的参数。
 MethodType构造方法为私有，只能通过MethodType提供的静态工具方法来获取实例
 
 ```java
@@ -63,7 +68,7 @@ MethodType构造方法为私有，只能通过MethodType提供的静态工具方
     }
 ```
 
-常用的工具方法：
+MethodType中常用的工具方法有：
  * 大于一个参数
 ```java
     public static MethodType methodType(Class<?> rtype, Class<?> ptype0, Class<?>... ptypes) {
@@ -81,8 +86,7 @@ MethodType构造方法为私有，只能通过MethodType提供的静态工具方
     }
 ```
  
-
-静态工具方法都通过makeImple创建实例，该方法做如下几件事情：
+工具方法都通过makeImple方法来封账MethodType实例，指北君带领大家来看看makeImple中做了哪些事情：
 1. 参数检查
 	+ 返回值的类型不能为null，如果无返回使用void.class
 	+ 参数类型不能为null，且不能为void.class
@@ -124,7 +128,7 @@ static
 + appendParameterTypes
 + dropParameterTypes
 
-## 核心类MethodHandle
+### MethodHandle
 MethodHandle为抽象类，但是里面提供了大量的原生方法，提供底层访问，也是方法调用的核心逻辑。这部分涉及MethodHandle的机制实现，对于使用功能来说指北君就不在此展开了。
 ```java
     @HotSpotIntrinsicCandidate
@@ -135,7 +139,7 @@ MethodHandle为抽象类，但是里面提供了大量的原生方法，提供�
 ```
 ![调用方法](/assets/images/2021/simsky/jdk_src_methodhandle_2.png)
 
-## 核心类MethodHandles, Lookup
+### MethodHandles, Lookup
 MethodHandles不是MethodHandle的实现，他提供工具用于帮助获取MethodHandle，我们主要使用到lookup(),publicLookup()
 
 @CallerSensitive注解，可以使Reflection.getCallerClass()获取到调用lookup()方法的类
