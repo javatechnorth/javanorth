@@ -156,8 +156,11 @@ MethodHandles不是MethodHandle的实现，他提供工具用于帮助获取Meth
         return Lookup.PUBLIC_LOOKUP;
     }
 ```
-Lookup构造方法主要传入：lookupClass搜寻的类, allowedModes:许可模式。
-通过Lookup的findXXX获取到MethodHandle
+Lookup构造方法主要传入两个参数：
+1. lookupClass搜寻的类, 
+2. allowedModes:许可模式。
+
+最后，通过Lookup的findXXX获取到MethodHandle，详细说明见下表：
 
 ![查找方法](/assets/images/2021/simsky/jdk_src_methodhandle_1.png)
 
