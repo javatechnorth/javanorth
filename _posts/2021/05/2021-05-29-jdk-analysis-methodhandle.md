@@ -49,7 +49,7 @@ Lookup的findVirtual查找成员方法
 
 以上就是一个简单的调用示例。
 
-## 核心类MethodType
+## MethodType
 MethodType构造方法为私有，只能通过MethodType提供的静态工具方法来获取实例
 
 ```java
