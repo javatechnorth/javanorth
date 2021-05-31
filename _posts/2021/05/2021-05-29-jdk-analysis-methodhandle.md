@@ -16,14 +16,14 @@ MethodHandle是Java7引入的一种机制，主要是为了JVM支持动态语言
 
 ## 一个MethodHandle调用示例
 
-### 创建查找对象：Lookup
+### （第一步）创建查找对象：Lookup
 
 ```java
 		// 获取Look用于查找方法句柄
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 ```
 
-### 创建方法类型：MethodType
+### （第二步）创建方法类型：MethodType
 构造方法的返回值类型，参数类型
 
 ```java
@@ -31,7 +31,7 @@ MethodHandle是Java7引入的一种机制，主要是为了JVM支持动态语言
 		MethodType mt = MethodType.methodType(boolean.class, String.class, int.class);
 ```
 
-### 查找方法句柄
+### （第三步）查找方法句柄
 Lookup的findVirtual查找成员方法
 
 ```java
@@ -39,7 +39,7 @@ Lookup的findVirtual查找成员方法
 		MethodHandle handle = lookup.findVirtual(String.class, "startsWith", mt);
 ```
 
-### 方法调用
+### （第四步）方法调用
 通过MehodHandle的invoke方法执行，并返回结果
 
 ```java
