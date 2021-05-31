@@ -30,17 +30,17 @@ Spring Boot 的设计目标
 
 打开Intellij IDEA 使用 Spring Initializr 向导 新建 Hello World的项目
 
-![Spring Boot Started 1](/assets/images/2021/feng/spring-boot-started-1.png)
+![Spring Boot Started 1](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-started-1.png)
 
 选择 Spring Web， 然后点击 Finish 等待项目创建完成。
 
-![Spring Boot Started 2](/assets/images/2021/feng/spring-boot-started-2.png)
+![Spring Boot Started 2](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-started-2.png)
 
 #### 第二步
 
 项目已经创建完成。下面我们来看一下项目结构：
 
-![Spring Boot Started 3](/assets/images/2021/feng/spring-boot-satrted-3.png)
+![Spring Boot Started 3](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-satrted-3.png)
 
 来看下 HelloApplication 入口类的内容, HelloApplication 里面定义了一个 main 函数，一个基本的 @SpringBootApplication 注解。后续的文章会详细解释一下 @SpringBootApplication 注解。现在我们只要知道有了 @SpringBootApplication 注解，所有的 Spring Boot 项目依赖都可以扫描加入进来。
 
@@ -118,11 +118,11 @@ public class HelloApplication {
 
 在主类上，右键菜单栏里选择 Run “HelloApplication” 命令，启动项目。如下图所示，2秒钟就能启动完成。从输出日志可以看出，项目启动了内置的 tomcat 服务器，分配了8080 作为本次 web 服务器的请求端口。
 
-![Spring Boot Started 4](/assets/images/2021/feng/spring-boot-started-4.png)
+![Spring Boot Started 4](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-started-4.png)
 
 好了，我们现在访问一下 /hello 请求， 如下图所示，输出了 Hello World。
 
-![Spring Boot Started 5](/assets/images/2021/feng/spring-boot-started-5.png)
+![Spring Boot Started 5](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-started-5.png)
 
 是不是很简单，我们很快就上手完成了第一个 Hello World 应用。 
 
@@ -153,7 +153,7 @@ $ mvn package
 
 打包完成，查看 target 目录，我们能看到 hello-0.0.1-SNAPSHOT.jar 文件。
 
-![Spring Boot Started 6](/assets/images/2021/feng/spring-boot-started-6.png)
+![Spring Boot Started 6](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-started-6.png)
 
 从上图可以看到有个名字相类似的文件，hello-0.0.1-SNAPSHOT.jar.original 文件是 Spring Boot repackage 之前的文件，也就是说这个文件其实就是 maven 创建的原始jar文件，不包含其他依赖的jar包。
 
