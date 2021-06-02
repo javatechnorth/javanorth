@@ -2,10 +2,9 @@
 layout: post
 title:  JDK源码解读——MethodHandle
 tagline: by simsky
-categories: JDK 源码解析
+categories: JDK 源码解读
 tags: 
-    - 反射
-    - MethodHandle
+    - simsky
 
 ---
 
