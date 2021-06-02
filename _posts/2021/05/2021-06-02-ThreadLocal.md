@@ -10,7 +10,7 @@ tags:
 大家好，我是指北君。
 
 今天学习了ThreadLocal相关得知识，发现原来道哥(Doug Lea)也用ThreadLocal。既然大师们都喜欢用的，我们必须得研究起来。大师的背影总是需要追随。
-![Doug_Lea1.jpeg](http://www.javanorth.cn/assets/images/2021/ThreadLocal/Doug_Lea1.jpeg)
+![Doug_Lea1.png](http://www.javanorth.cn/assets/images/2021/ThreadLocal/Doug_Lea1.png)
 
 那么指北君给大家安排上了，如果你拥有了JAVA中的ThreadLocal，那麽你可以创建一个只允许同一个线程读写的变量。 因此，即使两个线程执行了相同的代码，并且引用了相同的ThreadLocal变量，这两个线程也无法看到彼此的ThreadLocal。 可以说ThreadLocal提供了一种代码线程安全的的简单方法。
 
@@ -178,7 +178,7 @@ private void remove(ThreadLocal<?> key) {
     }
 }
 ```
-#### JAVA中使用的ThreadLocal
+#### 三 JAVA中使用的ThreadLocal
 Java中有哪些源码使用了ThreadLocal。
 
 ThreadLocalRandom 中使用计算nextGaussian值时有使用到ThreadLocal。
@@ -199,7 +199,7 @@ static final class ThreadLocalHoldCounter extends ThreadLocal<HoldCounter> {
 //曾经的Doug Lea老爷子推荐static field，而他默默的使用了static final。
 ```
 
-#### 如何使用ThreadLocal
+#### 四 如何使用ThreadLocal
 
 ThreadLocal非常适合存储非线程安全的对象，并且不需要跨线程共享对象。很多需要线程隔离的操作都可以尝试使用它。
 
