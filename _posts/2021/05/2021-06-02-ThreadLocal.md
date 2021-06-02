@@ -10,7 +10,6 @@ tags:
 大家好，我是指北君。
 
 今天学习了ThreadLocal相关得知识，发现原来道哥(Doug Lea)也用ThreadLocal。既然大师们都喜欢用的，我们必须得研究起来。大师的背影总是需要追随。
-![Doug_Lea1.png](http://www.javanorth.cn/assets/images/2021/ThreadLocal/Doug_Lea1.png)
 
 那么指北君给大家安排上了，如果你拥有了JAVA中的ThreadLocal，那麽你可以创建一个只允许同一个线程读写的变量。 因此，即使两个线程执行了相同的代码，并且引用了相同的ThreadLocal变量，这两个线程也无法看到彼此的ThreadLocal。 可以说ThreadLocal提供了一种代码线程安全的的简单方法。
 
@@ -27,6 +26,7 @@ Since: 1.2
 Author: Josh Bloch and Doug Lea
 ```
 又是并发大佬们的杰作，膜拜一下。怪不得道哥也爱用，自己设计的类总得用用。下面来看看基本内容与用法吧。
+![Doug_Lea.jpg](http://www.javanorth.cn/assets/images/2021/ThreadLocal/Doug_Lea.jpg)
 #### 二 ThreadLocal原理
 首先请看男神们的介绍
 
