@@ -7,6 +7,8 @@ tags:
     - feng
 ---
 
+文稿原地址： https://www.yuque.com/wbf1013/mglhnr/ah83wl
+
 大家好，我是指北君。
 
 ### 前言
