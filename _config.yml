@@ -437,7 +437,7 @@ changyan:
 gitalk:
   enable: true
   clientID: Iv1.eaa2ee7835230285
-  clientSecret: 09cf781431b9b650720f3be23a7d6cf4073b55a7
+  clientSecret: 310aff7e2bfcc3e199cdcddd1c901364f443d353
   repo: blog-comments
   owner: ityouknow
   admin: ityouknow
