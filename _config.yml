@@ -436,8 +436,8 @@ changyan:
 # Support for gitalk comments system.
 gitalk:
   enable: true
-  clientID: Iv1.eaa2ee7835230285
-  clientSecret: 310aff7e2bfcc3e199cdcddd1c901364f443d353
+  clientID: 91f372f43c98f1c2a729
+  clientSecret: eacf0e50dbfd8d6220296f295f988e55062dfcdf 
   repo: blog-comments
   owner: ityouknow
   admin: ityouknow
