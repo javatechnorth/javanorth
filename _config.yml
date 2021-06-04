@@ -213,7 +213,7 @@ font:
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
-  GitHub: https://github.com/justdojava
+  GitHub: https://github.com/javatechnorth
   知乎: https://zhuanlan.zhihu.com/ityouknow
 
 
@@ -286,13 +286,6 @@ links_title: Links
 #links_layout: inline
 links:
   纯洁的微笑: http://ityouknow.com
-  沉默王二: http://www.itwanger.com
-  子悠: http://home.zxsilence.cn/
-  江南一点雨: http://www.javaboy.org
-  炸鸡可乐: http://pzblog.cn
-  郑璐璐: https://www.dynamic-zheng.com
-  程序通事: https://studyidea.cn
-  懿: http://chuyikeji.cn/
 
 
 # ---------------------------------------------------------------
