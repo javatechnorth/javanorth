@@ -2,13 +2,13 @@
 layout: post
 title:  JDK源码解析——深入函数式接口（原理篇）
 tagline: by simsky
-categories: JDK 源码解读
+categories: JDK 源码解读 JVM
 tags: 
     - simsky
 
 ---
 
-大家好，上次指北君给大家开启了函数式接口的介绍，今天，指北君将在第一篇基础上继续为大家解读函数式接口涉及到的知识点。本篇文章为函数接口的应用篇二，将会为各位小伙伴详细介绍“@FunctionInterface”注解，java.util.function包中所有接口。
+大家好，函数式接口的应用篇已经给大家讲完，今天，指北君和大家一同深入探索Java实现函数式接口的原理。
 
 <!--more-->
 
@@ -22,121 +22,250 @@ tags:
 
 说明：源码使用的版本为JDK-11.0.11
 
-
-## FunctionInterface
-这一节，指北君给大家介绍如何声明一个函数式接口，FunctionInterface注解就是用于来干这件事情的，当我们为接口增加FunctionInterface注解后，编译器会按照函数式接口的约束进行检查。
-先看看注解的定义：
-```java
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface FunctionalInterface {}
-```
-源码显示该注解可用于类、接口和枚举类型，注解应用于运行时阶段。
-
-如果仅从代码层面我们可能会犯错误，比如如下情况：
-```java
-@FunctionalInterface
-public interface IFuncInterfaceSample{
-  void func1();
-  void func2();
+## 编译
+无论是接口还是类，都需要经过编译，然后在运行期由JVM执行调用，现在我们来看看几个关键位置的编译结果。
+先看看函数式接口编译
+```sh
+Classfile /O:/SCM/ws-java/sample-lambda/bin/com/tree/sample/func/IFuncInterfaceSample.class
+  Last modified 2021-6-4; size 238 bytes
+  MD5 checksum 58a3c8c5cbe9c7498e86d4a349554ae0
+  Compiled from "IFuncInterfaceSample.java"
+public interface com.tree.sample.func.IFuncInterfaceSample
+  minor version: 0
+  major version: 55
+  flags: ACC_PUBLIC, ACC_INTERFACE, ACC_ABSTRACT
+Constant pool:
+   #1 = Class              #2             // com/tree/sample/func/IFuncInterfaceSample
+   #2 = Utf8               com/tree/sample/func/IFuncInterfaceSample
+   #3 = Class              #4             // java/lang/Object
+   #4 = Utf8               java/lang/Object
+   #5 = Utf8               func1
+   #6 = Utf8               ()V
+   #7 = Utf8               SourceFile
+   #8 = Utf8               IFuncInterfaceSample.java
+   #9 = Utf8               RuntimeVisibleAnnotations
+  #10 = Utf8               Ljava/lang/FunctionalInterface;
+{
+  public abstract void func1();
+    descriptor: ()V
+    flags: ACC_PUBLIC, ACC_ABSTRACT
 }
+SourceFile: "IFuncInterfaceSample.java"
+RuntimeVisibleAnnotations:
+  0: #10()
 
 ```
-我们会发现编译器报错了，这是因为在设计FunctionInterface的时候还增加了额外的约束，这些约束无法在注解的定义中呈现，是通过编译器实现的，下面指北君就一一为小伙伴们道来。
+接口的编译信息中没有任何额外的工作，如果显示声明了FunctionInterface注解，则编译信息中带有，反之则无。
 
-首先、FunctionInterface是SAM接口，什么是SAM接口呢？全称Single Abstract Method，从英文字义我们就能明白，接口中只能有一个抽象方法。由于Java在接口中增加了对默认方法和静态方法的支持，因此采用SAM设计的接口也可以定义默认方法和静态方法，也就是说我们在使用了FunctionInterface注解的接口中还能够定义默认方法和静态方法。
-除了默认方法和静态方法外，这里还有一种列外，我们查看java.util.Comparator源码
+那我们着重来看应用部分的代码编译的情况，先看应用部分的源代码：
 ```java
-@FunctionalInterface
-public interface Comparator<T> {
-    int compare(T o1, T o2);
-    boolean equals(Object obj);
-    ...
-```
-咦，这怎么回事，不是说只能有一个抽象方法么？小伙伴们仔细观察接口会发现其中一个是equals接口，这不是Object中的方法么？是的，这就是另一条特殊的约束，如果抽象方法是覆盖的是Object的方法，则不计入抽象方法的个数。
-
-除了抽象方法的个数限制外FunctionInterface只能用于interface，不能用于class和enum，对于这种情形编译器也会报错。
-
-小伙伴们有没想过FunctionInterface为什么要有上面提到的约束呢？相信有些已经隐隐感觉到了:Java是通过类来实现函数式编程的（这部分内容将在原理篇中说明）。
-
-最后，还有一个重点知识：是不是只有使用了@FunctionalInterface才能作为函数式接口呢？相信有不少伙伴和指北君之前一样理所当然地觉得显然应该是这样嘛。但是，JDK的世界很精妙：只要符合函数式接口约束条件的接口，即使没有采用@FunctionalInterface，编译器都会处理成函数式接口，比如下面的示例代码：
-```java
-public interface IFuncInterfaceWithoutAn {
-  boolean test(int i);
-}
-
-public class Demo {
-  public static void main(String args[]) {
-    IFuncInterfaceWithoutAn whithout = (x)->x%2==1;
-    System.out.println(whithout.test(3));
-  }
-}
-```
-
-## java.util.function
-
-之前的学习，指北君介绍了什么是函数式编程，如果写一段Lambda表达式，以及学习如何申明函数式接口。本节我们将学习JDK为我们提供的基础函数式接口，这些接口位于java.util.function包中，它们可以满足我们很多通用场景的使用需要。
-
-![function包](/assets/images/2021/simsky/jdk_src_func_if_4.png)
-
-打开java.util.function包，我们发现里面足足有43个接口，这43个接口就是JDK提供给我们43把剑，如果要让小伙伴舞动这43把剑，是不是感觉鸭梨山大了呢？小伙伴们，别慌！在你看完指北君后面的分析后，你就可以将这43把剑化为无形，做到手中无剑心中有剑。
-
-指北君先带领小伙伴们对接口名称进行分析。是的，是接口名称，不是源码
-
-![接口名称解析](/assets/images/2021/simsky/jdk_src_func_if_2.png)
-
-从思维导图中可以看到，接口的主体为最后的单词，包含：Consumer，Function，Predicate，Supplier，Operator。
-
-![接口主体类别](/assets/images/2021/simsky/jdk_src_func_if_3.png)
-
-除了主体外，小伙伴是不是还看到了Unary，Binary，Bi这种表示参数个数的修饰词。
-
-修饰词|作用
--|-
-Unary|一元
-Binary|二元
-Bi|Binary缩写
-
-再就剩下参数类型和方向的修饰词和参数方向Int，Long，Double，Obj，(X)To(Y)。
-
-通过以上解析，我们可以确定所有的接口都是用于描述函数的输入参数和返回，这就是java.util.function留在我们心中终极大剑。有了这把终极武器，我们可以对于这43把剑信手拈来，也随意创造自己的武器，当然，要创造新的武器，按照这43把剑依葫芦画瓢是可以，但是要打造精品武器还需要掌握我们接下来介绍的FunctionInterface接口了。
-
-在对整个java.util.function包了然于胸后，我们再打开一个典型的接口看看源码。function包中的类型都为接口类型，并且使用了@FunctionInterface注解，且每个接口都且只有一个接口（抽象）方法，部分接口存在默认方法和静态方法。
-
-```java
-@FunctionalInterface
-public interface Consumer<T> {
-
+public class LambdaBinaryCode {
+    private int lambdaVar = 100;
+    
+    public static void main(String[] args) {
+        
+        LambdaBinaryCode ins = new LambdaBinaryCode();
+        ins.invokeLambda();
+        ins.invokeEta();
+        ins.invokeLambda2();
+    }
+    
     /**
-     * Performs this operation on the given argument.
-     *
-     * @param t the input argument
+     * 简单的函数式编程示例
      */
-    void accept(T t);
-
+    public void invokeLambda() {
+        // 准备测试数据
+        Integer[] data = new Integer[] {1, 2, 3};
+        List<Integer> list = Arrays.asList(data);
+        
+        // 简单示例：打印List数据
+        list.forEach(x -> System.out.println(String.format("Cents into Yuan: %.2f", x/100.0)));
+    }
+    
     /**
-     * Returns a composed {@code Consumer} that performs, in sequence, this
-     * operation followed by the {@code after} operation. If performing either
-     * operation throws an exception, it is relayed to the caller of the
-     * composed operation.  If performing this operation throws an exception,
-     * the {@code after} operation will not be performed.
-     *
-     * @param after the operation to perform after this operation
-     * @return a composed {@code Consumer} that performs in sequence this
-     * operation followed by the {@code after} operation
-     * @throws NullPointerException if {@code after} is null
+     * 简单的函数式编程示例
      */
-    default Consumer<T> andThen(Consumer<? super T> after) {
-        Objects.requireNonNull(after);
-        return (T t) -> { accept(t); after.accept(t); };
+    public void invokeEta() {
+        // 准备测试数据
+        Integer[] data = new Integer[] {1, 2, 3};
+        List<Integer> list = Arrays.asList(data);
+        
+        // 通过eta操作符访问
+        list.forEach(System.out::println);
+    }
+    
+    /**
+     * 简单的函数式编程示例
+     */
+    public void invokeLambda2() {
+        // 准备测试数据
+        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+        int count = 10;
+        Random r = new Random();
+        while(count-->0) {
+            map.put(r.nextInt(100), r.nextInt(10000));
+        }
+        
+        // Lambda调用示例
+        map.forEach((x, y) -> {
+            System.out.println(String.format("Map key: %1s, value: %2s", x, y+lambdaVar));
+        });
     }
 }
 ```
-accept为核心接口方法，andThen为方便复杂组合场景提供的默认方法。function包的整个代码逻辑都很简洁易懂，部分Operator继承了Function，指北君就不一一赘述了。
+这段源码中选取了几种典型的场景进行组合，让大家了解更多的扩展知识，因此代码稍显长。
++ invokeLambda() 单个参数的lambda表达式，省略参数括号和表达式主体的花括号。
++ invokeEta() eta方式的方法引用。
++ invokeLambda2() 两个参数的lambda表达式，lambda中使用成员变量。
+
+### lambda表达式的编译
+指北君和大家一起看看编译后的内容，使用命令查看编译后的方法结构(javap -p com.tree.sample.func.LambdaBinaryCode）
+```sh
+Compiled from "LambdaBinaryCode.java"
+public class com.tree.sample.func.LambdaBinaryCode {
+  private int lambdaVar;
+  public com.tree.sample.func.LambdaBinaryCode();
+  public static void main(java.lang.String[]);
+  public void invokeLambda();
+  public void invokeEta();
+  public void invokeLambda2();
+  private static void lambda$0(java.lang.Integer);
+  private void lambda$2(java.lang.Integer, java.lang.Integer);
+}
+```
+小伙伴有没发现，class文件中比源码文件中多出了两个方法：lambda$0，lambda$2。这两个方法分别对应invokeLambda和invokeLambda2中的的lambda表达式。
+
+我们在javap命令中增加-v参数，可以查看到增加的lambda$0方法的更多细节，不熟悉JVM指令的小伙伴也不用担心，我们只是验证lambda$0就是invokeLambda中lambda表达式对应“x -> System.out.println(String.format("Cents into Yuan: %.2f", x/100.0))”。
+
+```sh
+  private static void lambda$0(java.lang.Integer);
+    descriptor: (Ljava/lang/Integer;)V
+    flags: ACC_PRIVATE, ACC_STATIC, ACC_SYNTHETIC
+    Code:
+      stack=9, locals=1, args_size=1
+         0: getstatic     #61                 // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: ldc           #105                // String Cents into Yuan: %.2f
+         5: iconst_1
+         6: anewarray     #3                  // class java/lang/Object
+         9: dup
+        10: iconst_0
+        11: aload_0
+        12: invokevirtual #107                // Method java/lang/Integer.intValue:()I
+        15: i2d
+        16: ldc2_w        #111                // double 100.0d
+        19: ddiv
+        20: invokestatic  #113                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+        23: aastore
+        24: invokestatic  #118                // Method java/lang/String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+        27: invokevirtual #124                // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        30: return
+      LineNumberTable:
+        line 30: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      31     0     x   Ljava/lang/Integer;
+```
+从编译信息中我们可以看到几条明显相同的逻辑：
++ LocalVariableTable 首先包含了函数的输入参数，并且一致
++ 24行执行String.format方法
++ 27行执行PrintStream.println方法
+从上面三个关键部分我们可以确定就是invokeLambda方法中的lambda表达式编译后的内容了。
+
+仔细的小伙伴比较lambda$0，lambda$2两个方法后，可能会发现两个问题：第一，两个方法怎么一个是static一个是非static的呢？。第二，方法命名中的数字为什么不是数字连续的？
+对于第一个问题，比较invokeLambda和invokeLambda2的源码，小伙伴发现有什么不同么？是否可以看到invokeLambda2中的lambda表达式引用了成员属性lambdaVar。这就是lambda生成方法的一种逻辑，**未使用成员变量的lambda表达式编译成静态方法，使用了成员变量的lambda语句则编译为成员方法**。
+
+第二个问题我们将留待后面回答。
+
+## Lambda调用
+上面我们看到了lambda表达式的代码编译成了一个独立方法，指北君继续带领大家查看编译后的文件，我们要了解编译后lambda方法是如何调用执行的。
+查看invokeLambda方法的编译后的内容（直贴出了关键部分）：
+
+```sh
+  public void invokeLambda();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=4, locals=4, args_size=1
+        ... ...
+        32: istore_3
+        33: aload_2
+        34: invokedynamic #45,  0             // InvokeDynamic #0:accept:()Ljava/util/function/Consumer;
+        39: invokeinterface #49,  2           // InterfaceMethod java/util/List.forEach:(Ljava/util/function/Consumer;)
+        ... ...
+```
+在invokeLambda中有一个指令invokedynamic，熟悉动态语言的小伙伴可能知道，这个指令是Java7为支持动态脚本语言而增加的。而函数式Java调用函数接口也正是通过invokedynamic指令来实现的。invokeLambda的详细内容指北君后续单独为大家讲解，今天我们关注函数接口的调用过程。
+
+使用invokeLambda指令，那么该指令是直接调用的lambda$0方法么？我们知道list.forEach(xx)调用中，我们是将函数接口作为参数传递到其他类的函数中进行执行的。Java需要解决两个问题：1）如何将方法传递给被调用的外部类的方法，2）外部的内和方法如何访问我们内部私有的方法。
+
+## 引导方法表
+为解决上面两个问题，我们继续查编译后的文件，在末尾，我们看到下面的部分：
+
+```sh
+BootstrapMethods:
+  0: #146 invokestatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #148 (Ljava/lang/Object;)V
+      #151 invokestatic com/tree/sample/func/LambdaBinaryCode.lambda$0:(Ljava/lang/Integer;)V
+      #152 (Ljava/lang/Integer;)V
+  1: #146 invokestatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #153 (Ljava/lang/Object;)V
+      #156 invokevirtual java/io/PrintStream.println:(Ljava/lang/Object;)V
+      #157 (Ljava/lang/Integer;)V
+  2: #146 invokestatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #159 (Ljava/lang/Object;Ljava/lang/Object;)V
+      #162 invokespecial com/tree/sample/func/LambdaBinaryCode.lambda$2:(Ljava/lang/Integer;Ljava/lang/Integer;)V
+      #163 (Ljava/lang/Integer;Ljava/lang/Integer;)V
+InnerClasses:
+     public static final #169= #165 of #167; //Lookup=class java/lang/invoke/MethodHandles$Lookup of class java/lang/invoke/MethodHandles
+```
+
+这生成了三个引导方法，刚好和我们的三个函数接口调用一致，从引导方法的参数我们看出
+
+序号|调用|调用类型
+-|-|-
+0|lambda$0|static
+1|PrintStream.println|vertual
+2|lambda$2|special
+
+顺便回答一下之前的方法名称的数字序号不连续问题，我们看出，方法名称的序号是根据引导方法的序号来确定的，不是根据生成的lambda表达式方法序号来的。
+我们看到，引导方法的逻辑似乎就是调用lambda方法或者其他的函数接口，每个引导方法中都出现了LambdaMetafactory.metafactory方法
+
+## 动态调用
+现在，我们结合invokedynamic指令来说明BootstrapMethods执行的过程
+
+![动态调用逻辑](/assets/images/2021/simsky/jdk_src_func_mech_1.png)
+
+上面的的流程显示了动态调用的基本逻辑
+1. 执行invokedynamic
+2. 检查调用点是否已连接可用
+---
+3. 如果未连接，构建动态调用点
+4. 执行引导方法
+5. 生成并加载调用点对应的动态内部类
+6. 连接
+---
+7. 调用动态内部类方法
+8. 内部类调用lambda对应的方法并执行
+
+这两个阶段我们通过调用堆栈也能明显观察到：
+
+![引导阶段](/assets/images/2021/simsky/jdk_src_func_mech_2.png)
+
+![执行阶段](/assets/images/2021/simsky/jdk_src_func_mech_3.png)
+
+我们还可以通过设置VM参数-Djdk.internal.lambda.dumpProxyClasses，查看以引导阶段动态生成的内部类：
+
+![动态内部类列表](/assets/images/2021/simsky/jdk_src_func_mech_4.png)
+
+打开其中一个如下：
+
+![动态内部类详情](/assets/images/2021/simsky/jdk_src_func_mech_5.png)
 
 
 ## 小结
-至此，指北君将函数式接口的应用知识点已经介绍和分析完，涵盖知识点包含：java.util.function包，FunctionInterface注解，Lambda表达式，双冒号操作符等知识点。函数式接口在集合，流中应用较为广泛，也证明了其在数据时候的显著优势，各位小伙伴可以结合这些JDK中的源码进行巩固加深。本篇为函数式接口的应用篇，在下一篇，指北君将从编译、JVM层面深入介绍Java中函数式编程实现原理。
+动态函数接口的调用原理，指北君就给大家介绍到这里了，相信大家看完本篇内容后，对函数式接口有了更深一层的学习。
+由于涉及的内容较多，没有时间给大家逐一详细的给每个涉及到的类进行解读。后续指北君会根据小伙伴们需要对今天提及的知识点做深入的阶段，比如invokeddynamic指令，class结构，动态调用相关的各部分代码逻辑。
 
 
