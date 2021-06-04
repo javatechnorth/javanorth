@@ -268,3 +268,5 @@ public class ResourceBanner implements Banner {
 本文主要讲述了Banner的输出打印过程，如何打印个性化的文本 Banner。ImageBanner 没在本文详细说明，有兴趣的朋友可以查看阅读源码，也比较简单，也有助于你了解 Java 如何实现图片转文本的知识点。通过本文的知识点，你也可以根据自己的要求来实现 Banner， 设置为 fallbackBanner, 从而达到完全个性化的自定义 Banner 的效果。
 
 有任何问题可以在公众号后台留言，指北君会第一时间回复大家。欢迎关注公众号【Java技术指北】，第一时间获取更多精彩内容。
+
+[EOF]
