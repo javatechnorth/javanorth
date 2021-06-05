@@ -25,7 +25,7 @@ tags:
 
 #### 1.1 介绍
 
-首先我们看看Lock接口是如何解决死锁问题的，首先我们需要知道死锁是如何产生的，死锁的产生需要满足下面四个条件：
+在我们分析Lock接口是如何解决死锁问题之前，我们先看看死锁是如何产生的。死锁的产生需要满足下面四个条件：
 
 1. **互斥**：共享资源同一时间只能被一个线程占用
 2. **不可抢占**：其他线程不能强行占有另一个线程的资源
@@ -34,7 +34,7 @@ tags:
 
 所以，我们只需要破坏上面条件中的任意一个，即可打破死锁。但需要注意的是，互斥条件是不能破坏的，因为使用锁的目的就是为了互斥。所以Lock接口通过破坏掉 "不可抢占"这个条件来解决死锁，具体如下：
 
-1. **非阻塞获取锁**：尝试获取锁，如果失败了就立刻返回失败，这样就可以释放已经持有的锁
+1. **非阻塞获取锁**：尝试获取锁，如果失败了就立刻返回失败，这样就可以释放已经持有的其他锁
 
 2. **响应中断**：如果发生死锁后，此线程被其他线程中断，则会释放锁，解除死锁
 
@@ -49,20 +49,20 @@ tags:
 ```java
 	
 public interface Lock {
-		/**
-		  阻塞获取锁，不响应中断，如果获取不到，则当前线程将进入休眠状态，直到获得锁为止。
-		 */
+    /**
+        阻塞获取锁，不响应中断，如果获取不到，则当前线程将进入休眠状态，直到获得锁为止。
+    */
     void lock();
 
-  	/**
-		  阻塞获取锁，响应中断，如果出现以下两种情况将抛出异常
-		  1.调用该方法时，此线程中断标志位被设置为true
-		  2.获取锁的过程中此线程被中断，并且获取锁的实现会响应中断
-		 */
+    /**
+        阻塞获取锁，响应中断，如果出现以下两种情况将抛出异常
+        1.调用该方法时，此线程中断标志位被设置为true
+        2.获取锁的过程中此线程被中断，并且获取锁的实现会响应中断
+    */
     void lockInterruptibly() throws InterruptedException;
   
     /**
-      非阻塞获取锁，不管成功还是失败，都会立刻返回结果，成功了返回true,失败了返回false
+        非阻塞获取锁，不管成功还是失败，都会立刻返回结果，成功了返回true,失败了返回false
      */
     boolean tryLock();
  
@@ -77,14 +77,14 @@ public interface Lock {
     boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
    
     /**
-      没啥好说，只有拥有锁的线程才能释放锁
+        没啥好说，只有拥有锁的线程才能释放锁
      */
     void unlock();
 
     /**
-      返回绑定到此Lock实例的新Condition实例。
-      在等待该条件之前，该锁必须由当前线程持有。调用Condition.await（）会在等待之前自动释放锁，并在等待返回之前重新获取该锁。
-      我们再下一小节再详细说说Condition接口
+        返回绑定到此Lock实例的新Condition实例。
+        在等待该条件之前，该锁必须由当前线程持有。调用Condition.await（）会在等待之前自动释放锁，并在等待返回之前重新获取该锁。
+        我们再下一小节再详细说说Condition接口
      */
     Condition newCondition();
 }
@@ -100,7 +100,7 @@ public interface Lock {
 	 Lock l = ...;
 	 l.lock();
  	 try {
-   // access the resource protected by this lock
+             // access the resource protected by this lock
 	 } finally {
   	 l.unlock();
 	 }
@@ -116,11 +116,11 @@ public interface Lock {
 
  <br/>
 
-### 二. Condition
+### 二. Condition接口
 
 #### 2.1 介绍
 
-针对synchronized最多使用一个条件变量的问题，Condition接口提供了解决方案。但是为什么多个条件变量就比一个条件变量好呢？我们先来看看synchronized使用一个条件变量时会有什么弊端。
+针对synchronized最多只能使用一个条件变量的问题，Condition接口提供了解决方案。但是为什么多个条件变量就比一个条件变量好呢？我们先来看看synchronized使用一个条件变量时会有什么弊端。
 
 一个synchronized内置锁只对应一个等待容器（wait set），当线程调用wait方法时，会把当前线程放入到同一个等待容器中，当我们需要根据某些特定的条件来唤醒符合条件的线程时，我们只能先从等待容器里唤醒一个线程后，再看是否符合条件。如果不符合条件，则需要将此线程继续wait，然后再去等待容器中获取下一个线程再判断是否满足条件。这样会导致许多无意义的cpu开销。
 
@@ -140,49 +140,49 @@ Condition newCondition();
 public interface Condition {
 
     /**
-			使当前线程等待，并响应中断。当当前线程进入休眠状态后，如果发生以下四种情况将会被唤醒：
-			1.其他一些线程对此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
-			2.其他一些线程对此条件调用signalAll方法
-			3.其他一些线程中断当前线程，并支持中断线程挂起
-			4.发生“虚假唤醒”。
+	使当前线程等待，并响应中断。当当前线程进入休眠状态后，如果发生以下四种情况将会被唤醒：
+	1.其他一些线程对此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
+	2.其他一些线程对此条件调用signalAll方法
+	3.其他一些线程中断当前线程，并支持中断线程挂起
+	4.发生“虚假唤醒”。
      */
     void await() throws InterruptedException;
 
     /**
-			使当前线程等待，并不响应中断。只有以下三种情况才会被唤醒
-			1.其他一些线程对此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
-			2.其他一些线程对此条件调用signalAll方法
-			3.发生“虚假唤醒”。
+	使当前线程等待，并不响应中断。只有以下三种情况才会被唤醒
+	1.其他一些线程对此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
+	2.其他一些线程对此条件调用signalAll方法
+	3.发生“虚假唤醒”。
      */
     void awaitUninterruptibly();
 
     /**
-      使当前线程等待，响应中断，且可以指定超时事件。发生以下五种情况之一将会被唤醒：
-      1.其他一些线程为此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
-      2.其他一些线程为此条件调用signalAll方法；
-      3.其他一些线程中断当前线程，并且支持中断线程挂起；
-      4.经过指定的等待时间；
-      5.发生“虚假唤醒”。
+        使当前线程等待，响应中断，且可以指定超时事件。发生以下五种情况之一将会被唤醒：
+        1.其他一些线程为此条件调用signal方法，而当前线程恰好被选择为要唤醒的线程；
+        2.其他一些线程为此条件调用signalAll方法；
+        3.其他一些线程中断当前线程，并且支持中断线程挂起；
+        4.经过指定的等待时间；
+        5.发生“虚假唤醒”。
      */
     long awaitNanos(long nanosTimeout) throws InterruptedException;
 
     /**
-			与awaitNanos类似，时间单位不同
+	与awaitNanos类似，时间单位不同
      */
     boolean await(long time, TimeUnit unit) throws InterruptedException;
 
     /**
-			与awaitNanos类似，只不过超时时间是截止时间
+	与awaitNanos类似，只不过超时时间是截止时间
      */
     boolean awaitUntil(Date deadline) throws InterruptedException;
 
     /**
-			唤醒一个等待线程
+	唤醒一个等待线程
      */
     void signal();
 
     /**
-			唤醒所有等待线程
+	唤醒所有等待线程
      */
     void signalAll();
 }
@@ -191,14 +191,14 @@ public interface Condition {
 
 
 
-需要注意的是，Object类的等待方法是没有返回值的，但Condtition类中的部分等待方法是有返回值的。awaitNanos(long nanosTimeout)返回了剩余等待的时间；await(long time, TimeUnit unit)返回boolean值，如果返回false，则说明是因为超时返回的, 否则返回true。为什么增加返回值？为了就是帮助我们弄清楚方法返回的原因。
+需要注意的是，Object类的等待方法是没有返回值的，但Condtition类中的部分等待方法是有返回值的。awaitNanos(long nanosTimeout)返回了剩余等待的时间；await(long time, TimeUnit unit)返回boolean值，如果返回false，则说明是因为超时返回的，否则返回true。为什么增加返回值？为了就是帮助我们弄清楚方法返回的原因。
 
  <br/>
 
 ### 三. 总结
 
-Lock与Condition就说完了，最后指北君再总结一下：
+Lock与Condition接口就说完了，最后指北君再总结一下：
 
-针对synchronized内置锁无法解决死锁、只有一个条件变量等问题，Doug Lea在Java并发包中增加了Lock和Condition接口来解决。对于死锁问题，Lock接口增加了超时、响应中断、非阻塞三种方式来获取锁，从而避免死锁。针对一个条件变量问题，Condtition接口通过一把锁可以创建多个条件变量的方式来解决。
+针对synchronized内置锁无法解决死锁、只有一个条件变量等问题，Doug Lea在Java并发包中增加了Lock和Condition接口来解决。对于死锁问题，Lock接口增加了超时、响应中断、非阻塞三种方式来获取锁，从而避免了死锁。针对一个条件变量问题，Condtition接口通过一把锁可以创建多个条件变量的方式来解决。
 
 今天就到这了，我是指北君，我们下篇文章见~
