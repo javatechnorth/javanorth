@@ -213,7 +213,7 @@ font:
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
-  GitHub: https://github.com/justdojava
+  GitHub: https://github.com/javatechnorth
   知乎: https://zhuanlan.zhihu.com/ityouknow
 
 
@@ -286,13 +286,6 @@ links_title: Links
 #links_layout: inline
 links:
   纯洁的微笑: http://ityouknow.com
-  沉默王二: http://www.itwanger.com
-  子悠: http://home.zxsilence.cn/
-  江南一点雨: http://www.javaboy.org
-  炸鸡可乐: http://pzblog.cn
-  郑璐璐: https://www.dynamic-zheng.com
-  程序通事: https://studyidea.cn
-  懿: http://chuyikeji.cn/
 
 
 # ---------------------------------------------------------------
@@ -443,8 +436,8 @@ changyan:
 # Support for gitalk comments system.
 gitalk:
   enable: true
-  clientID: a8a9e806ae8898126795
-  clientSecret: f64f78aac63236a7a9cd25a16de2c3d91613914a
+  clientID: 91f372f43c98f1c2a729
+  clientSecret: eacf0e50dbfd8d6220296f295f988e55062dfcdf 
   repo: blog-comments
   owner: ityouknow
   admin: ityouknow
@@ -476,7 +469,7 @@ google_analytics: U
 #yandex_site_verification:
 
 # CNZZ count
-cnzz_siteid: 1276814721
+cnzz_siteid: 1279980447
 
 # Application Insights
 # See https://azure.microsoft.com/en-us/services/application-insights/
