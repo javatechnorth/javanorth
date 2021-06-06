@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Lock与Condition接口
+title:  了解这两个接口后，阿里多线程面试题秒AC
 tagline: by 24只羊
 categories: JDK JUC 源码解读
 tags: 
@@ -10,6 +10,10 @@ tags:
 
 大家好，我是指北君
 
+我们知道，阿里面试时是非常喜欢考Java多线程编程题，如果你AC不了，那可能会给面试官留下一个基础不扎实的印象，当年指北君面阿里时就因为秒AC了一道多线程面试题，让面试官刮目相看，所以我们需要重视Java多线程编程。一般在解决多线程编程题时，我们都离不开JUC并发包下的各种工具类，特别是ReentrantLock锁，它能提供互斥与线程同步的能力，那它是如何获得这个能力的呢？今天指北君就来详细说说给它提供强大能力的两大接口。（PS：文末有当年指北君面试阿里的多线程编程原题以及答案喔）
+
+<!--more-->
+
 我们知道，并发领域中有两大核心问题：互斥与同步问题，Java在1.5版本之前，是提供了synchronized来实现的。synchronized是内置锁，虽然在大部分情况下它都能很好的工作，但是依然还是会存在一些局限性，除了当时1.5版本的性能问题外（1.6版本后，synchronized的性能已经得到了很大的优化），还有如下两个问题：
 
 1. 无法解决死锁问题
@@ -17,7 +21,7 @@ tags:
 
 所以针对这些问题，Doug Lea在并发包中增加了两个接口Lock和Condition来解决这两个问题，所以指北君今天就说说这两个接口是如何解决synchronized中的这两个问题的。
 
-<!--more-->
+
  
  <br/>
 
@@ -194,11 +198,124 @@ public interface Condition {
 需要注意的是，Object类的等待方法是没有返回值的，但Condtition类中的部分等待方法是有返回值的。awaitNanos(long nanosTimeout)返回了剩余等待的时间；await(long time, TimeUnit unit)返回boolean值，如果返回false，则说明是因为超时返回的，否则返回true。为什么增加返回值？为了就是帮助我们弄清楚方法返回的原因。
 
  <br/>
+ 
+ 
 
-### 三. 总结
+### 四. 阿里多线程考题
+
+最后我们通过实现了Lock和Condition接口能力的ReentrantLock类来解决阿里多线程面试题的。
+
+题目是使用三个线程循环打印ABC，一共打印50次。我们直接上答案：
+
+```java
+public class Test {
+
+
+    int count = 0;
+    Lock lock = new ReentrantLock();
+    Condition conditionA = lock.newCondition();
+    Condition conditionB = lock.newCondition();
+    Condition conditionC = lock.newCondition();
+
+    public void printA() {
+        while (count < 50) {
+            try {
+                // 加锁
+                lock.lock();
+                // 打印A
+                System.out.println("A");
+                count ++;
+                // 唤醒打印B的线程
+                conditionB.signal();
+                // 将自己放入ConditionA的容器中，等待其他线程的唤醒
+                conditionA.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                // 释放锁
+                lock.unlock();
+            }
+        }
+
+
+    }
+
+    public void printB() {
+        while (count < 50) {
+            try {
+                // 加锁
+                lock.lock();
+                // 打印B
+                System.out.println("B");
+                count ++;
+                // 唤醒打印C的线程
+                conditionC.signal();
+                // 将自己放入ConditionB的容器中，等待其他线程的唤醒
+                conditionB.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                // 释放锁
+                lock.unlock();
+            }
+        }
+    }
+
+
+    public void printC() {
+        while (count < 50) {
+            try {
+                // 加锁
+                lock.lock();
+                // 打印B
+                System.out.println("C");
+                count ++;
+                // 唤醒打印A的线程
+                conditionA.signal();
+                // 将自己放入ConditionC的容器中，等待其他线程的唤醒
+                conditionC.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        // 建立打印ABC的三个线程
+        Thread theadA = new Thread(() -> {
+            test.printA();
+        });
+        Thread theadB = new Thread(() -> {
+            test.printB();
+        });
+        Thread theadC = new Thread(() -> {
+            test.printC();
+        });
+				
+        // 启动线程
+        theadA.start();
+        theadB.start();
+        theadC.start();
+
+    }
+}
+```
+
+
+
+
+
+ <br/>
+
+
+
+### 五. 总结
 
 Lock与Condition接口就说完了，最后指北君再总结一下：
 
-针对synchronized内置锁无法解决死锁、只有一个条件变量等问题，Doug Lea在Java并发包中增加了Lock和Condition接口来解决。对于死锁问题，Lock接口增加了超时、响应中断、非阻塞三种方式来获取锁，从而避免了死锁。针对一个条件变量问题，Condtition接口通过一把锁可以创建多个条件变量的方式来解决。
+针对synchronized内置锁无法解决死锁、只有一个条件变量等问题，Doug Lea在Java并发包中增加了Lock和Condition接口来解决。对于死锁问题，Lock接口增加了超时、响应中断、非阻塞三种方式来获取锁，从而避免了死锁。针对一个条件变量问题，Condtition接口通过一把锁可以创建多个条件变量的方式来解决。最后我们通过一个阿里面试题来说明了Lock和Condition接口所提供的能力。
 
 今天就到这了，我是指北君，我们下篇文章见~
