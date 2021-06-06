@@ -128,7 +128,7 @@ public interface Lock {
 
 一个synchronized内置锁只对应一个等待容器（wait set），当线程调用wait方法时，会把当前线程放入到同一个等待容器中，当我们需要根据某些特定的条件来唤醒符合条件的线程时，我们只能先从等待容器里唤醒一个线程后，再看是否符合条件。如果不符合条件，则需要将此线程继续wait，然后再去等待容器中获取下一个线程再判断是否满足条件。这样会导致许多无意义的cpu开销。
 
-我们可以看到Lock接口中有个newCondition()的方法
+我们可以看到Lock接口中有个newCondition()的方法:
 
 ```java
 Condition newCondition();
@@ -203,7 +203,7 @@ public interface Condition {
 
 ### 四. 阿里多线程考题
 
-最后我们通过实现了Lock和Condition接口能力的ReentrantLock类来解决阿里多线程面试题的。
+最后我们通过实现了Lock和Condition接口能力的ReentrantLock类来解决阿里多线程面试题。
 
 题目是使用三个线程循环打印ABC，一共打印50次。我们直接上答案：
 
