@@ -24,6 +24,7 @@ Zookeeper作为一个开源的分布式应用协调系统，简称 ZK。已经�
 如果你对 Zookeeper是什么,能做什么,以及 Paxos 算法和底层使用的 Zab 协议还不了解的话，那么建议先看下这两篇文章，先懂原理再看源码才是正确的路线。
 
 [Zookeeper基础Paxos算法详解](http://www.javanorth.cn/2021/05/30/Zookeeper-Paxos/)
+
 [Zookeeper实现Zab协议详解](http://www.javanorth.cn/2021/05/30/Zookeeper-Zab/)
 
 接下来本文就开始真正走进Zookeeper底层源码的学习。俗话说授人以鱼不如授人以渔，今天我们就来分析下Zookeeper非常重要的一个环节：**Leader选举**。
