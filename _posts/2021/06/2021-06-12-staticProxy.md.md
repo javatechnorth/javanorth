@@ -53,7 +53,6 @@ public interface IBagShop {
 }
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 接着定义一个包包商店的实现类，这个包包商店类实现了包包商店接口，因此提供了真实的买包服务：
 
@@ -66,7 +65,6 @@ public class BagShop implements IBagShop {
 }
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 最后定义我们的代购小哥，也要实现包包商店接口（毕竟也是需要提供买包服务给妹子的），且需要引用包包商店类，**因为他最终还是需要自己去到包包商店买包包：**
 
@@ -87,7 +85,6 @@ public class PurchasingAgent implements IBagShop {
 }
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 
 
@@ -109,7 +106,6 @@ public class Girl {
 }
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 ![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/staticProxyResult1.png)
 
@@ -156,7 +152,6 @@ public class PurchasingAgent implements IBagShop {
 }
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 再次启动“妹子”类测试，测试结果为：
 
