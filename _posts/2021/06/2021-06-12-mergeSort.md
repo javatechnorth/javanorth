@@ -17,13 +17,13 @@ tags:
 <!--more-->
 
 
-<img src="/Users/yangyang/Library/Application Support/typora-user-images/image-20210612182425424.png" alt="image-20210612182425424" style="zoom:50%;" />
+![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/offer1.png)
 
 所以在面试中，越是简单的题，就越要答好，不然会给面试官留下基础不扎实的印象。好了，回归到面试题上来，排序数组这道题本身是没有规定使用什么排序算法的，但面试官指定需要使用归并排序算法来解答，肯定是有他道理的，如果指北君是面试官，大概率也会要求读者使用归并排序，为啥呢？在解答之前我们先看看有哪些排序算法。
 
 我们知道，排序算法有很多，大致有如下几种：
 
-![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/offer1.png)
+![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/sortType.png)
 
 其中归并排序应该是使用的最多的几种之一，Java中Arrays.sort()采用了一种名为TimSort的排序算法，就是归并排序的优化版本。归并排序自身的优点有二，首先是因为它的平均时间复杂度低，为O(N*logN)；其次它是稳定的排序，即相等元素的顺序不会改变；除了这两点优点之外，其蕴含的分治思想，是可以用来解决我们许多算法问题的，这也是面试官为什么要指定归并排序的原因。好了，废话不多说，我们接下来具体看看归并排序算法是如何实现的吧。
 
