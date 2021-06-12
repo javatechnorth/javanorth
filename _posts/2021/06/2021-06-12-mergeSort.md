@@ -2,7 +2,7 @@
 layout: post
 title:  阿里四面，居然栽在一道排序算法上
 tagline: by 24只羊
-categories: JDK JUC 源码解读
+categories: 算法 leetcode
 tags: 
     - 24只羊
 
@@ -11,7 +11,7 @@ tags:
 
 大家好，我是指北君。
 
-前两天有读者发消息给指北君哭诉阿里四面挂了，面试过程中该读者都表现的很不错，最后面试官可能看到该读者前面表现和面评不错，决定出个简单题放放水，于是让读者用归并排序算法完成"[912. 排序数组](https://leetcode-cn.com/problems/sort-an-array/)"这道题，该读者最终写出来了，但因为细节问题运行case始终过不了，最终收到感谢信。
+前两天有童鞋发消息给指北君哭诉阿里四面挂了，据了解，面试过程中该童鞋表现得很不错，所以最后面试官出了道简单题"[912. 排序数组](https://leetcode-cn.com/problems/sort-an-array/)"放放水，但指定使用归并排序算法，但该读者因为细节问题运行case始终过不了，最终收到感谢信。
 
 <!--more-->
 
