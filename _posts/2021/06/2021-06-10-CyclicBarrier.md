@@ -13,7 +13,7 @@ tags:
 
 ![](http://www.javanorth.cn/assets/images/2021/CyclicBarrier/0.png)
 
-指北君就让小 B 用 CyclicBarrier 。CyclicBarrier 是一个循环的栅栏，在多个线程完成各自的任务之后后，主线程才可以开始执行任务。小 B 的情况就适用于多个线程并行查询数据库，然后写入 excel 的各个 sheet 页，在所有操作完成之后执行汇总数据的算法并将结果写入汇总的 sheet 页。
+指北君就让小 B 用 CyclicBarrier 。CyclicBarrier 是一个循环的栅栏，在多个线程完成各自的任务之后，主线程才可以开始执行任务。小 B 的情况就适用于多个线程并行查询数据库，然后写入 excel 的各个 sheet 页，在所有操作完成之后执行汇总数据的算法并将结果写入汇总的 sheet 页。
 <!--more-->
 
 下面用一个小 demo，对 CyclicBarrier 有一个初步的印象。
@@ -70,7 +70,7 @@ public class Test implements Runnable{
 
 #### 内部类
 
-CyclicBarrier 的一个内部类，Generation 被翻译成为“代”。当一代的所有线程都到达栅栏后可以开启下一代，所以才被成为循环栅栏。broken 属性表示栅栏是否被打破了。
+CyclicBarrier 的一个内部类，Generation 被翻译成为“代”。当这一代的所有线程都到达栅栏后可以开启下一代，所以才被成为循环栅栏。broken 属性表示栅栏是否被打破了。
 
 ```java
 private static class Generation {
@@ -241,7 +241,7 @@ CyclicBarrier 为什么会一代结束后可以开始下一代，就靠这个 ne
 
 ### 总结
 
-CyclicBarrier 使用了两个队列，一个条件队列，一个 AQS 队列，在 trip.await() 出进入条件队列。当最后一个线程到达栅栏出的时候，条件队列中的线程全部移动到 AQS　队列中要注意的是最后一个线程并没有进入 AQS 队列中。在 lock.unlock() 的时候 AQS 队列中的线程出队。
+CyclicBarrier 使用了两个队列，一个条件队列，一个 AQS 队列，在 trip.await() 出进入条件队列。当最后一个线程到达栅栏出的时候，条件队列中的线程全部移动到 AQS　队列中，要注意的是最后一个线程并没有进入 AQS 队列中。在 lock.unlock() 的时候 AQS 队列中的线程出队。
 
 CyclicBarrier 基于 ReentrantLock 和 Condition 实现同步线程的逻辑。
 
