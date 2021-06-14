@@ -239,7 +239,7 @@ Spring Boot 提供的故障分析器，对我们分析一些错误非常的友�
 
 本文的所有示例源代码都已上传到了 Github：
 
->https://github.com/javatechnorth/java-north-sample
+> https://github.com/javatechnorth/java-north-sample
 
 欢迎大家 Star 关注，后续会不断更新。
 

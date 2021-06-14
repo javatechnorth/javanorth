@@ -1,0 +1,132 @@
+---
+layout: post
+title:  从舔狗的新路历程看垃圾回收
+tagline: by 某某白米饭
+categories: gc
+tags: 
+    - 某某白米饭
+---
+
+大家好，我是指北君。
+
+端午了，我的朋友小 B 准备约女神看电影、划龙船，可惜等了几个小时都没有被回应。小 B 觉得女神的心就是那 Java 内存空间，他就是那个可以随时可以被清理的垃圾对象。去看看 Java 的垃圾回收可能会有一点启发，永占女神心中 C 位，加油！加油！加油！小 B 给自己打气。
+<!--more-->
+### 初始
+
+身为初级程序员的小 B 知道在 Java 里面创建的对象都会被放到 Java 堆内存中，而创建最多的对象就是在方法中被局部变量所引用的对象。就像下面代码中的 stu 对象，被 insert 到数据库后就可以成为垃圾对象了。
+
+```java
+private void insert() {
+    Stu stu = new Stu();
+    stu.setName("张三");
+    stu.setAge(20);
+    stuDao.insert(stu);
+}
+```
+
+如果不把类似 stu 的对象清空掉，Java 的内存就会被消耗一空。
+
+此时小 B 乱想到我就是那个 stu，被女神放到那个位置了？
+
+Java 堆内存被划分了两个区域，年轻代和老年代。什么是年轻代和老年代呢？年轻代就是那种创建之后很快被清空的对象， 老年代就是那种一直需要被使用的对象。
+
+![](http://www.javanorth.cn/assets/images/2021/gc/0.png)
+
+小 B 觉得要是他在女神的位置是老年代就好了，可惜他被女神放在了年轻代，随时都可能被清理。
+
+### 年轻代
+
+年轻代被分为 1 个 Eden 区和 2 个 Survivor 区，Eden 区占了 80% 的内存空间，每一个 Survivor 区各占 10% 的内存空间, Eden 区 和 Survivor 区 的比例为 8:1:1。比如 1000G 的新生代内存，800M 属于 Eden 区，两个 100M 属于 Survivor 区。
+
+![](http://www.javanorth.cn/assets/images/2021/gc/1.png)
+
+#### 复制算法
+
+小 B 想看看和他一样在 Java 中同病相怜的局部变量是用什么算法被回收的。
+
+年轻代用的算法叫复制算法，当 Eden 区满了的时候，会将对象复制到 Survivor 区，清空 Eden 区的对象。
+
+一次年轻代的 GC （Minor GC）的流程如下： 
+
+1. 新对象在生成的时候都是存放到 Eden 区，当 Eden 区放不下新对象之后，就会触发 Minor GC，它对所有的对象进行 GC Roots 追踪，标记所有被 GC Roots 直接或间接引用的对象，把这些被标记的对象复制到 S1 区，清空 Eden 区
+2. 过了一段时间后。
+3. 当 Eden 区又满了之后，再次触发 Minor GC，把 Eden 区和 S1 区 存活的对象复制到 S2 区，清空 Eden 区和 S1 区。
+4. 又过了一段时间后。
+5. 当 Eden 区满了之后，再次触发 Minor GC，把 Eden 区和 S2 区 存活的对象复制到 S1 区，清空 Eden 区和 S2 区。
+
+![](http://www.javanorth.cn/assets/images/2021/gc/2.png)
+
+什么是 GC Roots 追踪呢？
+
+GC Roots 就是从 "GC Roots" 的对象作为起始点，一路向下搜索被引用到的对象。如果这个对象没有被搜索到就表示这个对象不可到达，可以被回收。
+
+可以被称为 GC Roots 的对象有:
+1. 局部变量引用的对象。
+2. 类的静态变量引用的对象。
+3. 常量引用的对象。
+4. Native方法引用的对象。
+
+![](http://www.javanorth.cn/assets/images/2021/gc/3.png)
+
+如上图所示，Object A 、Object B、Object C 就可以被标记为存活， Object D 和 Object E 就没有被 GC Roots 追踪到，就标记为垃圾对象，但是这个垃圾对象还有一次逃脱被回收的命运。这个类重写了 Object 的 finalize() 方法，在 finalize() 中将 GC Roots 追踪链路上的对象重新建立的了引用关系。
+
+```java
+public class Test {
+
+    public static FinalizeTest FINALIZETEST = null;
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        Test.FINALIZETEST = this;
+    }
+}
+```
+finalize() 只会被调用一次，第二次 Minor GC 的时候就不会被调用了。
+
+身为舔狗的小 B，把 GC Roots 比做了女神心里重要的那个人。他也想做 GC Roots 对象或者进入老年代。
+
+### 老年代
+
+新生的对象都会在 Eden 区，那么老年代的对象是啥时候进去的呢？
+
+1. 大对象直接被放入老年代，可以通过 JVM 的 -XX:PretenureSizeThreshold 参数设置是多少大小的对象。
+2. 对象在年轻代里面熬过了很多次的垃圾回收，默认是 15 次。可以设置 JVM 的 -XX:MaxTenuringThreshold 改变。
+3. Minor GC 后存活的对象大小超过了 Survivor 区的大小。此时 Survivor 区放不下了，就放到老年代。
+4. 动态的年龄规划，有一批存活的对象的内存总的大小 > Survivor 区内存的 50%，这个时候 >= 这批对象年龄的对象直接进入老年代。就是年龄1 + 年龄2 + 年龄3 + ... + 年龄 N >= Survivor 内存的 50%，年龄 N 以上的的对象都放到老年代。
+
+女神经常使唤我，那么我在女神心里是熬过了多少次呢？
+
+#### 标记整理算法
+
+当老年代中的对象内存达到一定的比例就会触发老年代的垃圾回收，JDK 1.6 是 92%，可以通过 JVM 的 -XX:CMSInitiatingOccupancyFaction 参数设置比例。
+
+老年代的算法是标记整理算法，可以分为 4 个步骤：
+1. 第一步：标记处所有 GC Roots 直接引用的对象。
+2. 第二步：最终所有对象是否在根源上被 GC Roots 引用，标记没有被 GC Roots 引用的对象。
+3. 第三步：在第二步系统是在运行的，这时将产生的新对象新对象重新标记。
+4. 第四步：清理标记出来的垃圾对象。
+
+
+如果 Eden 区有大量的对象存活，Survivor 区都存放不了，老年代也存放不下，那会怎么样？
+
+第一步：Minor GC 之前，JVM 会检查老年代的可用的内存空间，是否大于新生代所有对象的总大小。
+第二步（1）：如果老年代总大小大于新生代所有对象总大小，JVM 会做 Minor GC，即使 S 区放不下存活的对象也可以放到老年代。
+第二步（2）：如果老年代总大小小于新生代所有对象总大小，检查 -XX:HandlePromotionFailure 参数是否设置
+第三步（1）：如果 -XX:HandlePromotionFailure 参数已经设置，JVM 就会检查老年代剩余大小是否大于之前每一次 Minor GC 进入老年代的对象的平均大小
+第四步（1）：如果 -XX:HandlePromotionFailure 参数没有被设置或者 老年代剩余大小小于之前每一次 Minor GC 进入老年代的对象的平均大小，触发 Full GC，对老年代进行回收，然后触发 Minor GC
+第四步（2）：如果 老年代剩余大小 大于 之前每一次 Minor GC 进入老年代的对象的平均大小，做 Minor GC
+第四步（2）的结果：
+（1）Minor GC 后 存活对象 小于 S 区大小，将存活对象放入 S 区
+（2）Minor GC 后 存活对象 大于 S 区大小，且 小于 老年代大小，将存活对象放入 老年代 中
+（3）Minor GC 后 存活对象 大于 S 区大小，且 大于 老年代大小，会触发 Full GC ，如果 Full GC 后还是没能存放入老年代，导致 “OOM”内存溢出
+
+![](http://www.javanorth.cn/assets/images/2021/gc/4.png)
+
+### 总结
+
+小 B 看完了垃圾回收，觉得自己就是那个局部变量没有任何的办法留在女神心中，随时都可能被清理。最后决定在女神的心中反复横跳，达到 15 次不被垃圾收或者被动态规划进入老年代。
+
+最后他踢了下脚边的小狗。
+
+我是指北君，操千曲而后晓声，观千剑而后识器。感谢各位人才的：点赞、收藏和评论，我们下期更精彩！
