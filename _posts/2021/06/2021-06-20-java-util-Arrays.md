@@ -276,24 +276,7 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
 　　八种基本数据类型以及对象都能进行比较。
 
 　　我们先看看 int类型的数组比较源码实现：
-```
-public static boolean equals(int[] a, int[] a2) {
-        if (a==a2)//数组引用相等，则里面的元素一定相等
-            return true;
-        if (a==null || a2==null)//两个数组其中一个为null，都返回false
-            return false;
 
-        int length = a.length;
-        if (a2.length != length)//两个数组长度不等，返回false
-            return false;
-
-        for (int i=0; i<length; i++){//通过for循环依次比较数组中每个元素是否相等
-            if (a[i] != a2[i])
-                return false;
-        }
-        return true;
- }
-```
 　　在看对象数组的比较：
 
 　　基本上也是通过 equals 来判断。
