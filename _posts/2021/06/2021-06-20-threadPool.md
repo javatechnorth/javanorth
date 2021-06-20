@@ -60,6 +60,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 当线程池中的核心线程数量 corePoolSize 满了，就会将任务先加入到任务队列 workQueue 中。
 
+![](http://www.javanorth.cn/assets/images/2021/threadPool/6.png)
 
 
 ### 常用的线程池
