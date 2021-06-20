@@ -221,12 +221,14 @@ public static int binarySearch(int[] a, int key) {
             int mid = (low + high) >>> 1;//取中间值下标
             int midVal = a[mid];//取中间值
             
-            if (midVal < key)
-            low = mid + 1;
-            else if (midVal > key)
-            high = mid - 1;
-            else
-            return mid; 
+            if (midVal < key){
+                low = mid + 1;
+                else if (midVal > key)
+                high = mid - 1;
+            }
+            else{
+                return mid; 
+            }
         }
         return -(low + 1); 
 }
@@ -281,14 +283,17 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
 　　我们先看看 int类型的数组比较源码实现：
 ```java
 public static boolean equals(int[] a, int[] a2) {
-        if (a==a2)//数组引用相等，则里面的元素一定相等
+        if (a==a2){//数组引用相等，则里面的元素一定相等
             return true;
-        if (a==null || a2==null)//两个数组其中一个为null，都返回false
+        }   
+        if (a==null || a2==null){//两个数组其中一个为null，都返回false
             return false;
+        }
 
         int length = a.length;
-        if (a2.length != length)//两个数组长度不等，返回false
+        if (a2.length != length){//两个数组长度不等，返回false
             return false;
+        }
 
         for (int i=0; i<length; i++){//通过for循环依次比较数组中每个元素是否相等
             if (a[i] != a2[i]){
@@ -316,33 +321,38 @@ public static boolean equals(int[] a, int[] a2) {
 ```java
     //给a数组所有元素赋值 val
     public static void fill(int[] a, int val) {
-        for (int i = 0, len = a.length; i < len; i++)
+        for (int i = 0, len = a.length; i < len; i++){
             a[i] = val;
+        }
     }
     
     //给从 fromIndex 开始的下标，toIndex-1结尾的下标都赋值 val,左闭右开
     public static void fill(int[] a, int fromIndex, int toIndex, int val) {
         rangeCheck(a.length, fromIndex, toIndex);//判断范围是否合理
-        for (int i = fromIndex; i < toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++){
             a[i] = val;
+        }
     }
 ```
 ### 7、toString 和 deepToString
 　　toString 用来打印一维数组的元素，而 deepToString 用来打印多层次嵌套的数组元素。
 ```java
 public static String toString(int[] a) {
-        if (a == null)
+        if (a == null){
             return "null";
+        }
         int iMax = a.length - 1;
-        if (iMax == -1)
+        if (iMax == -1){
             return "[]";
+        }
 
         StringBuilder b = new StringBuilder();
         b.append('[');
         for (int i = 0; ; i++) {
             b.append(a[i]);
-            if (i == iMax)
+            if (i == iMax){
                 return b.append(']').toString();
+            }
             b.append(", ");
         }
     }
