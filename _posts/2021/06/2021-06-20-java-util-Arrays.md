@@ -309,12 +309,13 @@ public static boolean equals(Object[] a, Object[] a2) {
         for (int i=0; i<length; i++) {
             Object o1 = a[i];
             Object o2 = a2[i];
-            if (!(o1==null ? o2==null : o1.equals(o2)))
+            if (!(o1==null ? o2==null : o1.equals(o2))){
                 return false;
+            }
         }
 
         return true;
-    }
+}
 ```
 　　基本上也是通过 equals 来判断。
 
