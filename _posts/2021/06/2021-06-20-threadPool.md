@@ -60,8 +60,14 @@ public ThreadPoolExecutor(int corePoolSize,
 
 当线程池中的核心线程数量 corePoolSize 满了，就会将任务先加入到任务队列 workQueue 中。
 
-![](http://www.javanorth.cn/assets/images/2021/threadPool/6.png)
+### 执行过程
 
+线程池的执行过程如下图：
+1. 首先判断核心线程 corePoolSize 是不是满了，如果没有满，就执行任务，否则就进入下一步。
+2. 线程池判断任务队列 workQueue 是否了，如果没有满，则将新提交的任务放入在这个任务队列里。如果任务队列满了，则进入一步。
+3. 判断线程池里的线程达到了最大线程数 maximumPoolSize，如果没有，则创建一个新的线程来执行任务。如果已经满了，则交给拒绝策略来处理这个任务。
+
+![](http://www.javanorth.cn/assets/images/2021/threadPool/6.png)
 
 ### 常用的线程池
 
