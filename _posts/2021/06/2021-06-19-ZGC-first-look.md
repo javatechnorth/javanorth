@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  定了！Java 17再没有了ZGC的更新，那么是时候盘一盘Java11时推出并在12-16均有更新的ZGC了。
+title: 定了！Java 17再没有了ZGC的更新，那么是时候盘一盘Java11时推出并在12-16均有更新的ZGC了。
 tagline: by 揽月中人
 categories: JVM ZGC
 tags:
