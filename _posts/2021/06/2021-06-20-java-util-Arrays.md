@@ -287,12 +287,12 @@ public static boolean equals(int[] a, int[] a2) {
         if (a2.length != length)//两个数组长度不等，返回false
             return false;
 
-        for (int i=0; i<length; i++)//通过for循环依次比较数组中每个元素是否相等
+        for (int i=0; i<length; i++){//通过for循环依次比较数组中每个元素是否相等
             if (a[i] != a2[i])
                 return false;
-
+        }
         return true;
-    }
+ }
 ```
 　　在看对象数组的比较：
 
