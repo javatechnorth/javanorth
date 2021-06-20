@@ -167,7 +167,7 @@ public class TodoDemo implements Runnable {
 
 一般最常用的是FixedThreadExecutor和CachedThreadExecutor。
 
-### 线程池的回收策略
+### 拒绝策略
 
 在线程池中任务队列已经满了，并且线程的数量已经到了最大的数量，这个时候再加任务线程池就不再接受了。
 
