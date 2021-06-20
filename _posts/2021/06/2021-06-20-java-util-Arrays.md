@@ -295,12 +295,7 @@ public static boolean equals(int[] a, int[] a2) {
     }
 ```
 　　在看对象数组的比较：
-```
-public static boolean equals(Object[] a, Object[] a2) {
 
-        return true;
-}
-```
 　　基本上也是通过 equals 来判断。
 
 　　**②、deepEquals**
