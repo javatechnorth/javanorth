@@ -143,9 +143,8 @@ JWT是什么？相信大家都一定听过吧，它就是 JSON Web Token 的缩�
 
 Swagger-core 注解:
 
-|||
-|---|---|
 | Name | Description |
+|---|---|
 |@Api| 标记为 Swagger 资源|
 |@ApiModel |标记为 Swagger 模型 |
 |@ApiModelProperty | 模型字段的属性说明|
