@@ -9,7 +9,7 @@ tags:
 
 大家好，我是指北君。
 
-今天学习了ThreadLocal相关得知识，发现原来道哥(Doug Lea)也用ThreadLocal。既然大师们都喜欢用的，我们必须得研究起来。大师的背影总是需要追随。  
+今天学习了ThreadLocal相关的知识，发现原来道哥(Doug Lea)也用ThreadLocal。既然大师们都喜欢用的，我们必须得研究起来。大师的背影总是需要追随。  
 
 那么指北君给大家安排上了，如果你拥有了Java中的ThreadLocal，那麽你可以创建一个只允许同一个线程读写的变量。 因此，即使两个线程执行了相同的代码，并且引用了相同的ThreadLocal变量，这两个线程也无法看到彼此的ThreadLocal。 可以说ThreadLocal提供了一种代码线程安全的的简单方法。  
 
