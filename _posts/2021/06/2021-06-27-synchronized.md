@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  你时哪家的锁，这么膨胀
+title:  你是哪家的锁，这么膨胀
 tagline: by 某某白米饭
 categories: 多线程
 tags: 
