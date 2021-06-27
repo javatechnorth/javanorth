@@ -12,7 +12,7 @@ tags:
 
 <!--more-->
 
-## 概述
+### 概述
 函数式接口将分为三个篇章来为大家介绍：
 + （应用篇一）（1）函数式接口的来源，（2）Lambda表达式，（3）双冒号运算符
 + （应用篇二）（4）详细介绍@FunctionInterface注解（5）对java.util.function包进行解读
@@ -23,7 +23,7 @@ tags:
 说明：源码使用的版本为JDK-11.0.11
 
 
-## FunctionInterface
+### FunctionInterface
 这一节，指北君给大家介绍如何声明一个函数式接口，FunctionInterface注解就是用于来干这件事情的，当我们为接口增加FunctionInterface注解后，编译器会按照函数式接口的约束进行检查。
 先看看注解的定义：
 ```java
@@ -74,21 +74,21 @@ public class Demo {
 }
 ```
 
-## java.util.function
+### java.util.function
 
 之前的学习，指北君介绍了什么是函数式编程，如果写一段Lambda表达式，以及学习如何申明函数式接口。本节我们将学习JDK为我们提供的基础函数式接口，这些接口位于java.util.function包中，它们可以满足我们很多通用场景的使用需要。
 
-![function包](/assets/images/2021/simsky/jdk_src_func_if_4.png)
+![function包](http://www.javanorth.cn/assets/images/2021/simsky/jdk_src_func_if_4.png)
 
 打开java.util.function包，我们发现里面足足有43个接口，这43个接口就是JDK提供给我们43把剑，如果要让小伙伴舞动这43把剑，是不是感觉鸭梨山大了呢？小伙伴们，别慌！在你看完指北君后面的分析后，你就可以将这43把剑化为无形，做到手中无剑心中有剑。
 
 指北君先带领小伙伴们对接口名称进行分析。是的，是接口名称，不是源码
 
-![接口名称解析](/assets/images/2021/simsky/jdk_src_func_if_2.png)
+![接口名称解析](http://www.javanorth.cn/assets/images/2021/simsky/jdk_src_func_if_2.png)
 
 从思维导图中可以看到，接口的主体为最后的单词，包含：Consumer，Function，Predicate，Supplier，Operator。
 
-![接口主体类别](/assets/images/2021/simsky/jdk_src_func_if_3.png)
+![接口主体类别](http://www.javanorth.cn/assets/images/2021/simsky/jdk_src_func_if_3.png)
 
 除了主体外，小伙伴是不是还看到了Unary，Binary，Bi这种表示参数个数的修饰词。
 
@@ -136,7 +136,7 @@ public interface Consumer<T> {
 accept为核心接口方法，andThen为方便复杂组合场景提供的默认方法。function包的整个代码逻辑都很简洁易懂，部分Operator继承了Function，指北君就不一一赘述了。
 
 
-## 小结
+### 小结
 至此，指北君将函数式接口的应用知识点已经介绍和分析完，涵盖知识点包含：java.util.function包，FunctionInterface注解，Lambda表达式，双冒号操作符等知识点。函数式接口在集合，流中应用较为广泛，也证明了其在数据时候的显著优势，各位小伙伴可以结合这些JDK中的源码进行巩固加深。本篇为函数式接口的应用篇，在下一篇，指北君将从编译、JVM层面深入介绍Java中函数式编程实现原理。
 
 
