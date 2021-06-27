@@ -1,21 +1,23 @@
 ---
 layout: post
-title:  新人都能看懂的线程池
+title:  没用线程池的我，被上司一jio
 tagline: by 某某白米饭
 categories: 线程
 tags: 
     - 某某白米饭
 ---
 
-
 大家好，我是指北君。
 
-### 初识
+前天指北君的朋友小 B，他写了一个汇总的业务，用了很多的线程就是没用到线程池，被上司一顿批。那一起来看看，线程池是什么吧？
 
 线程池是用来统一管理线程的，在 Java 中创建和销毁线程都是一件消耗资源的事情，线程池可以重复使用线程，不再频繁的创建、销毁线程。
 
-Java 中的线程池是由 juc 即 java.util.concurrent 包来实现的，最主要的就是 ThreadPoolExecutor 类。
 <!--more-->
+
+### 初识
+Java 中的线程池是由 juc 即 java.util.concurrent 包来实现的，最主要的就是 ThreadPoolExecutor 类。
+
 
 ![](http://www.javanorth.cn/assets/images/2021/threadPool/0.png)
 
@@ -30,6 +32,7 @@ Java 中的线程池是由 juc 即 java.util.concurrent 包来实现的，最主
 ![](http://www.javanorth.cn/assets/images/2021/threadPool/1.png)
 
 从源码中可以看出每个前三个构造函数都调用了最后一个构造函数。
+
 ```java
 public ThreadPoolExecutor(int corePoolSize,
                               int maximumPoolSize,
@@ -41,6 +44,7 @@ public ThreadPoolExecutor(int corePoolSize,
     //省略代码
     }
 ```
+
 仔细分析一下构造参数：
 1. corePoolSize：线程池里的核心线程数量，当正在运行的线程数量小于核心线程数量，就创建一个核心线程。
 2. maximumPoolSize：线程池最多能放多少个线程。
@@ -56,12 +60,22 @@ public ThreadPoolExecutor(int corePoolSize,
 
 当线程池中的核心线程数量 corePoolSize 满了，就会将任务先加入到任务队列 workQueue 中。
 
+### 执行过程
+
+线程池的执行过程如下图：
+1. 首先判断核心线程 corePoolSize 是不是满了，如果没有满，就执行任务，否则就进入下一步。
+2. 线程池判断任务队列 workQueue 是否了，如果没有满，则将新提交的任务放入在这个任务队列里。如果任务队列满了，则进入一步。
+3. 判断线程池里的线程达到了最大线程数 maximumPoolSize，如果没有，则创建一个新的线程来执行任务。如果已经满了，则交给拒绝策略来处理这个任务。
+
+![](http://www.javanorth.cn/assets/images/2021/threadPool/6.png)
 
 ### 常用的线程池
 
-线程池的创建需要有 7 个参数，还是比较复杂的，JVM 为我们提供了多个静态工厂，生成一些常用的线程池。
+线程池的创建需要有 7 个参数，还是比较复杂的，JVM 为我们提供了 Executors 类中多个静态工厂，生成一些常用的线程池。
 
-1. SingleThreadExecutor：单线程的线程池，里面就一个核心线程数。
+#### SingleThreadExecutor
+
+单线程的线程池，里面就一个核心线程数。
 
 ```java
 public static ExecutorService newSingleThreadExecutor() {
@@ -97,7 +111,9 @@ public class TodoDemo implements Runnable {
 ![](http://www.javanorth.cn/assets/images/2021/threadPool/3.png)
 
 
-2. FixedThreadExecutor 固定数量的线程池
+#### FixedThreadExecutor 
+
+固定数量的线程池
 
 ```java
     return new ThreadPoolExecutor(nThreads, nThreads,
@@ -130,8 +146,9 @@ public class TodoDemo implements Runnable {
 
 ![](http://www.javanorth.cn/assets/images/2021/threadPool/4.png)
 
+#### CachedThreadExecutor 
 
-3. CachedThreadExecutor 自动回收空闲的线程
+自动回收空闲的线程
 
 ```java
 public static ExecutorService newCachedThreadPool() {
@@ -167,7 +184,7 @@ public class TodoDemo implements Runnable {
 
 一般最常用的是FixedThreadExecutor和CachedThreadExecutor。
 
-### 拒绝策略
+### 线程池的回收策略
 
 在线程池中任务队列已经满了，并且线程的数量已经到了最大的数量，这个时候再加任务线程池就不再接受了。
 
