@@ -49,10 +49,17 @@ ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
 ThreadLocal中有一个内部类来ThreadLocalMap来维护这些线程本地变量，
 ```java
 static class ThreadLocalMap {
-        private static final int INITIAL_CAPACITY = 16; //初始容量，2的n次方
-        private Entry[] table; //根据需要调整数组大小，2的n次方
-        private int size = 0;  //上面Entry数组中的元素数量
-        private int threshold; //The next size value at which to resize  Default to 0
+        //初始容量，2的n次方
+        private static final int INITIAL_CAPACITY = 16; 
+        
+        //根据需要调整数组大小，2的n次方
+        private Entry[] table;
+
+        //上面Entry数组中的元素数量
+        private int size = 0;
+
+        //The next size value at which to resize  Default to 0
+        private int threshold; 
 }
 ```
 ThreadLocalMap中的Entry结构如下，是一种key为弱引用（其目的就是Entry对象在GC时容易回收）的hash map，其中key总是ThreadLocal。
@@ -74,45 +81,60 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 大概可分为以下几步：  
 (1) 先获取当前线程，然后再从线程中得到ThreadLocalMap。  
 (2) 然后使用ThreadLocal对象的threadLocalHashCode进行散列计算，得到一个数组的index  
-(3) 从Table数组中得到Entry，再对比Entry的key是不是可当前的ThreadLocal相等，如果相等就返回此Entry的value  
+(3) 从Table数组中得到Entry，再对比Entry的key是不是和当前的ThreadLocal相等，如果相等就返回此Entry的value  
 (4) 如果上一步中得到的Entry与当前ThreadLocal不相等，则会在方法getEntryAfterMiss中进行遍历Entry数组table中的每一个元素，如果找不到就返回null。而且在遍历的过程中会顺便清理一下废弃的Entry。  
 
 下面可以看一下get方法的具体代码。
 ```java
 public T get() {
-        Thread t = Thread.currentThread(); //获取当前线程
-        ThreadLocalMap map = getMap(t); //从当前线程中获取ThreadLocalMap
-        if (map != null) {
-                ThreadLocalMap.Entry e = map.getEntry(this); //获取map中当前ThreadLocal对象对应的entry
-                if (e != null) {
-                        @SuppressWarnings("unchecked")
-                        T result = (T)e.value;
-                        return result;
-                }
+    //获取当前线程
+    Thread t = Thread.currentThread(); 
+
+    //从当前线程中获取ThreadLocalMap
+    ThreadLocalMap map = getMap(t); 
+    if (map != null) {
+        
+        //获取map中当前ThreadLocal对象对应的entry
+        ThreadLocalMap.Entry e = map.getEntry(this); 
+        if (e != null) {
+                @SuppressWarnings("unchecked")
+                T result = (T)e.value;
+                return result;
         }
-        return setInitialValue();
+    }
+    return setInitialValue();
 }
 
 private Entry getEntry(ThreadLocal<?> key) {
-        int i = key.threadLocalHashCode & (table.length - 1);//散列计算得到Entry中当前的index
-        Entry e = table[i];
-        if (e != null && e.get() == key) //如果Entry不是null而且key等于当前ThreadLocal对象则返回此Entry
-            return e;
-        else
-            return getEntryAfterMiss(key, i, e);//Entry==null 或者其key不等于当前ThreadLocal对象，遍历其余Entry
+    //散列计算得到Entry中当前的index
+    int i = key.threadLocalHashCode & (table.length - 1);
+    Entry e = table[i];
+    
+    //如果Entry不是null而且key等于当前
+    // ThreadLocal对象则返回此Entry
+    if (e != null && e.get() == key) 
+        return e;
+    else
+        
+        //Entry==null 或者其key不等于当前
+        // ThreadLocal对象，遍历其余Entry
+        return getEntryAfterMiss(key, i, e);
 }
 
 private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
-        Entry[] tab = table;
-        int len = tab.length;
-        while (e != null) {
-                ThreadLocal<?> k = e.get();
-                if (k == key) return e;
-                if (k == null)
-                    expungeStaleEntry(i);//如果遍历过程中发现有Entry的Key为Null，则清除掉作废的Entry
-                else
-                    i = nextIndex(i, len);//计算Entry数组下一个index
-                    e = tab[i];
+    Entry[] tab = table;
+    int len = tab.length;
+    while (e != null) {
+        ThreadLocal<?> k = e.get();
+        if (k == key) return e;
+        if (k == null)
+            //如果遍历过程中发现有Entry的Key为Null，
+            // 则清除掉作废的Entry
+            expungeStaleEntry(i);
+        else
+            //计算Entry数组下一个index
+            i = nextIndex(i, len);
+            e = tab[i];
         }
         return null;
 }
@@ -128,12 +150,12 @@ set线程本地变量步骤如下：
 
 ```java
 public void set(T value) {
-        Thread t = Thread.currentThread();
-        ThreadLocalMap map = getMap(t);
-        if (map != null)
-                map.set(this, value);
-        else
-                createMap(t, value);
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
  }
  
 private void set(ThreadLocal<?> key, Object value) {
@@ -144,16 +166,23 @@ private void set(ThreadLocal<?> key, Object value) {
          e != null;
          e = tab[i = nextIndex(i, len)]) {
         ThreadLocal<?> k = e.get();
-        if (k == key) {      //如果原Entry的key就是当前ThreadLocal对象，则直接替换现有value
+        
+        //如果原Entry的key就是当前ThreadLocal对象，
+        // 则直接替换现有value
+        if (k == key) {     
             e.value = value;
             return;
         }
         if (k == null) {
-            replaceStaleEntry(key, value, i); // 如果Entry的Key为null， 则直接替换为新的Entry
+            
+    // 如果Entry的Key为null， 则直接替换为新的Entry            
+            replaceStaleEntry(key, value, i); 
             return;
         }
     }
-    tab[i] = new Entry(key, value); // 如果前面的遍历没有return，则插入新的Entry对象到对应的卡槽
+    // 如果前面的遍历没有return，
+    // 则插入新的Entry对象到对应的卡槽    
+    tab[i] = new Entry(key, value); 
     int sz = ++size;
     if (!cleanSomeSlots(i, sz) && sz >= threshold)
         rehash();
@@ -167,8 +196,10 @@ private void remove(ThreadLocal<?> key) {
     ...
     for (Entry e = tab[i]; e != null; e = tab[i = nextIndex(i, len)]) {
         if (e.get() == key) {
-            e.clear();//Entry 的key置为null
-            expungeStaleEntry(i); // 清理对应卡槽，
+            //Entry 的key置为null
+            e.clear();
+            // 清理对应卡槽，
+            expungeStaleEntry(i); 
             return;
         }
     }
@@ -184,19 +215,21 @@ InheritableThreadLocal继承了ThreadLocal，线程中使用inheritableThreadLoc
 
 ReentrantReadWriteLock中线程读写锁的计数器使用了ThreadLocal，其目的是记录每个线程获取读写锁的次数
 ```java
-static final class ThreadLocalHoldCounter extends ThreadLocal<HoldCounter> {
-        public HoldCounter initialValue() {
-                return new HoldCounter();
-        }
+static final class ThreadLocalHoldCounter 
+        extends ThreadLocal<HoldCounter> {
+    public HoldCounter initialValue() {
+        return new HoldCounter();
+    }
 }
-//曾经的Doug Lea老爷子推荐static field，而他默默的使用了static final。
+//曾经的Doug Lea老爷子推荐static field，
+// 而他默默的使用了static final。
 ```
 
 ### 4 如何使用ThreadLocal
 
 ThreadLocal非常适合存储非线程安全的对象，并且不需要跨线程共享对象。很多需要线程隔离的操作都可以尝试使用它。
 
-ThreadLocal也非常适合在WEB应用程序中使用，典型的应用就是在Web请求进来一开始就将请求状态存储在ThreadLocal中，然后参与处理的任何组件均可访问该状态。
+ThreadLocal也非常适合在Web应用程序中使用，典型的应用就是在Web请求进来一开始就将请求状态存储在ThreadLocal中，然后参与处理的任何组件均可访问该状态。
 
 以下是一个ThreadLocal示例：
 
@@ -204,7 +237,8 @@ ThreadLocal也非常适合在WEB应用程序中使用，典型的应用就是在
 
 ```java 
 public class SessionContextHolder {
-    private static final ThreadLocal<SessionContex> CONTEXHOLDER = new InheritableThreadLocal<>();
+    private static final ThreadLocal<SessionContex> CONTEXHOLDER 
+                    = new InheritableThreadLocal<>();
     
     public static void remove(){CONTEXHOLDER.remove();};
     
