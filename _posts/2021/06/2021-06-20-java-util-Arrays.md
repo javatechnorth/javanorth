@@ -287,28 +287,28 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
 
 　　我们先看看 int类型的数组比较源码实现：
 ```java
-public static boolean equals(int[] a, int[] a2) {
-        //数组引用相等，则里面的元素一定相等
-        if (a==a2){ 
-            return true;
-        }   
-        //两个数组其中一个为null，都返回false
-        if (a==null || a2==null){ 
-            return false;
-        }
-        //两个数组长度不等，返回false
-        int length = a.length;
-        if (a2.length != length){ 
-            return false;
-        }
-        //通过for循环依次比较数组中每个元素是否相等
-        for (int i=0; i<length; i++){
-            if (a[i] != a2[i]){
+    public static boolean equals(int[] a, int[] a2) {
+            //数组引用相等，则里面的元素一定相等
+            if (a==a2){ 
+                return true;
+            }   
+            //两个数组其中一个为null，都返回false
+            if (a==null || a2==null){ 
                 return false;
             }
-        }
-        return true;
-}
+            //两个数组长度不等，返回false
+            int length = a.length;
+            if (a2.length != length){ 
+                return false;
+            }
+            //通过for循环依次比较数组中每个元素是否相等
+            for (int i=0; i<length; i++){
+                if (a[i] != a2[i]){
+                    return false;
+                }
+            }
+            return true;
+    }
 ```
 　　在看对象数组的比较：
 // todo
