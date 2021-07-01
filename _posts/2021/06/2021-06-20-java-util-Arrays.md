@@ -9,8 +9,9 @@ tags:
 
 哈喽，大家好，我是指北君。 
 日常开发中，我们会使用各种工具类，利用封装好的轮子，能让我们的开发事半功倍。但是在JDK中，有一个特别的工具类——java.lang.Arrays.class，其源码实现还是挺精湛，接下来让我们来揭开它神秘的面纱。
-<!--more-->
-　　java.util.Arrays 类是 JDK 提供的一个工具类，用来处理数组的各种方法，而且每个方法基本上都是静态方法，能直接通过类名Arrays调用。
+<!--more-->  
+
+java.util.Arrays 类是 JDK 提供的一个工具类，用来处理数组的各种方法，而且每个方法基本上都是静态方法，能直接通过类名Arrays调用。
 ### 1、asList
 ```java
     public static <T> List<T> asList(T... a) {
@@ -318,8 +319,8 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
         }
     }
 ```
-### 小结
-　　好了，这就是JDK中java.lang.Arrays 类的源码解析。
+### 7、小结
+　　好了，这就是JDK中java.lang.Arrays 类的源码解析。  
 　　指北君后续的文章会给大家介绍JDK的各种源码，让大家吃透JDK，另外还有各种工作趣闻，面试宝典。  
 
 　　我是指北君，操千曲而后晓声，观千剑而后识器。感谢各位人才的：点赞、收藏和评论，我们下期更精彩！
