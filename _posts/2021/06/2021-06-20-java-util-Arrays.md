@@ -287,7 +287,7 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
 
 　　我们先看看 int类型的数组比较源码实现：
 ```java
-    public static boolean equals(int[] a, int[] a2) {
+    public static boolean equals(int[] a, int[] a2) 
         //数组引用相等，则里面的元素一定相等
         if (a==a2){ 
             return true;
@@ -308,7 +308,7 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
             }
         }
         return true;
-    }}
+    
 ```
 　　在看对象数组的比较：
 // todo
