@@ -276,54 +276,8 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
         return copy;
     }
 ```
-### 5、equals 和 deepEquals
-　　**①、equals**
 
-　　equals 用来比较两个数组中对应位置的每个元素是否相等。  
-　　
-![](http://www.javanorth.cn/assets/images/2021/itcore/arrays-01-04.png)      
-
-　　八种基本数据类型以及对象都能进行比较。
-
-　　我们先看看 int类型的数组比较源码实现：
-```java
-    public static boolean equals(int[] a, int[] a2) 
-        //数组引用相等，则里面的元素一定相等
-        if (a==a2){ 
-            return true;
-        }   
-        //两个数组其中一个为null，都返回false
-        if (a==null || a2==null){ 
-            return false;
-        }
-        //两个数组长度不等，返回false
-        int length = a.length;
-        if (a2.length != length){ 
-            return false;
-        }
-        //通过for循环依次比较数组中每个元素是否相等
-        for (int i=0; i<length; i++){
-            if (a[i] != a2[i]){
-                return false;
-            }
-        }
-        return true;
-    
-```
-　　在看对象数组的比较：
-// todo
-　　基本上也是通过 equals 来判断。
-
-　　**②、deepEquals**
-
-　　也是用来比较两个数组的元素是否相等，不过 deepEquals 能够进行比较多维数组，而且是任意层次的嵌套数组。
-```java
-         String[][] name1 = {{ "G","a","o" },{ "H","u","a","n"},{ "j","i","e"}};  
-         String[][] name2 = {{ "G","a","o" },{ "H","u","a","n"},{ "j","i","e"}};
-         System.out.println(Arrays.equals(name1,name2));// false  
-         System.out.println(Arrays.deepEquals(name1,name2));// true
-```
-### 6、fill
+### 5、fill
 　　该系列方法用于给数组赋值，并能指定某个范围赋值。
 ```java
     //给a数组所有元素赋值 val
@@ -341,7 +295,7 @@ System.out.println(Arrays.toString(num2));//[1, 2, 3]
         }
     }
 ```
-### 7、toString 和 deepToString
+### 6、toString 和 deepToString
 　　toString 用来打印一维数组的元素，而 deepToString 用来打印多层次嵌套的数组元素。
 ```java
     public static String toString(int[] a) {
