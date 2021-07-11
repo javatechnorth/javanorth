@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  面试时别再说 ArrayList 是数组了
+title:  ArrayList 的核心源码真的只有几行
 tagline: by 某某白米饭
 categories: 源码解析
 tags: 
