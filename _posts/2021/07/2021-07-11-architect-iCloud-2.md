@@ -12,10 +12,10 @@ tags:
 
 <!--more-->
 ### 前言
-在iCloud的第一篇中，我们看到iCloud通过容器构建了一个安全、便捷的系统，为应用提供多端协同的强大能力。
+在iCloud的第一篇中，我们看到iCloud通过容器构建了一个安全、便捷的系统，为应用提供多端协同的强大能力。从本篇开始讲详细介绍iCloud在同步过程中使用的几种存储方式：键值存储，文档存储以及核心数据的存储，正是基于这几类基本存储，应用借助于iCloud实现多端协同的一致体验。
 
 ### 概念
-键值存储，简单的理解就是一个key-value存储，比较适合键值存储的比如首选项，应用的配置和状态等。在实际使用中，开发者将应用的配置，用户自定义选项等使用键值存储，然后通过iCloud同步到所有设备上，这样我们在其他设备上使用应用时就会得到一样的使用体验。并且只要我们任何设备更改相应的配置，其他设备上的该应用也会更新。
+键值存储，简单的理解就是一个key-value存储，比较适合键值存储的有首选项，应用的配置和状态等类型的数据。在实际使用中，开发者可以将应用的配置，用户自定义选项等采用iCloud的键值存储，通过iCloud账户同步到所有设备上，用户在其他设备上使用该应用时就会得到一样的使用体验。并且，当用户在任何设备更改相应的配置，其他设备上的该应用也会更新。
 
 ![iCloud容器](/assets/images/2021/simsky/architect-icloud-2-1.png)
 
@@ -23,28 +23,27 @@ tags:
 
 ![iCloud容器](/assets/images/2021/simsky/architect-icloud-2-2.png)
 
-在你使用NSUserDefaults对象时，你可以考虑使用iCloud的键值存储来保存对应的值或者属性列表，比如Bool，Double，Int64，String，Data这些基础类型，以及Array和Dictionary，数组和字典值可以包含所有基本类型。 NSUbiquitousKeyValueStore提供对应数据的读取和写入方法。
+在开发过程中大家会使用NSUserDefaults对象，这时可以考虑使用iCloud的键值存储来保存对应的值或者属性列表，比如Bool，Double，Int64，String，Data这些基础类型，以及Array和Dictionary，数组和字典值可以包含所有基本类型。 要操作键值存储需要通过NSUbiquitousKeyValueStore提供方法来实现数据的读取和写入。
 
 每次写入key-value数据，操作成功或失败都是原子的；要么写入所有数据，要么不写入。当应用需要确保一组值同时生效时，可以将相互依赖的值放在数组或字典中。
 
-### 开启键值存储
-如果要在应用中使用键值存储，则应用需要具有相应的权利。 在Xcode中开启iCloud访问权限。
+### 开启权限
+如果要在应用中使用键值存储，则应用需要具有相应的权限。 在Xcode中开启iCloud访问权限。
 
 ### 准备使用
-在你设备的上的应用，只要连接到你的iCloud账户，都可以修改键值并更新到iCloud云端。要获取这种变更，可以在应用启动时注册NSUbiquitousKeyValueStoreDidChangeExternallyNotification通知。为确保应用获取最新数据，通过调用synchronize方法从iCloud云端获取最新的键和值。
-将synchronize代码放在您的application:didFinishLaunchingWithOptions:方法 (iOS) 或applicationDidFinishLaunching:方法 (OS X) 中。
-在通知的处理流程中，检查信息并确定是否将更改写入应用。
+设备的上的应用，只要连接到你的iCloud账户，就可以修改键值并更新到iCloud云端。所有设备要获取其他设备的变更，需要在应用启动时注册NSUbiquitousKeyValueStoreDidChangeExternallyNotification通知。要使应用获取最新数据，需要通过调用synchronize方法从iCloud云端获取最新的键和值。
+将synchronize代码放在您的application:didFinishLaunchingWithOptions:方法 (iOS) 或applicationDidFinishLaunching:方法 (OS X) 中。在通知的处理流程中，检查信息并确定是否将更改写入应用。
 
 ### 键值冲突
 当应用将本地的键值更新上传到iCloud时，iCloud会检查其他设备是否对键值存储进行了任何更改。如果没有何更改，则NSUbiquitousKeyValueStore将更新写入到服务器。如果进行了更改，则不会写入并产生NSUbiquitousKeyValueStoreDidChangeExternallyNotification通知，应用可以根据自身要求进行相应处理，比如应用强制更新本地数据，或者强制将本地数据同步到云端。
 
 ![键值冲突](/assets/images/2021/simsky/architect-icloud-2-3.png)
 
-应用在接收到NSUbiquitousKeyValueStoreDidChangeExternallyNotification通知时，应用需要验证云端和本地数据，确保给出足够有意义的信息帮助用户选择以本地还是云端数据为准。如果云端数据与应用本地状态不匹配，还需要考虑云端上其他设备的数据是否有效。例如，如果用户在一台设备上的等级为13级，而在另一台设备上是5级，则选择13级的对应的数据显然更符合最新数据的可能。
+在接收到NSUbiquitousKeyValueStoreDidChangeExternallyNotification通知时，应用需要验证云端和本地数据，确保给出足够的信息帮助用户选择以本地还是云端数据为准。如果云端数据与应用本地状态不匹配，还需要考虑云端上其他设备的数据是否有效。例如，如果用户在一台设备上的等级为13级，而在另一台设备上是5级，则13级的对应的数据更为可能是用户想要的最新数据。
 
 ### 容量计算和限制
 单个应用使用iCloud的键值存储总空间1MB，最大键数量为1024，单个键的大小限制为1MB。比如，如果单个键存储一个为1MB的值，则达到了总空间限制，则无法再新增键。
-键采用UTF8编码，长度最大为64字节，键的容量大小不计入1MB键值存储空间中；但是呢，键值的容量（最多消耗64KB）计入iCloud容量中。
+键采用UTF8编码，长度最大为64字节，键的容量大小不计入1MB键值存储空间中；但是，键值的容量（最多消耗64KB）计入iCloud容量中。
 
 ![容量计算](/assets/images/2021/simsky/architect-icloud-2-4.png)
 
