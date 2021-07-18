@@ -21,7 +21,7 @@ tags:
 
 在介绍hash冲突的时候，先简单介绍下哈希表，哈希表也叫散列表，是根据关键值Key(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值中的Key映射到表中一个位置来访问记录，以加快查找的速度。其中，映射的实现也叫做哈希函数，而存放记录的数组叫做哈希表，其如下图所示
 
-![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/hashtable.jpeg)
+![MESA Monitor](http://www.javanorth.cn/assets/images/2021/Yang24/hashtable.png)
 
 而hash冲突，就是将key通过哈希函数f(key)得到的结果的作为地址去存放当前的值时，发现算出来的地址上已经有人先来了。这就是所谓的hash冲突，下面我们看看具体的解决方案吧。
 
