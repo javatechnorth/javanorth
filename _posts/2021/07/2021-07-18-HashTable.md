@@ -2,7 +2,7 @@
 layout: post
 title:  hash冲突怎么办
 tagline: by 24只羊
-categories: JDK JUC 源码解读
+categories: 面试
 tags: 
     - 24只羊
 ---
