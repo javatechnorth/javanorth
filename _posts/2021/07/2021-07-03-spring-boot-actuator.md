@@ -9,19 +9,20 @@ tags:
 
 大家好，我是指北君
 
-不知道大家在写 Spring Boot 项目的过程中，使用过 Spring Boot Actuator 吗？ 知道 Spring Boot Actuator 是什么 ？ 干什么的吗？今天就要来给大家介绍一下 Spring Boot Actuator，学习如何在 Spring Boot 2.x 中使用、配置和扩展这个监控工具。Spring Boot 1.x 的使用就不再这边介绍了。相信大家平时使用的框架基本上都要升级到 2.x了吧。
+不知道大家在写 `Spring Boot` 项目的过程中，使用过 `Spring Boot Actuator` 吗？ 知道 `Spring Boot Actuator` 是什么，干什么的吗？今天就要来给大家介绍一下 `Spring Boot Actuator`，学习如何在 `Spring Boot 2.x` 中使用、配置和扩展这个监控工具。`Spring Boot 1.x` 的使用就不再这边介绍了。相信大家平时使用的框架基本上都要升级到 2.x了吧。
 
 <!--more-->
 
 ### 什么是 Actuator ？
 
-从本质上讲，Spring Boot Actuator 为我们的应用程序带来了生产就绪的功能。监控我们的应用程序，收集指标，了解流量，或者是数据库的状态。有了它，我们就可以很简单的监控应用程序的各种指标数据。
+从本质上讲，`Spring Boot Actuator` 为我们的应用程序带来了生产就绪的功能。监控我们的应用程序，收集指标，了解流量，或者是数据库的状态。有了它，我们就可以很简单的监控应用程序的各种指标数据。
 
-Spring Boot Actuator 使用 http 或者 JMX 的方式来公开运行中的应用程序的操作信息--健康、指标、信息、转储、环境等，我们能够方便的与它互动。只要添加 
-Spring Boot Actuator 依赖到 classpath 中，就有几个指标路径可供我们开箱使用。与大多数 Spring boot 模块一样，我们可以很容易地以多种方式配置或扩展它。
+`Spring Boot Actuator` 使用 http 或者 JMX 的方式来公开运行中的应用程序的操作信息--健康、指标、信息、转储、环境等，我们能够方便的与它互动。只要添加 
+`Spring Boot Actuator` 依赖到 classpath 中，就有几个指标路径可供我们开箱使用。与大多数 `Spring boot` 模块一样，我们可以很容易地以多种方式配置或扩展它。
 
 ### 快速入门
-要想启用 Spring Boot Actuator，我们只需在软件包管理器中添加 spring-boot-starter-actuator 依赖项。在 pom.xml 文件添加如下代码即可：
+
+要想启用 `Spring Boot Actuator`，我们只需在软件包管理器中添加 `spring-boot-starter-actuator` 依赖项。在 `pom.xml` 文件添加如下代码即可：
 
 ```java
 <dependency>
@@ -30,19 +31,19 @@ Spring Boot Actuator 依赖到 classpath 中，就有几个指标路径可供我
 </dependency>
 ```
 
-是吧，很简单就添加好了。有的小朋友可能会又疑问了，为什么没有添加 version 节点呢？那是因为 Spring Boot 的parent pom 会制定版本号，所以这里无需再次指定了。
+是吧，很简单就添加好了。有的小朋友可能会又疑问了，为什么没有添加 `version` 节点呢？那是因为 `Spring Boot` 的 `parent pom` 会制定版本号，所以这里无需再次指定了。
 
 ### Spring Boot 2.x Actuator
 
-在 2.x 版本中，Spring Boot Actuator 保持了1.x 的基本操作，但简化了它的模型，扩展了它的能力，并加入了更好的默认值。这个版本变得与技术无关。它还简化了其安全模型，将其与应用程序模型合并。最新版本现在支持CRUD模型，而不是旧的读写模型。
+在 `2.x` 版本中，`Spring Boot Actuator` 保持了 `1.x` 的基本操作，但简化了它的模型，扩展了它的能力，并加入了更好的默认值。这个版本变得与技术无关。它还简化了其安全模型，将其与应用程序模型合并。最新版本现在支持CRUD模型，而不是旧的读写模型。
 
 #### 技术支持
 
-在 2.x 中，Spring Boot Actuator 将其模型定义为可插拔和可扩展的，而不依赖于MVC。通过这个新的模型，我们能够利用MVC以及WebFlux作为底层Web技术的优势。此外，可以通过实现正确的适配器来添加即将到来的技术。不过 JMX 仍然被支持，无需任何额外的代码就可以暴露路径。
+在 `2.x` 中，`Spring Boot Actuator` 将其模型定义为可插拔和可扩展的，而不依赖于 MVC。通过这个新的模型，我们能够利用 MVC 以及 WebFlux 作为底层 Web 技术的优势。此外，可以通过实现正确的适配器来添加即将到来的技术。不过 JMX 仍然被支持，无需任何额外的代码就可以暴露路径。
 
 #### 重要变化
 
-与以前的版本不同，Spring Boot Actuator的大多数路径都是禁用的。默认情况下，只有 /health 和 /info 两个可用。如果我们想启用所有的路径，可以设置 management.endpoints.web.exposure.include=* 来实现。Actuator 现在与常规的 App 安全规则共享安全配置，所以安全模型被大大简化。要调整 Actuator 的安全规则，我们可以只添加一个 /actuator/** 的条目。
+与以前的版本不同，`Spring Boot Actuator` 的大多数路径都是禁用的。默认情况下，只有 `/health` 和 `/info` 两个可用。如果我们想启用所有的路径，可以设置 `management.endpoints.web.exposure.include=*` 来实现。`Actuator` 现在与常规的 `App` 安全规则共享安全配置，所以安全模型被大大简化。要调整 `Actuator` 的安全规则，我们可以只添加一个 `/actuator/**` 的条目。
 
 ```java
 @Bean
@@ -55,7 +56,7 @@ public SecurityWebFilterChain securityWebFilterChain(
 }
 ```
 
-我们可以在全新的Actuator官方文档中找到进一步的细节。另外，在默认情况下，所有的Actuator路径现在都被放在/actuator路径下。和以前的版本一样，我们可以使用新的属性management.endpoints.web.base-path来调整这个路径。
+我们可以在全新的 `Actuator` 官方文档中找到进一步的细节。另外，在默认情况下，所有的 `Actuator` 路径现在都被放在 `/actuator` 路径下。和以前的版本一样，我们可以使用新的属性`management.endpoints.web.base-path` 来调整这个路径。
 
 #### 预定义的路径
 
@@ -82,7 +83,7 @@ public SecurityWebFilterChain securityWebFilterChain(
 
 #### 执行器路径的超媒体
 
-Spring Boot 增加了一个所有路径的集合入口，可以返回所有可用的执行器路径的链接。这将有助于发现执行器路径及其相应的URL。默认情况下，这个集合入口可以通过/actuator路径访问。因此，如果我们向这个URL发送一个GET请求，它将返回各种路径的执行器链接。
+`Spring Boot` 增加了一个所有路径的集合入口，可以返回所有可用的执行器路径的链接。这将有助于发现执行器路径及其相应的URL。默认情况下，这个集合入口可以通过 `/actuator` 路径访问。因此，如果我们向这个URL发送一个GET请求，它将返回各种路径的执行器链接。
 
 ```json
 {
@@ -111,11 +112,11 @@ Spring Boot 增加了一个所有路径的集合入口，可以返回所有可�
 }
 ```
 
-如上所示，/actuator路径在_links字段下报告所有可用的执行器路径。如果我们配置了一个自定义的管理基础路径，那么我们应该能使用该集合入口发现URL。例如，如果我们将management.endpoints.web.base-path设置为/mgmt，那么我们应该向/mgmt路径发送请求，以查看链接列表。但是如果当管理集合入口被设置为/时，集合入口被禁用，以防止与其他映射发生冲突的可能性。
+如上所示，`/actuator` 路径在 `_links` 字段下报告所有可用的执行器路径。如果我们配置了一个自定义的管理基础路径，那么我们应该能使用该集合入口发现URL。例如，如果我们将`management.endpoints.web.base-path` 设置为 `/mgmt` ，那么我们应该向 `/mgmt` 路径发送请求，以查看链接列表。但是如果当管理集合入口被设置为 / 时，集合入口被禁用，以防止与其他映射发生冲突的可能性。
 
 #### 健康指示器
 
-就像以前的版本一样，我们可以很容易地添加自定义指标。与其他API相反，用于创建自定义健康路径的抽象概念保持不变。然而，一个新的接口，即ReactiveHealthIndicator，已经被添加到实现反应式健康检查。让我们来看看一个简单的自定义反应式健康检查。
+就像以前的版本一样，我们可以很容易地添加自定义指标。与其他 API 相反，用于创建自定义健康路径的抽象概念保持不变。然而，一个新的接口，即 `ReactiveHealthIndicator`，已经被添加到实现反应式健康检查。让我们来看看一个简单的自定义反应式健康检查。
 
 ```java
 @Component
@@ -136,32 +137,32 @@ public class DownstreamServiceHealthIndicator implements ReactiveHealthIndicator
 
 #### 健康组
 
-从Spring Boot 2.2开始，我们可以将健康指标组织成组，并对所有组员应用相同的配置。例如，我们可以通过在application.properties中添加以下内容来创建一个名为custom的健康组。
+从 `Spring Boot 2.2` 开始，我们可以将健康指标组织成组，并对所有组员应用相同的配置。例如，我们可以通过在 `application.properties` 中添加以下内容来创建一个名为 `custom` 的健康组。
 
 ```java
 management.endpoint.health.group.custom.include=diskSpace,ping
 ```
 
-这样，自定义组包含diskSpace和ping健康指标。现在，如果我们调用/actuator/health路径，它将在JSON响应中告诉我们关于新的健康组。
+这样，自定义组包含 `diskSpace` 和 `ping` 健康指标。现在，如果我们调用 `/actuator/health` 路径，它将在 `JSON` 响应中告诉我们关于新的健康组。
 
 ```json
 {"status":"UP","groups":["custom"]}
 ```
 
-通过健康组，我们可以看到一些健康指标的汇总结果。在这种情况下，如果我们向/actuator/health/custom发送一个请求，
+通过健康组，我们可以看到一些健康指标的汇总结果。在这种情况下，如果我们向 `/actuator/health/custom` 发送一个请求，
 
 ```json
 {"status": "UP"}
 ```
 
-我们可以通过application.properties来配置该组，以显示更多细节。
+我们可以通过 `application.properties` 来配置该组，以显示更多细节。
 
 ```java
 management.endpoint.health.group.custom.show-components=always
 management.endpoint.health.group.custom.show-details=always
 ```
 
-现在，如果我们向/actuator/health/custom发送同样的请求，我们会看到更多的细节。
+现在，如果我们向 `/actuator/health/custom` 发送同样的请求，我们会看到更多的细节。
 
 ```json
 {
@@ -189,19 +190,19 @@ management.endpoint.health.group.custom.show-components=when_authorized
 management.endpoint.health.group.custom.show-details=when_authorized
 ```
 
-我们还可以有一个自定义的状态映射。例如，它可以不返回HTTP 200 OK响应，而是返回207状态代码。
+我们还可以有一个自定义的状态映射。例如，它可以不返回 `HTTP 200 OK` 响应，而是返回 207 状态代码。
 
 ```java
 management.endpoint.health.group.custom.status.http-mapping.up=207
 ```
 
-在这里，我们要告诉Spring Boot，如果自定义组的状态是UP，就返回207的HTTP状态代码。
+在这里，我们要告诉 `Spring Boot`，如果自定义组的状态是 UP，就返回 207 的 HTTP 状态代码。
 
 #### Spring Boot 2中的度量
 
-在Spring Boot 2.0中，内部指标被Micrometer支持所取代，因此我们可以预期会有一些变化。如果我们的应用程序正在使用GaugeService或CounterService等度量衡服务，它们将不再可用。
+在 `Spring Boot 2.0` 中，内部指标被 Micrometer 支持所取代，因此我们可以预期会有一些变化。如果我们的应用程序正在使用 GaugeService 或 CounterService 等度量衡服务，它们将不再可用。
 
-相反，我们要与Micrometer直接互动。在Spring Boot 2.0中，我们会得到一个自动配置的MeterRegistry类型的bean。此外，Micrometer现在是Actuator依赖的一部分，所以只要Actuator的依赖在classpath中，我们就应该可以使用了。此外，我们将从/metrics端点得到一个全新的响应。
+相反，我们要与 Micrometer 直接互动。在 `Spring Boot 2.0` 中，我们会得到一个自动配置的 MeterRegistry 类型的 bean。此外，Micrometer 现在是 Actuator 依赖的一部分，所以只要 Actuator 的依赖在 classpath 中，我们就应该可以使用了。此外，我们将从 `/metrics` 端点得到一个全新的响应。
 
 ```json
 {
@@ -215,7 +216,7 @@ management.endpoint.health.group.custom.status.http-mapping.up=207
 }
 ```
 
-正如我们所看到的，没有像我们在1.x中得到的实际度量。为了得到一个特定指标的实际值，我们现在可以导航到所需的指标，例如，/actuator/metrics/jvm.gc.pause，然后得到一个详细的响应。
+正如我们所看到的，没有像我们在1.x中得到的实际度量。为了得到一个特定指标的实际值，我们现在可以导航到所需的指标，例如，`/actuator/metrics/jvm.gc.pause`，然后得到一个详细的响应。
 
 ```json
 {
@@ -322,6 +323,7 @@ public class InfoWebEndpointExtension {
 ```
 
 #### 启用所有端点
+
 为了能够使用 HTTP 访问 Actuator 的端点，我们需要启用和公开它们。默认情况下，除了/shutdown，所有的端点都是启用的。默认情况下，只有/health和/info这两个端点是公开的。我们需要添加以下配置来公开所有端点。
 
 ```java

@@ -7,43 +7,44 @@ tags:
     - feng
 ---
 
-大家好，我是指北君
+大家好，我是指北君。
 
 ### 前言
 
-前几天，指北君有一个朋友小王在面试过程中遇到了这样一个问题，Spring Boot 的最重要的注解是什么？
+前几天，指北君有一个朋友小王在面试过程中被吊打了。当时的情况是这样的。
 
-小王听到这个面试题觉得这还不简单，当然是 @SpringBootApplication 啊，立即回答啦。面试官立刻追问，那 @SpringBootApplication 为什么是最重要的。
+**面试官**：`Spring Boot` 中最重要的注解是什么？你能讲讲为什么最重要吗？
 
-小王听后回答说：@SpringBootApplication 注解能实现Spring 配置，组建扫描，启用Spring Boot 的自动配置功能。
+**小王**：`@SpringBootApplication`，这个注解最重要吧。 `@SpringBootApplication` 注解能够实现 Spring 组件自动化配置，组件扫描。
 
-面试官：那 @SpringBootApplication 注解是怎么实现Spring Boot的自动配置功能。
+**面试官**：那 `@SpringBootApplication` 注解是怎么实现 `Spring Boot` 的自动配置功能呢？
 
-小王这时心想，这下上套了，还真没有看过源码。支支吾吾回答不上，只好回家等通知了。
+小王心想大事不妙，还真没有看过这块源码。支支吾吾回答不上，只好回家等通知了。
+
 <!--more-->
-指北君得知这个情况之后，跟朋友一顿操作和解释，然后就有了今天的文章，我们将学习 Spring Boot 框架中最重要的注解之一，它改变了Java开发人员使用Spring编写Java应用程序的方式。
+
+指北君得知此事，跟小王好好理了理这块知识点，然后就有了今天的文章。
 
 ### 概述
 
-在这篇文章中，我将解释 @SpringBootApplication 是什么意思，以及如何在一个简单的 Spring Boot 应用程序中使用它。我们在 Application 类中使用 @SpringBootApplication 注解来启用一些功能，如基于 Java 的 Spring 配置、组件扫描，特别是用于启用 Spring Boot 的自动配置功能。
+我们先来了解一下 `@SpringBootApplication` 是什么，以及如何在一个简单的 `Spring Boot` 应用程序中使用它。我们先看看 `Spring Team` 在源码中对它的定义是什么？
 
-如果你已经使用 Spring Boot 很久了，那么你可能知道我们需要在 Application 类或 Main 类中注解相当多的注解才能开始使用，比如说
+> Indicates a configuration class that declares one or more @Bean methods and also triggers auto-configuration and component scanning. This is a convenience annotation that is equivalent to declaring @Configuration, @EnableAutoConfiguration and @ComponentScan.
+> 
+> 表示一个配置类，它声明了一个或多个@Bean方法，也触发了自动配置和组件扫描。这是一个方便的注解，相当于声明了@Configuration、@EnableAutoConfiguration和@ComponentScan。
 
-+ @Configuration，启用基于Java的配置。
-+ @ComponentScan 来启用组件扫描。
-+ @EnableAutoConfiguration启用Spring Boot的自动配置功能。
+从上面的定义我们可以看出，`@SpringBootApplication` 注解其实是一个组合注解。使用 `@SpringBootApplication` 相当于同时使用了 `@Configuration`、`@EnableAutoConfiguration` 和 `@ComponentScan` 。 `@SpringBootApplication` 是在 `Spring Boot 1.2.0` 之后才开始有的，如何你的项目使用的 `Spring Boot 1.2.0` 之前的版本，那需要抱歉了，你不能使用这个注解，你只能完整的使用那 3 个注解来代替它。
 
-但现在你只需用 @SpringBootApplication 来注解你的 Application 类，就可以做到这一切。
+那我们接下来看看，通过一个简单的示例来看看怎么使用的。
 
-顺便说一下，这个注解从 Spring Boot 1.2开始就有了，这意味着如果你运行在较低版本的 Spring Boot 上，那么如果你需要这些功能，你仍然需要使用@Configuration、@CompnentScan 和 @EnableAutoConfiguration。
-
-### @SpringBootApplication 示例
+### `@SpringBootApplication` 示例
 
 下面是一个简单的例子，说明如何使用 @SpringBootApplication 注解来编写 Spring Boot 应用程序。
 
 ```java
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
@@ -52,7 +53,7 @@ public class Application {
 }
 ```
 
-在 Spring Boot 应用程序中，Application 类有两个用途：配置和引导。首先，它是主要的 Spring 配置类，其次，它可以实现 Spring Boot 应用程序的自动配置。
+`Spring Boot` 项目的启动类非常的简洁，没有一行多余的代码。 `@SpringBootApplication` 放在项目启动类上主要起到了自动化配置的作用。下面我们看看 `@SpringBootApplication` 具体的代码。
 
 ```java
 @Target(ElementType.TYPE)
@@ -80,49 +81,23 @@ public @interface SpringBootApplication {
 }
 ```
 
-从 @SpringBootApplication 源码可以看出 @SpringBootApplication = @SpringBootConfiguration + @ComponentScan + @EnableAutoConfiguration 。
+从 `@SpringBootApplication` 源码可以看出 `@SpringBootApplication` = `@SpringBootConfiguration` + `@ComponentScan`+ `@EnableAutoConfiguration` 。
 
-@SpringBootApplication注解是以下三个Spring注解的组合，只需一行代码就能提供所有三个注解的功能。
+前面已经提过了，`@SpringBootApplication` 是3个注解的组合，下面分别介绍一下每个注解都有什么作用吧。
 
-> @SpringBootConfiguration
+> `@SpringBootConfiguration`
 > 
-> 这个注解将一个类标记为基于Java配置的配置类。如果你喜欢基于Java的配置而不是基于XML的配置，这一点就特别重要。
+> 这个注解将一个类标记为基于 Java Config 的配置类。如果你喜欢基于 Java 的配置而不是基于 XML 的配置，这一点就特别重要。
 > 
-> @ComponentScan
+> `@ComponentScan`
 > 
-> 该注解使组件扫描成为可能，这样你创建的Web控制器类和其他组件将被自动发现，并在Spring应用上下文中注册为Bean。你编写的所有@Controller类将被该注解发现。
+> 该注解使组件扫描成为可能，这样你创建的 Web 控制器类和其他组件将被自动发现，并在 Spring 应用上下文中注册为 Bean。你编写的所有 `@Controller` 类将被该注解发现。
 > 
-> @EnableAutoConfiguration
+> `@EnableAutoConfiguration`
 > 
-> 这个注解可以启用Spring Boot惊人的自动配置功能，它可以为你自动配置很多东西。
+> 这个注解可以启用 `Spring Boot` 自动配置功能。
 
-另外我们还可以关注一下几个方法
-
-> Class<?>[] exclude() default {}:
-> 
-> 根据 class 来排除，排除特定的类加入 spring 容器，传入参数 value 类型是 class 类型。
-> 
-> String[] excludeName() default {}:
-> 
-> 根据 class name 来排除，排除特定的类加入 spring 容器，传入参数 value 类型是 class 的全类名字符串数组。
-> 
-> String[] scanBasePackages() default {}:
-> 
-> 指定扫描包，参数是包名的字符串数组。
-> 
-> Class<?>[] scanBasePackageClasses() default {}:
-> 
-> 扫描特定的包，参数类似是 Class 类型数组。
-
-就拿 scanBasePackages 来举个例子：
-
-```java
-@SpringBootApplication(scanBasePackages  = {"com.javanorth.controller"})
-```
-
-如果是将不需要的 bean 排除在 spring 容器中，如何操作？看看官方的代码怎么用的：
-
-![application](http://www.javanorth.cn/assets/images/2021/feng/application1.png)
+如果你仔细的话会发现和前面讲的不一样， `@SpringBootConfiguration` 是从那里冒出来的，不是应该是 `@Configuration` 吗？下面就告诉你答案。
 
 ### @SpringBootConfiguration
 
@@ -138,25 +113,33 @@ public @interface SpringBootConfiguration {
 }
 ```
 
-@SpringBootConfiguration 继承自 @Configuration，二者功能也一致，标注当前类是配置类，并会将当前类内声明的一个或多个以@Bean注解标记的方法的实例纳入到 Spring 容器中，并且实例名就是方法名。
+从源码可以看出，`@SpringBootConfiguration` 继承自 `@Configuration`，二者功能也一致，标注当前类是配置类，不过 `@SpringBootConfiguration` 是一个特殊的标记类，在项目中只能使用一次。
 
 ### @ComponentScan
 
-可以通过该注解指定扫描某些包下包含如下注解的均自动注册为 spring beans：@Component、@Service、 @Repository、 @Controller等等 。使用方式例如：
-
 ```java
-@ComponentScan(basePackages = {"com.javanorth.controller"})
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Repeatable(ComponentScans.class)
+public @interface ComponentScan {
+	@AliasFor("basePackages")
+	String[] value() default {};
+	@AliasFor("value")
+	String[] basePackages() default {};
+	Class<?>[] basePackageClasses() default {};
+	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
+	Class<? extends ScopeMetadataResolver> scopeResolver() default AnnotationScopeMetadataResolver.class;
+	ScopedProxyMode scopedProxy() default ScopedProxyMode.DEFAULT;
+    ...
+}
 ```
 
-除了可以使用 @ComponentScan  注解来加载我们的 bean，还可以在 Application 类中使用 @Import  指定该类。 例如：
-
-```java
-@Import(JdbcRepositoriesRegistrar.class)
-```
+`@ComponentScan` 不做过多的解释了，使用过 Spring 的朋友都懂的。 其他的朋友我就啰嗦一句吧， 可以通过该注解指定扫描某些包下包含如下注解的均自动注册为 `Spring beans`：`@Component`、`@Service`、 `@Repository`、 `@Controller` 等等注释的类。`Spring Boot` 除了可以使用 @ComponentScan 注解来加载我们的bean，还可以使用 @Import 指定该类。
 
 ### @EnableAutoConfiguration
 
-@EnableAutoConfiguration 的作用启动自动的配置，@EnableAutoConfiguration 注解的意思就是 Spring Boot 根据你添加的 jar 包来配置你项目的默认配置，比如根据 spring-boot-starter-web ，来判断你的项目是否需要添加了web mvc 和 tomcat，就会自动的帮你配置 web 项目中所需要的默认配置。简单点说就是它会根据定义在 classpath 下的类，自动的给你生成一些 Bean，并加载到 Spring 的 Context 中。
+`@EnableAutoConfiguration` 的作用启动自动的配置，意思就是 `Spring Boot` 根据你添加的 jar 包来配置你项目的默认配置，比如根据 `spring-boot-starter-web` ，来判断你的项目是否需要添加了 `web mvc` 和 `tomcat`，就会自动的帮你配置 web 项目中所需要的默认配置。简单点说就是它会根据定义在 classpath 下的类，自动的给你生成一些 Bean，并加载到 Spring 的上下文中。
 
 ```java
 @Target(ElementType.TYPE)
@@ -172,7 +155,7 @@ public @interface EnableAutoConfiguration {
 }
 ```
 
-可以看到 import 引入了 AutoConfigurationImportSelector 类。该类使用了 Spring Core 包的 SpringFactoriesLoader 类的 loadFactoryNames() 方法。AutoConfigurationImportSelector 类实现了 DeferredImportSelector 接口，并实现了 selectImports 方法，用来导出Configuration 类。
+从上述源码中可以看到 `@Import` 引入了 `AutoConfigurationImportSelector` 类。`AutoConfigurationImportSelector` 使用了 `Spring Core` 包的 `SpringFactoriesLoader#loadFactoryNames()` 方法。`AutoConfigurationImportSelector` 类实现了 `DeferredImportSelector` 接口，并实现了 `selectImports` 方法，用来导出 `Configuration` 类。
 
 ```java
 public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
@@ -210,7 +193,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 }
 ```
 
-导出的类是通过 SpringFactoriesLoader.loadFactoryNames() 读取了 classpath 下面的 META-INF/spring.factories 文件。
+导出的类是通过 `SpringFactoriesLoader#loadFactoryNames()` 读取了 `classpath` 下面的 `META-INF/spring.factories` 文件。
 
 ```java
 public final class SpringFactoriesLoader {
@@ -259,7 +242,7 @@ public final class SpringFactoriesLoader {
 }
 ```
 
-这里列出了一部分自动配置的内容：
+`META-INF/spring.factories` 文件中一部分自动配置的内容：
 
 ```java
 # Auto Configure
@@ -287,9 +270,11 @@ org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveRepositor
 @EnableAutoConfiguration(exclude  = {DataSourceAutoConfiguration.class})
 ```
 
+这也是一种为 `Spring Boot` 项目瘦身的方法。你可以看到网上一些为项目瘦身的方法都是通过这个注解来操作的。
+
 ### @AutoConfigurationPackage
 
-@EnableAutoConfiguration 又继承了@AutoConfigurationPackage，@AutoConfigurationPackage 会引导类（@SpringBootApplication标注的类）所在的包及下面所有子包里面的所有组件扫描到Spring容器。具体怎么实现的呢，我们来看代码，原来它 import 了 AutoConfigurationPackages.Registrar.class， 我们来看看它做了什么？
+`@EnableAutoConfiguration` 又继承了 `@AutoConfigurationPackage` ，`@AutoConfigurationPackage` 会引导类（`@SpringBootApplication` 标注的类）所在的包及下面所有子包里面的所有组件扫描到Spring容器。具体怎么实现的呢，我们来看代码，原来它 import 了 `AutoConfigurationPackages.Registrar.class`， 我们来看看它做了什么？
 
 ```java
 @Import(AutoConfigurationPackages.Registrar.class)
@@ -309,10 +294,10 @@ static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImp
 }
 ```
 
-看代码就很容易理解，把注解扫描进来的package 全部给注册到 spring bean中。这样 Spring Boot 的自动配置也就完成了。
+看代码就很容易理解，把注解扫描进来的 package 全部给注册到 spring bean中。这样 `Spring Boot` 的自动配置也就完成了。
 
 ### 总结
 
-经过这样的一番折腾，相信大家已经对 @SpringBootApplication 注解，有了一定的了解。也知道了@SpringBootApplication 怎么实现的Spring Boot 的自动配置功能。你可以只写这一行代码来启用基于Java的配置、组件扫描，并启用Spring Boot的自动配置功能。它使你的代码更具可读性。
+经过这样的一番折腾，相信大家已经对 `@SpringBootApplication` 注解，有了一定的了解。也知道了 `@SpringBootApplication` 怎么实现 `Spring Boot` 的自动配置功能。下次面试官要是再问这个问题，现在你就可以不被他吊打了。
 
 有任何问题可以在公众号后台留言，指北君会第一时间回复大家。欢迎关注公众号【Java技术指北】，第一时间获取更多精彩内容。
