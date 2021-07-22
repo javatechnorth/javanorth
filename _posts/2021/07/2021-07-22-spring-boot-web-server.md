@@ -11,7 +11,7 @@ tags:
 
 今天指北君要带实习生来了解一下 `Spring Boot` 嵌入式 Web 服务器的相关内容。好，上思维导图目录。文末有完整的思维导图哦。
 
-![概览目录](../../../assets/images/2021/feng/spring-boot-web-server1.png)
+![概览目录](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server1.png)
 
 <!--more-->
 
@@ -25,11 +25,11 @@ tags:
 
 **指北君**：那行，我直接来了。Spring Boot 现在有4种 web 服务器。分别是 tomcat ，jetty，undertow 和 netty。
 
-![web服务器种类](../../../assets/images/2021/feng/spring-boot-web-server2.png)
+![web服务器种类](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server2.png)
 
 **实习生**：我们现在的项目只使用tomcat，其他的我就听过 Jetty 和 netty 。 另外的 Undertow 我听都没听过。
 
-![一脸懵逼](../../../assets/images/2021/feng/spring-boot-web-server3.png)
+![一脸懵逼](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server3.png)
 
 **指北君**：你以前不知道，现在知道了不就行了么。Undertow 是Jboss 旗下的开源服务器产品，根据GitHub上一些开发者的性能压测，Undertow 在 `Spring Boot` 里可是最强的。
 
@@ -67,7 +67,7 @@ tags:
 
 这里有一点需要注意下，因为 jetty 9.4 是不支持 servlet 4.0 的，所以我们在使用的时候，需要做 Jetty 和servlet-api 的版本适配。
 
-![Jetty](../../../assets/images/2021/feng/spring-boot-web-server4.png)
+![Jetty](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server4.png)
 
 **实习生**：既然后 Jetty 有这个问题， 另外的 undertow 和 netty 有这个问题吗？
 
@@ -89,7 +89,7 @@ spring.main.web-application-type=none
 
 **实习生**：给 `spring boot` 团队点赞👍 。
 
-![点赞](../../../assets/images/2021/feng/spring-boot-web-server5.gif)
+![点赞](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server5.gif)
 
 **指北君**：好，下一个端口修改。这个功能比较简单了。只要改一下 `application.properties` 文件就行了。
 
@@ -99,7 +99,7 @@ spring.main.web-application-type=none
 
 **实习生**：我……
 
-![疑问](../../../assets/images/2021/feng/spring-boot-web-server6.png)
+![疑问](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server6.png)
 
 **指北君**：其实也挺简单的。随机端口只要配置 `server.port=0` 就可以了。不暴露端口的话， 配置 `server.port=-1` 这样就OK了。
 
@@ -107,13 +107,13 @@ spring.main.web-application-type=none
 
 **指北君**：可以可以，再来看看http2 的支持情况。总体来说，对http2支持最好的是undertow，原生支持，完全不需要一些特殊处理。
 
-![http2的支持](../../../assets/images/2021/feng/spring-boot-web-server7.png)
+![http2的支持](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server7.png)
 
 **实习生**：这看起来有点复杂啊，脑壳疼。
 
 **指北君**：没事，等我讲完了，我把这个思维导图发给你。 再来看看日志配置吧，http的访问日志，有些时候也挺重要的，需要分析之类的。
 
-![日志配置](../../../assets/images/2021/feng/spring-boot-web-server8.png)
+![日志配置](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server8.png)
 
 **实习生**：哇哦，so easy。我学废了。
 
@@ -123,7 +123,7 @@ spring.main.web-application-type=none
 
 **指北君**：好嘞好嘞。
 
-![开始摸鱼](../../../assets/images/2021/feng/spring-boot-web-server10.png)
+![开始摸鱼](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server10.png)
 
 ### 总结
 
@@ -131,4 +131,4 @@ spring.main.web-application-type=none
 
 有任何问题可以在公众号后台留言，指北君会第一时间回复大家。欢迎关注公众号【Java技术指北】，第一时间获取更多精彩内容。
 
-![完整导图](../../../assets/images/2021/feng/spring-boot-web-server9.png)
+![完整导图](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server9.png)
