@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Spring Boot 嵌入式 Web 服务器
+title: Spring Boot 嵌入式 Web 服务器
 tagline: by feng
 categories: "Spring-Boot"
 tags: 
@@ -14,6 +14,8 @@ tags:
 ![概览目录](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-web-server1.png)
 
 **指北君**：实习生，你过来下，我今天给你讲讲 `Spring Boot` 嵌入式 Web 服务器。
+
+<!--more-->
 
 **实习生**：好的，大佬，马上就来。
 
