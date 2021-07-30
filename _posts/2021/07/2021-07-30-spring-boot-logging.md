@@ -17,6 +17,8 @@ tags:
 
 ![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-logging1.png)
 
+<!--more-->
+
 今天就从这几个角度来讲。
 
 **实习生**：好的，那我们先来看看概述吧。
