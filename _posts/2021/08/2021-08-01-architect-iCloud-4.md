@@ -70,6 +70,23 @@ tags:
 文档存储的使用流程如下：
 ![使用流程](/assets/images/2021/simsky/architect-icloud-4-1.png)
 
+### iCloud Drive中使用文档存储
+如果要在iCloud Drive中启用文档存储需要添加相应的秘钥信息。以及指定应用的容器：
+```xml
+    <key>NSUbiquitousContainers</key>
+    <dict>
+        <key>iCloud.com.example.MyApp</key>
+        <dict>
+            <key>NSUbiquitousContainerIsDocumentScopePublic</key>
+            <true/>
+            <key>NSUbiquitousContainerSupportedFolderLevels</key>
+            <string>Any</string>
+            <key>NSUbiquitousContainerName</key>
+            <string>MyApp</string>
+        </dict>
+    </dict>
+```
+
 ### 总结
 
 关于iCloud的文档存储就讲完了，本次主要介绍文档存储在使用时的要求，文档存储相关的文档状态持久化如何处理，以及文档存储在跨平台时要考虑哪些兼容性要素，最后给出使用文档存储的流程。
