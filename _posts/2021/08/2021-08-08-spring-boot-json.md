@@ -21,23 +21,23 @@ tags:
 
 **指北君**：哟，还听准时，真就花了2分钟。今天我给你讲的是 spring boot 输出json格式数据的功能。看思维导图，Spring boot 默认提供了3个json格式映射库-- Gson ，Jackson 和 JSON-B。 现在我们比较常见的是 Gson 和 Jackson。我们今天就讲讲这两个比较常见的json映射的应用。
 
-![](../../../assets/images/2021/feng/spring-boot-json1.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json1.png)
 
 **实习生**：好的。我们现在项目里使用的是Jackson吧，我好像没有看到有那里配置。
 
 **指北君**：是的，Jackson 是spring boot 的默认实现。 我们可以在application.properties 文件里对它进行各种配置。
 
-![](../../../assets/images/2021/feng/spring-boot-json2.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json2.png)
 
 **实习生**：spring 真的强大啊，这样配置一下，就很方便了啊。
 
 **指北君**：对的，有些个性化的方便，配置一下很方便。我们来看一下 spring boot 怎么做到默认实现的。我看看来看看 spring-boot-starter-web 这个依赖。我们可以看到spring-boot-starter-web中包含一个 spring-boot-starter-json 。
 
-![](../../../assets/images/2021/feng/spring-boot-json.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json.png)
 
 这个starter 起到了配置jackson 为默认解析器的作用。
 
-![](../../../assets/images/2021/feng/spring-boot-json3.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json3.png)
 
 你看，spring-boot-starter-json 里面都是jackson 相关的依赖库。所以说，jackson就默认成为了spring boot 的json 输出解析器。
 
@@ -45,7 +45,7 @@ tags:
 
 **指北君**：其实你找不到怎么依赖的话，你可以使用IDEA的工具来查看。
 
-![](../../../assets/images/2021/feng/spring-boot-json4.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json4.png)
 
 你看这不就找到了。 或者说你也可以使用 Maven 命令行查看
 
@@ -53,7 +53,7 @@ tags:
 mvn dependency:tree
 ```
 
-![](../../../assets/images/2021/feng/spring-boot-json5.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json5.png)
 
 这不，一清二楚啦。
 
@@ -62,17 +62,17 @@ mvn dependency:tree
 **指北君**：好的，那么我们接下来就看看，怎么使用gson来替换Jackson。我们前面的文章已经讲到过，spring boot 替换一般来说是很简单的。
 我们先把 spring-boot-starter-json 排除出去
 
-![](../../../assets/images/2021/feng/spring-boot-json6.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json6.png)
 
 再添加gson的依赖。
 
-![](../../../assets/images/2021/feng/spring-boot-json7.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json7.png)
 
 到这里你可以就又疑问了，spring boot 不是一般都是一些starter的处理吗？ 为什么gson没有starter？
 
 我们找到Gson 自动化配置类GsonAutoConfiguration。
 
-![](../../../assets/images/2021/feng/spring-boot-json8.png)
+![](http://www.javanorth.cn/assets/images/2021/feng/spring-boot-json8.png)
 
 GsonAutoConfiguration 类上有 @ConditionalOnClass 的注解，里面配置了Gson.class 。 也就是说我们只要依赖 Gson.class 就能完成配置了。 所以说我们只要依赖gson 就行了。
 
