@@ -1,0 +1,273 @@
+---
+layout: post
+title:  内部类的使用（下）
+tagline: by 24只羊
+categories: JDK
+tags: 
+    - 24只羊
+---
+
+大家好，我是指北君
+
+这篇文章是内部类的第二篇，上面我们主要讲解了如何在类和接口中使用内部类，这篇指北君将会介绍如何使用static修饰的内部和如何在方法中使用内部类，废话不多说，我们先赶紧来看吧。
+
+<!--more-->
+
+<br/>
+
+
+## 1. static定义内部类
+
+### 1.1 static定义内部类
+
+如果说现在内部类上使用了static定义，那么这个内部类就变成了“外部类”，static定义的都是独立于类的结构，所以该类结构就相当于是一个独立的程序类了。需要注意，static定义的不管是类还是方法只能够访问static成员，**所以static定义的内部类只能够访问外部内中的static属性和方法**；
+
+```java
+public class Outer {
+    private static final String MSG = "哈哈";
+    static class Inner{
+        public void print(){
+            System.out.println(Outer.MSG);
+        }
+    }
+}
+```
+
+
+
+**这个时候的Inner类是一个独立类**，如果此时要想实例化Inner类对象，只需要根据“ 外部类.内部类 ”的结构实例化对象即可
+
+格式如下 **外部类.内部类  内部类对象  =  new   外部类.内部类（）**；
+
+这个时候类名称带有“.”
+
+我们现在实例化static内部类对象
+
+```java
+public class Test {
+    public static void main(String[] args) {
+       Outer.Inner in = new Outer.Inner();
+       in.print();
+    }
+}
+```
+
+
+
+输出结果是“haha”
+
+所以以后如果发现类名称上提供有“.”，首先应该立刻想到这是一个内部类的结构，如果可以直接进行实例化，则应该立刻认识到这是一个static定义的内部类，但是static定义内部类的形式来讲并不常用，**static定义内部接口的形式最为常用**。
+
+### 1.2 static定义内部接口
+
+上代码，注意内部接口IMessage和IChannel
+
+```java
+public interface IMessageWarp {
+    static interface  IMessage{
+        public String getContent();
+    }
+ 
+    static interface IChannel{
+        public boolean connect();  //消息的发送通道
+    }
+ 
+ 
+    //消息发送
+    public static void send(IMessage msg,IChannel channel){
+        if(channel.connect()){
+            System.out.println(msg.getContent());
+        }else{
+            System.out.println("消息通道无法建立");
+        }
+    };   
+}
+```
+
+
+
+```java
+public class DefaultMessage implements IMessageWarp.IMessage {
+    @Override
+    public String getContent() {
+        return "哈哈";
+    }
+}
+```
+
+
+
+```java
+public class NetChannel implements IMessageWarp.IChannel{
+    @Override
+    public boolean connect() {
+        return true;
+    }
+}
+```
+
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        IMessageWarp.send(new DefaultMessage() , new NetChannel());
+    }
+}
+```
+
+
+
+**之所以使用static定义的内部接口，主要是因为这些操作时属于一组相关的定义，有了外部接口之后可以更加明确的表述出这些接口的主要目的**
+
+<br/>
+
+
+## 2.方法中定义内部类
+
+内部类可以在任意的结构中定义，这就包括了：类中、方法中、代码块中。但在方法中定义内部类的情况比较多。
+
+```java
+public class Outer {
+    private String msg = "haha";
+    public void fun (long time){
+        class Inner {    //内部类
+            public void print(){
+                System.out.println(Outer.this.msg);
+                System.out.println(time);
+            }
+        }
+        new Inner().print();    //方法中直接实例化内部类对象
+    }
+}
+```
+
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        new Outer().fun(2390239023L);
+    }
+}
+```
+
+
+
+输出： haha 和 2390239023
+
+此时在fun()方法内部提供有Inner内部类的定义，并且发现内部类可以直接访问外部类中的私有属性也可以直接访问方法中的参数，但对于方法中的参数直接访问时从JDK1.8开始支持的。而在JDK1.8之前**，如果方法中定义的内部类要想访问方法中的参数则参数前必须追加final。**
+
+**之所以取消这样的限制是为了扩展函数式编程准备的**
+
+<br/>
+
+## 3.匿名内部类
+
+匿名类是一种简化的内部类的处理形式，其主要是在抽象类和接口的子类上使用的。
+
+接口和抽象类是一样的
+
+```java
+public interface IMessage {
+    public void send(String str);
+}
+```
+
+
+```java
+public class MessageImpl implements IMessage {
+    @Override
+    public void send(String str) {
+        System.out.println(str);
+    }
+}
+```
+
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        IMessage msg = new MessageImpl();
+        msg.send("哈哈");
+ 
+    }
+}
+```
+
+
+
+如果说现在IMessage接口中的MessageImpl子类只使用唯一的一次，那么是否还有必要将其定义为单独的类？那么在这样的要求下就发现这个时候定义的子类是有些多余了，所以就可以利用内部类的形式来解决此问题
+
+```java
+public interface IMessage {
+    public void send(String str);
+}
+```
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        IMessage msg = new IMessage() {
+           @Override
+            public void send(String str) {    //匿名内部类
+                System.out.println(str);
+            }
+        };
+        msg.send("哈哈");
+    }
+}
+```
+
+
+
+匿名内部类不一定要在抽象类或接口上，但只有在抽象类和接口上才有意义。有些时候为了更加方的体现出匿名内部类的使用，往往可以利用静态方法做一个内部类的匿名内部类实现
+
+
+
+在接口中直接定义匿名内部类
+
+```java
+public interface IMessage {
+    public void send(String str);
+}
+```
+
+
+
+```java
+public interface IMessage {
+    public void send(String str);
+ 
+    public static IMessage getInstance(){
+        return new IMessage() {
+            @Override
+            public void send(String str) {
+                System.out.println(str);
+            }
+        };
+    }
+}
+```
+
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        IMessage.getInstance().send("哈哈");
+    }
+}
+```
+
+
+与内部类相比匿名内部类只是一个没有名字的只能够使用一次的，并且结构固定的一个子类。
+
+<br/>
+
+## **4.总结：**
+
+好了，内部类的使用就介绍完了，大家可以收藏起来，工作中肯定用得到。
+
+我是指北君，操千曲而后晓声，观千剑而后识器。感谢各位人才的：点赞、收藏和评论，我们下期更精彩！
