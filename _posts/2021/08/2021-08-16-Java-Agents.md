@@ -1,0 +1,105 @@
+---
+layout: post
+title:  你的第一个Java-Agent
+tagline: by 揽月中人
+categories: Java
+tags:
+- 揽月中人
+---
+
+Java Agent是目前是各种监测调试JVM的主要技术。Eclipse，IntelliJ,Visual VM ,JConsole 等都依赖于此技术。相信你们的Java 程序部署的时候肯定也会配置各种Java Agent相关的信息。下面给大家盘一盘Java Agent！
+
+<!--more-->
+
+### 1 Java Agent的作用
+
+Java Agent是java.lang.instrument.Instrumentation API的一部分，Instrumentation 提供了修改字节码的机制。并且可以动态或者静态地完成。这意味着我们可以在不接触源程序代码的情况下，向程序中添加一些代码来改变程序。Java Agent有多种用途，如面向切面编程（AOP），程序分析等。AOP可以在不修改原有代码的情况下向程序提供日志记录或安全类似的功能。
+
+我们也可以使用JavaAgent来操控字节码可以和其他的程序进行组合。在JVM的层面监听对象创建、垃圾回收，线程创建等
+
+性能分析工具使用了大量Java Agent 在程序执行的时候分析JVM的一些参数指标。
+
+### 2 Java Agent的原理
+
+Agent类必须实现下面的方法，这个方法就是agent类的入口，类似于java 的main方法入口。
+
+```java
+public static void premain(String agentArgs, Instrumentation inst)
+```
+
+JVM初始化之后main方法执行之前*premain*方法会被调用，程序中可以有多个agent。每一个agent都是按照JVM初始化的顺序进行调用。如果上述 *premain*方法没有找到，那么JVM会调用他的重载方法。方法如下：
+
+```java
+public static void premain(String agentArgs)
+```
+
+ 
+
+JVM 启动之后，可以通过attach去调用*agentmain*方法，许多动态的JVM参数分析都是通过这个方法来完成的。
+
+```java
+public static void agentmain(String agentArgs, Instrumentation inst)
+```
+
+同样的如果上述*agentmain*方法没有找到，那么也会执行其重载方法的版本。
+
+```java
+public static void agentmain(String agentArgs)
+```
+
+
+
+下图为 OpenJDK11种的Agent类：
+
+![image-20210816015700853](http://www.javanorth.cn/assets/images/2021/lyj/agentJDK11.png)
+
+### 3 一个自定义Agent示例
+
+下面我们实现一个简单的Java Agent类来体验一下Agent。
+
+#### 3.1 自定义Agent类
+
+创建普通Maven工程并新建Agent启动类
+
+```java
+public class JavaNorthAgent {
+    //JVM启动时的agent 方法
+    public static void premain(String agentArgs, Instrumentation inst) {
+        System.out.println("premain --- agentArgs:" + agentArgs + " |inst:" + inst.toString());
+    }
+    //  JVM运行中的agent 方法
+    public static void agentmain(String agentArgs, Instrumentation inst){
+        System.out.println("agentmain --- agentArgs:" + agentArgs + " |inst:" + inst.toString());
+
+    }
+}
+```
+
+
+
+#### 3.2 将Agent类打成jar包
+
+将上述自定义Java Agent 类打包到jar包中，增加Maven build 参数如下
+
+![](http://www.javanorth.cn/assets/images/2021/lyj/agentBuildMaven1.png)
+
+执行 mvn clean package命令打包后，可以看到taget目录下的jar包文件如下。
+
+![](http://www.javanorth.cn/assets/images/2021/lyj/agentpackage.png)
+
+
+
+### 3.3 使用java命令使用指定的agent
+
+这里我们使用java命令行启动并使用我们自定义的Java Agent类
+
+java -javaagent:E:\javaNorth\javanorthagent\target\javanorthagent-1.0-SNAPSHOT.jar="hello javanorth"  com.javanorth.agent.Main
+
+输出结果如下：
+
+![image-20210816014255264](http://www.javanorth.cn/assets/images/2021/lyj/agentDemo.png)
+
+### 总结
+
+本片简单介绍了Java Agen类的使用，并给出了一个简单的Agent代码示例。其中Visual VM ,JConsole 等工具会使用JDK自带的Agent来实现实现JVM状态分析。同样arthas 和skywalking也是使用的agent的技术来实现对JVM的监测分析。
+
