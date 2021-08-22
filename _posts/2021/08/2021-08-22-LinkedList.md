@@ -2,7 +2,7 @@
 layout: post
 title:  LinkedList 集合类，用的不多，但有大用
 tagline: by IT可乐
-categories: JDK 源码解读
+categories: JDK 源码解读 Java基础
 tags: 
     - IT可乐
 ---

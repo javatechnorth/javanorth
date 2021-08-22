@@ -2,7 +2,7 @@
 layout: post
 title:  ArrayList 集合类，你知多少？
 tagline: by IT可乐
-categories: JDK 源码解读
+categories: JDK 源码解读 Java基础
 tags: 
     - IT可乐
 ---
