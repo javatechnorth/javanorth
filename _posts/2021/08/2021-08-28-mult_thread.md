@@ -26,7 +26,7 @@ tags:
 
 <!--more-->
 
-**采用实现**Runnable、Callable接口的方式创建线程的优缺点
+**采用实现Runnable、Callable接口的方式创建线程的优缺点**
 
 **优点**：线程类只是实现了Runnable或者Callable接口，还可以继承其他类。这种方式下，多个线程可以共享一个target对象，所以非常适合多个相同线程来处理同一份资源的情况，从而可以将CPU、代码和数据分开，形成清晰的模型，较好的体现了面向对象的思想。
 
@@ -136,7 +136,7 @@ wait()方法强制当前线程释放对象锁。这意味着在调用某对象�
 
 
 
-### 9、Java中interrupted 和** isInterruptedd 方法的区别？
+### 9、Java中interrupted 和 isInterrupted 方法的区别？
 
 interrupted() 和 isInterrupted()的主要区别是前者会将中断状态清除而后者不会。Java多线程的中断机制是用内部标识来实现的，调用Thread.interrupt()来中断一个线程就会设置中断标识为true。当中断线程调用静态方法Thread.interrupted()来检查中断状态时，中断状态会被清零。而非静态方法isInterrupted()用来查询其它线程的中断状态且不会改变中断状态标识。简单的说就是任何抛出InterruptedException异常的方法都会将中断状态清零。无论如何，一个线程的中断状态有有可能被其它线程调用中断来改变。
 
