@@ -5,10 +5,10 @@ tagline: by simsky
 categories: 面试题 设计模式
 tags: 
     - simsky
-
+ 
 ---
 
-
+设计模式面试内容
 
 <!--more-->
 
