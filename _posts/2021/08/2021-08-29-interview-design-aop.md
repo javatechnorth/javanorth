@@ -42,50 +42,6 @@ Privilege是权限颗粒，由Operation和Resource组成，表示对Resource的�
 
 ![](images/inv-design-pattern-2-2.png)
 
-#### 执行流程分析
-
-```doc
-Permission
-id expression name
-1 com.zqx.PermissionController:execute 权限列表
-2 com.zqx.PermissionController:edit 编辑权限
-3 com.zqx.PermissionController:delete 删除权限
-4 com.zqx.PermissionController:reload 重新加载权限
-5 com.zqx.RoleController:execute 角色列表
-6 com.zqx.RoleController:edit 编辑角色
-7 com.zqx.RoleController:delete 删除角色
-8 com.zqx.RoleController:save 添加角色
-角色
-id name List<Permission>
-1 角色管理员 5,6,7,8
-2 权限管理员 1,2,3,4
-员工
-id name List<Role>
-1 小胖 1
-2 小陈 2
-3 班长 1,2
-小胖这个用户登陆:
-1,检查用户名和密码;
-2,检查通过;
-1,得到小胖这个用户的对应的所有的角色:R1
-2,根据所有的角色,得到小胖所有的权限信息:P5,P6,P7,P8
-3,把小胖所有的权限的expression放到一个set中;
-4,把小胖这个对象和他的权限列表放到session中;
-小胖操作系统:
-1,点角色管理;
-2,请求被权限检查拦截器拦截到了(PermissionCheckInterceptor.intercepte);
-1,得到当次请求的Controller和方法;
-2,判断,当前的这个方法是否是需要一个权限的;
-3,如果当前方法不需要权限,直接放行;
-4,如果当前方法需要权限,
-1,把当前请求的method变成com.zqx.RoleController:execute一个表达式;
-2,在当前用户的permissionset中去看是否有这个表达式;
-3,如果有,放行;
-4,如果没有,直接导向到没有权限那个页面;
-```
-
-
-
 ### 日志记录
 
 当很多方法在开始、结束、抛异常时都需要记录，我们就可以采取上述AOP的思想来简化代码
