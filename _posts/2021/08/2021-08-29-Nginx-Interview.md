@@ -178,15 +178,85 @@ http {                               			# HTTP区块开始
 
 ### 14 限流怎么做的？
 
-Nginx限流就是限制用户请求速度，防止服务器受不了
+限流的两种策略是**控制流量**和**控制并发连接数**
 
-限流有3种
+限流类型有3种
 
 1.  正常限制访问频率（正常流量）
 2.  突发限制访问频率（突发流量）
 3.  限制并发连接数
 
-Nginx的限流都是基于漏桶流算法，底下会说道什么是桶铜流
+limit_req_zone 用来限制单位时间内的请求数，即速率限制,采用的漏桶算法 “leaky bucket”
+
+limit_req_conn 用来限制同一时间连接数，即并发限制。
+
+#### 控制速率  
+
+##### 正常限流：
+
+使用 `limit_req_zone` and `limit_req`的基本配置来控制速率，Nginx限流采用漏桶算法( *leaky bucket algorithm*)
+
+```yaml
+limit_req_zone $binary_remote_addr zone=mylimit:10m rate=10r/s;
+ 
+server {
+    location /login/ {
+        limit_req zone=mylimit   
+        proxy_pass http://my_upstream;
+    }
+}
+```
+
+##### 处理突发流量
+
+如果有时正常流量突然增大，超出的请求将被拒绝，无法处理突发流量，可以结合 **burst** 参数使用来解决该问题。
+
+```yaml
+location /login/ {
+    limit_req zone=mylimit burst=20;
+ 
+    proxy_pass http://my_upstream;
+}
+```
+
+
+
+#### 限制连接数
+
+[ngx_http_limit_conn_module](http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html) 提供了限制连接数的能力，利用 **limit_conn_zone** 和 **limit_conn** 两个指令即可。下面是 Nginx 官方例子：
+
+```yaml
+limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+
+server {
+    ...
+    limit_conn perip 10;
+    limit_conn perserver 100;
+}
+```
+
+#### 设置白名单
+
+限流主要针对外部访问，内网访问相对安全，可以不做限流，通过设置白名单即可。利用 Nginx [ngx_http_geo_module](http://nginx.org/en/docs/http/ngx_http_geo_module.html) 和 [ngx_http_map_module](http://nginx.org/en/docs/http/ngx_http_map_module.html) 两个工具模块即可搞定。
+
+```
+geo $limit {
+    default 1;
+    10.0.0.0/8 0;
+    192.168.0.0/24 0;
+    172.20.0.35 0;
+}
+
+map $limit $limit_key {
+    0 "";
+    1 $binary_remote_addr;
+}
+
+limit_req_zone $limit_key zone=myRateLimit:10m rate=10r/s;
+```
+
+
 
 ### 15 为什么要做动静分离？
 
