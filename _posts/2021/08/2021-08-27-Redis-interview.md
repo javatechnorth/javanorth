@@ -1,3 +1,15 @@
+---
+layout: post
+title:  Redis-面试题
+tagline: by 某某白米饭
+categories: Redis
+tags:
+- 某某白米饭
+---
+
+Redis-面试题
+<!--more-->
+
 ### 1、 Redis 的数据结构都有哪些？
 
 Redis 支持五种数据类型，其底层实现的编码数据结构有 8 种： 
