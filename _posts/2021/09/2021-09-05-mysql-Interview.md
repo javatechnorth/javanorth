@@ -9,7 +9,7 @@ tags:
 
 Mysql 面试题
 
-<!-- more -->
+<!--more-->
 
 ### 1. CHAR 和 VARCHAR 的区别？
 
