@@ -328,7 +328,7 @@ public class radixSort {
 
 ### 剪枝算法
 在搜索算法中优化中，剪枝，就是通过某种判断，避免一些不必要的遍历过程，形象的说，就是剪去了搜索树中的某些“枝条”，故称剪枝。应用剪枝优化的核心问题是设计剪枝判断方法，即确定哪些枝条应当舍弃，哪些枝条应当保留的方法。
-![剪枝算法](/assets/images/2021/simsky/inv-algrithm-1-1.png)
+![剪枝算法](/assets/images/2021/simsky/inv-algrithm-1-1.jpg)
 
 
 ### 回溯算法
