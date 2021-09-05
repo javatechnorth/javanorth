@@ -2,7 +2,7 @@
 layout: post
 title:  面试题——MongoDB
 tagline: by simsky
-categories: 面试题 设计模式
+categories: 面试题 MongoDB
 tags: 
     - simsky
  
