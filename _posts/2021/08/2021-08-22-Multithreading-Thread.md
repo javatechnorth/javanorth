@@ -138,7 +138,55 @@ wait() 方法会让当前线程处于“等待（阻塞）状态”，直到其�
 *         the owner of the object's monitor
 ```
 
- 
+### 4 线程的状态及转换
+
+![image](E:\javaNorth\javanorth\assets\images\2021\lyj\thread status convert.png)
+
+#### 4.1 New
+
+初始状态：线程被创建，但是还没有被启动，没有调用start()方法。
+
+#### 4.2 RUNNABLE
+
+运行状态： 可执行的状态，可能正在运行，也可能在等待CPU时间片。
+
+#### 4.3 BLOCKED
+
+阻塞状态：线程阻塞于锁。
+
+等待一个monitor lock 如果获得锁就进入一个同步代码块或者方法，或者在调用之后重新进入一个同步代码快或方法。
+
+#### 4.4 WAITING
+
+等待状态：表示线程进入等待状态，需要等待其他线程的一些特定动作。一个线程进入等待状态由于调用了以下的方法
+
+- Object.wait with no timeout
+- Thread.join with no timeout
+- LockSupport.park
+
+| 进入WAITING状态调用的方法                  | 退出方法                             |
+| ------------------------------------------ | ------------------------------------ |
+| 没有设置 Timeout 参数的 Object.wait() 方法 | Object.notify() / Object.notifyAll() |
+| 没有设置 Timeout 参数的 Thread.join() 方法 | 被调用的线程执行完毕                 |
+| LockSupport.park() 方法                    |                                      |
+
+#### 4.5 TIMED_WAITING
+
+超时等待状态：线程进入等待状态线程等待一段时间后会自动被唤醒。调用以下方法可以进入此状态：
+
+- Thread.sleep
+- Object.wait with timeout
+- Thread.join with timeout
+- LockSupport.parkNanos
+- LockSupport.parkUntil
+
+
+
+#### 4.6 TERMINATED
+
+终止状态：线程执行完毕，或者或者产生异常而结束。
+
+
 
 
 
