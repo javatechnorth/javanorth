@@ -1,3 +1,12 @@
+---
+layout: post
+title:  Spring-面试题
+tagline: by 某某白米饭
+categories: Spring
+tags:
+- 某某白米饭
+---
+
 ### 使用 Spring 框架的好处是什么？
 
 * 轻量：Spring 是轻量的，基本的版本大约 2MB。
@@ -128,13 +137,13 @@ Spring 提供以下几种集合的配置元素：
 * constructor：这个方式类似于 byType，但是要提供给构造器参数，如果没有确定的带参数的构造器参数类型，将会抛出异常。 
 * autodetect：首先尝试使用 constructor 来自动装配，如果无法工作，则使用 byType 方式。
 
-11. 什么是基于 Java 的 Spring 注解配置?
+### 11. 什么是基于 Java 的 Spring 注解配置?
 
 基于 Java 的配置，允许你在少量的 Java 注解的帮助下，进行你的大部分 Spring 配置而非通过 XML 文件。 
 
 以 @Configuration 注解为例，它用来标记类可以当做一个 bean 的定义，被 SpringIOC 容器使用。另一个例子是@Bean 注解，它表示此方法将要返回一个 对象，作为一个 bean 注册进 Spring 应用上下文。
 
-12. Spring 7种事务的传播⾏为
+### 12. Spring 7种事务的传播⾏为
 
 * PROPAGATION_REQUIRED：如果当前没有事务，就新建⼀个事务，如果已经存在⼀个事务中，加⼊到这个事务中。这是最常⻅的选择。
 * PROPAGATION_SUPPORTS：⽀持当前事务，如果当前没有事务，就以⾮事务⽅式执⾏。
@@ -145,7 +154,7 @@ Spring 提供以下几种集合的配置元素：
 * PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执⾏。如果当前没有事务，则执⾏与PROPAGATION_REQUIRED类似的
 操作。
 
-13. BeanFactory 和 ApplicationContext 有什么区别
+### 13. BeanFactory 和 ApplicationContext 有什么区别
 
 * BeanFactory 可以理解为含有 bean 集合的工厂类。BeanFactory 包含了种 bean 的定义，以便在接收到客户端请求时将对应的 bean 实例化。
 * BeanFactory 还能在实例化对象的时生成协作类之间的关系。此举将 bean 自身与 bean 客户端的配置中解放出来。BeanFactory 还包含了 bean 生命周期的控制，调用客户端的初始化方法（initialization methods）和销毁方法（destruction methods）。
@@ -154,29 +163,29 @@ Spring 提供以下几种集合的配置元素：
 * 统一的资源文件读取方式
 * 已在监听器中注册的 bean 的事件
 
-14. Spring IOC 如何实现
+### 14. Spring IOC 如何实现
 
 * Spring 中的 org.springframework.beans 包和 org.springframework.context 包构成了Spring 框架 IoC 容器的基础。
 * BeanFactory 接口提供了一个先进的配置机制，使得任何类型的对象的配置成为可能。ApplicationContex 接口对 BeanFactory（是一个子接口）进行了扩展，在 BeanFactory 的基础上添加了其他功能，比如与 Spring 的 AOP 更容易集成，也提供了处理 messageresource的机制（用于国际化）、事件传播以及应用层的特别配置，比如针对 Web 应用的WebApplicationContext。 
 * org.springframeworkbeans.factory.BeanFactory 是 Spring IoC 容器的具体实现，用来包装和管理前面提到的各种 bean。BeanFactory 接口是 Spring IoC 容器的核心接口。
 
-15. 怎样开启注解装配？
+### 15. 怎样开启注解装配？
 
 注解装配在默认情况下是不开启的，为了使用注解装配，我们必须在 Spring 配 置文件中配置<context:annotation-config/>元素。
 
-16. @Required 注解
+### 16. @Required 注解
 
 这个注解表明 bean 的属性必须在配置的时候设置，通过一个 bean 定义的显式 的属性值或通过自动装配，若@Required 注解的 bean 属性未被设置，容器将 抛出 BeanInitializationException。
 
-17. @Autowired 注解
+### 17. @Autowired 注解
 
 @Autowired 注解提供了更细粒度的控制，包括在何处以及如何完成自动装配。 它的用法和@Required 一样，修饰 setter 方法、构造器、属性或者具有任意名 称和/或多个参数的 PN 方法。
 
-18. @Qualifier 注解
+### 18. @Qualifier 注解
 
 当有多个相同类型的 bean 却只有一个需要自动装配时，将@Qualifier 注解和 @Autowire 注解结合使用以消除这种混淆，指定需要装配的确切的 bean。
 
-19. 如何给 Spring 容器提供配置元数据?
+### 19. 如何给 Spring 容器提供配置元数据?
 
 * XML 配置文件。
 * 基于注解的配置。
