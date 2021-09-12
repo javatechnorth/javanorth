@@ -44,7 +44,7 @@
 [root@localhost ~]# systemctl start  mysqld.service
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+(data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 通过以下命令查看MySQL运行状态
 
@@ -121,7 +121,7 @@ mysql> exit
 [root@localhost ~]# firewall-cmd --zone=public --add-port=8080/tcp --permanent
 ```
 
-![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+(data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 然后再重新载入
 
@@ -138,6 +138,7 @@ mysql> exit
 
 ![img](https://img-blog.csdn.net/2018053119584461)
 
+
 可以看到，绿色箭头处不是utf-8
 
 因此我们先退出mysql，然后再到、etc目录下的my.cnf文件下修改一下文件内容
@@ -147,9 +148,11 @@ mysql> exit
 进入文件后，新增四行代码：
 
 ![img](https://img-blog.csdn.net/20180531201748668)
+
 保存更改后的my.cnf文件后，重启下mysql，然后输入status再次查看，你就会发现变化啦
 
 ![img](https://img-blog.csdn.net/20180531200538548)
+
 
 最后，到Windows下用cmd命令启动mysql就ok了
 
