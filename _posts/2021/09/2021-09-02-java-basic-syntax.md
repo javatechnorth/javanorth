@@ -2,7 +2,7 @@
 layout: post
 title: Java 基础语法
 tagline: by feng
-categories: spring
+categories: Java基础
 tags: 
     - feng
 ---
