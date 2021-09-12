@@ -32,7 +32,7 @@
 
 如果命令行出现如下图片语句，则说明MySQL安装完成
 
-![img](https://img-blog.csdn.net/20180531164100716)!
+![img](https://img-blog.csdn.net/20180531164100716)
 
 
 
@@ -52,7 +52,7 @@
 [root@localhost ~]# systemctl status mysqld.service
 ```
 
-![img](https://img-blog.csdn.net/20180531164553246)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![img](https://img-blog.csdn.net/20180531164553246)
 
 如上图所示，此时MySQL已经开始正常运行
 
@@ -62,8 +62,7 @@
 [root@localhost ~]# grep "password" /var/log/mysqld.log
 ```
 
-![img](https://img-blog.csdn.net/20180531164427771)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
+![img](https://img-blog.csdn.net/20180531164427771)
 
 
  如下命令进入数据库：
@@ -92,7 +91,7 @@ grant all privileges on *.* to 'root'@'192.168.0.1' identified by 'password' wit
 
 
 
-![img](https://img-blog.csdn.net/20180918150432333?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NTgyNjA0/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![img](https://img-blog.csdn.net/20180918150432333?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NTgyNjA0/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 然后再输入下面两行命令
 
@@ -106,7 +105,7 @@ mysql> exit
 
 
 
-![img](https://img-blog.csdn.net/20180531193815519)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![img](https://img-blog.csdn.net/20180531193815519)
 
 
 
@@ -130,31 +129,27 @@ mysql> exit
 [root@localhost ~]# firewall-cmd --reload
 ```
 
-![img](https://img-blog.csdn.net/20180531195102403)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
+![img](https://img-blog.csdn.net/20180531195102403)
 
 
 ### 5 更改mysql的语言
 
 首先重新登录mysql，然后输入status：
 
-![img](https://img-blog.csdn.net/2018053119584461)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
-
+![img](https://img-blog.csdn.net/2018053119584461)
 
 可以看到，绿色箭头处不是utf-8
 
 因此我们先退出mysql，然后再到、etc目录下的my.cnf文件下修改一下文件内容
 
-![img](https://img-blog.csdn.net/20180531200259161)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![img](https://img-blog.csdn.net/20180531200259161)
 
 进入文件后，新增四行代码：
 
-![img](https://img-blog.csdn.net/20180531201748668)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
+![img](https://img-blog.csdn.net/20180531201748668)
 保存更改后的my.cnf文件后，重启下mysql，然后输入status再次查看，你就会发现变化啦
 
-![img](https://img-blog.csdn.net/20180531200538548)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+![img](https://img-blog.csdn.net/20180531200538548)
 
 最后，到Windows下用cmd命令启动mysql就ok了
 
