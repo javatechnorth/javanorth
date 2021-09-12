@@ -32,7 +32,7 @@
 
 如果命令行出现如下图片语句，则说明MySQL安装完成
 
-![img](https://img-blog.csdn.net/20180531164100716)
+![img](https://img-blog.csdn.net/20180531164100716)!(data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 
 
