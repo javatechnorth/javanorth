@@ -7,6 +7,9 @@ tags:
     - IT可乐
 ---
 
+计算机网络面试题
+<!--more-->
+
 ### 1、OSI与TCP/IP各层的结构与功能,都有哪些协议?
 TCP/IP 与 OSI 都是为了使网络中的两台计算机能够互相连接并实现通信与回应，但他们最大的不同在于，OSI 是一个理论上的网络通信模型，而 TCP/IP 则是实际上的网络通信标准。  
 ![](http://www.javanorth.cn/assets/images/2021/itcore/network-00-00.png)  
