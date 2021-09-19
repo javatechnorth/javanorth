@@ -7,6 +7,9 @@ tags:
     - IT可乐
 ---
 
+hibernate 面试题
+<!--more-->
+
 ### 1、什么是Hibernate，好处是什么？
  1）Hibernate是一个操作数据库的框架，实现了对JDBC的封装； 
 
