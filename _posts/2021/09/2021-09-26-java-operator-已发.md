@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Java 运算符
+title: Java 运算符——20210927
 tagline: by feng
 categories: Java基础
 tags: 
@@ -11,7 +11,7 @@ tags:
 
 今天指北君要带实习生小伙伴，过一遍Java运算符相关的内容。
 
-![image-20210926191224666](https://gitee.com/274904168/image-repo/raw/master/202109261912723.png)
+![](https://gitee.com/274904168/image-repo/raw/master/202109261912723.png)
 
 **指北君**: 在Java中，有很多种类型的运算符，主要可以分为：算术运算符、关系运算符、位运算符、逻辑运算符、赋值运算符、其他运算符。
 
@@ -94,7 +94,7 @@ public class selfAddMinus{
 
 **指北君**：我们再来看看关系运算符。
 
-![image-20210926181014901](https://gitee.com/274904168/image-repo/raw/master/202109261810954.png)
+![](https://gitee.com/274904168/image-repo/raw/master/202109261810954.png)
 
 关系运算符没有特别的难点，直接看示例吧。
 
@@ -127,7 +127,7 @@ b <= a = false
 
 **指北君**：接下来看看位运算符。
 
-![image-20210926181849534](https://gitee.com/274904168/image-repo/raw/master/202109261818580.png)
+![](https://gitee.com/274904168/image-repo/raw/master/202109261818580.png)
 
 ```java
 public class Test {
@@ -173,7 +173,7 @@ a >>> 2 = 15
 
 **指北君**：逻辑运算符
 
-![image-20210926182312472](https://gitee.com/274904168/image-repo/raw/master/202109261823531.png)
+![](https://gitee.com/274904168/image-repo/raw/master/202109261823531.png)
 
 ```java
 public class Test {
@@ -198,7 +198,7 @@ a || b = true
 
 **指北君**：接下来看看赋值运算符
 
-![image-20210926182627487](https://gitee.com/274904168/image-repo/raw/master/202109261826547.png)
+![](https://gitee.com/274904168/image-repo/raw/master/202109261826547.png)
 
 ```java
 public class Test {
