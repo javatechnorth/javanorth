@@ -58,11 +58,11 @@ public class CompletableFutureDemo1 {
 
 CompleteableFuture 其主要方法大多为CompletionStage相关的方法。
 
-- thenCompose
-- thenCombine
+- thenCompose 平行处理两个
+- thenCombine 聚合两个stage的result
 - thenAccept 直接消费
 - thenRun 直接执行
-- theApply
+- theApply 
 
 我们先列出来，后面会一一讲到。
 
@@ -213,7 +213,7 @@ public <U> CompletableFuture<U> thenComposeAsync(Function<? super T, ? extends C
 
 **thenCompose(Function<? super T, ? extends CompletionStage<U>> fn)**
 
-只有一个Function参数，Function中的输入值T为当前Stage的结果，输出R为一个CompletionStage, 返回一个新的CompletionStage，
+只有一个Function参数，Function中的输入值T为当前Stage的结果，输出值为一个CompletionStage, 返回一个新的CompletionStage，
 
 其余的方法同上。
 
@@ -312,6 +312,8 @@ public CompletableFuture<T> whenCompleteAsync(BiConsumer<? super T, ? super Thro
 **whenComplete(BiConsumer<? super T, ? super Throwable> action)**
 
 顾名思义，就是当前调用的stage完成的时候执行参数中的方法，并且返回包含同一个结果的CompletableFuture，如果有异常也会返回指定的异常。
+
+
 
 
 
