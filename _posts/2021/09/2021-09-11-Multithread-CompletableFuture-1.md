@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  Doug Lea 大师的艺术之作CompletableFuture 
+title:  Doug Lea 大师的艺术之作CompletableFuture （一）
 tagline: by 揽月中人
 categories: Thread
 tags:
 - 揽月中人
 ---
 
-completeFuture的复杂人生！ CompleteableFuture 继承自
+completeFuture作为Doug Lea大师的有一个艺术作品，把并发编程的艺术发挥到极致。之前的Future为我们提供了多线程执行返回值的使用问题。而CompletableFuture则为我们提供了一种线程执行结果连续处理的能力。为多线程编程提供了更为简洁的方式。关于CompletableFuture，我会分为多篇来讲，今天会为大家介绍一下其基本方法以及不同名称参数的方法含义及作用。
 
 <!--more-->
 
@@ -38,7 +38,25 @@ CompletableFuture实现了CompletionStage接口，那么其stage的这种设计�
 
 示例
 
-其主要方法大多为CompletionStage相关的方法。
+```java
+public class CompletableFutureDemo1 {
+    public static void main(String[] args) {
+
+        CompletableFuture<String> cf1 = new CompletableFuture<String>();
+        CompletableFuture<String> completedFuture = CompletableFuture.completedFuture("completedFuture");
+        CompletableFuture<String> stringCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            return "supplyAsyncFuture";
+        });
+        CompletableFuture<Void> runAsyncCompleteableFuture = CompletableFuture.runAsync(() -> {
+            System.out.println("runAsyncCompleteableFuture");
+        });
+    }
+}
+```
+
+
+
+CompleteableFuture 其主要方法大多为CompletionStage相关的方法。
 
 - thenCompose
 - thenCombine
@@ -291,14 +309,12 @@ public CompletableFuture<T> whenCompleteAsync(BiConsumer<? super T, ? super Thro
 public CompletableFuture<T> whenCompleteAsync(BiConsumer<? super T, ? super Throwable> action, Executor executor)
 ```
 
+**whenComplete(BiConsumer<? super T, ? super Throwable> action)**
 
-
-### 4 Completable Future 使用场景及示例
-
-​	
+顾名思义，就是当前调用的stage完成的时候执行参数中的方法，并且返回包含同一个结果的CompletableFuture，如果有异常也会返回指定的异常。
 
 
 
 ### 总结
 
-本篇为妹子讲了一下CompletableFuture的内容特点以及使用场景，并且列举了一些例子。相信聪明的美女同事已经比较熟悉CompleteableFuture的应用了！
+本篇为妹子讲了一下CompletableFuture的内容特点。相信聪明的美女同事已经比较熟悉CompleteableFuture的应用了！下期我们再来讲解CompletableFuture的使用场景以及应用示例。
