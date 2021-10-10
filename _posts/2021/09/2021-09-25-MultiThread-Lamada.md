@@ -13,34 +13,42 @@ JDK中有许多函数式接口，也会有许多方法会使用函数式接口�
 
 ### 1 JDK中常见的Lamada表达式
 
- **Runnable**
+Java中可以使用Lamada表达式的接口都有@FunctionalInterface注解。
+
+先来看看util.function包下面含有FunctionalInterface注解的接口。一屏显示不全，可见功能非常齐全。
+
+鉴于常用的一些函数式接口有Function/Consumer/Supplier/Predicate以及Runnable等。本篇介绍这几类接口。
+
+![image-20211010224457887](E:\javaNorth\javanorth\assets\images\2021\lyj\LamadaFunctionClass1.png)
+
+![image-20211010224559121](E:\javaNorth\javanorth\assets\images\2021\lyj\LamadaFunctionClass2.png)
+
+####  1.1 Runnable
 
 ```java
 @FunctionalInterface
 public interface Runnable {
-    /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
-     * @see     java.lang.Thread#run()
-     */
     public abstract void run();
 }
 ```
 
- 无参数，无返回值。
+ Runnable 使用Lamada方式书写时，无参数，无返回值。最终执行的是run方法
 
-**Function**
+使用Demo
+
+```java
+new Thread(() -> {
+    System.out.println("JavaNorth Runnable");
+}).start();
+```
+
+#### 1.2 Function 
+
+Function 表示接受一个参数并产生结果的函数。
 
 ```java
 @FunctionalInterface
 public interface Function<T, R> {
-
     /**
      * Applies this function to the given argument.
      *
@@ -64,11 +72,24 @@ public interface Function<T, R> {
 }
 ```
 
-  Function<T,R>接受一个参数T，并且有返回值 R	
+  Function<T,R>接受一个参数T，并且有返回值 R, 其实现也主要是实现此方法 R apply(T t);
 
-**Consumer**
+Function 的一个示例:
 
-  Consumer接受一个参数，没有返回值
+```java
+List<String> list = new ArrayList<String>();
+List<String> collect = list.stream().map((x) -> {
+    return "Java North Function" + x;
+}).collect(Collectors.toList());
+```
+
+上述示例中是一个stream的map方法。其中x为输入参数，『"Java North and" + x』为输出。
+
+
+
+#### 1.3 Consumer
+
+  Consumer表示接受一个参数，没有返回值的操作，主要方法为 void accept(T t);
 
 ```java
 @FunctionalInterface
@@ -87,7 +108,32 @@ public interface Consumer<T> {
 }
 ```
 
-**Supplier**
+##### 1.3.1 Consumer 在Java中的应用
+
+常见的有List的forEach等。
+
+```java
+list.forEach(x -> System.out.println( "Java North Consumer test " + x));
+```
+
+x为参数，输出语句直接执行。
+
+下面的map的forEach参数为BiConsumer，其入参有两个。
+
+```java
+Map<String,String> map = new HashMap<>();
+map.forEach((K,V) -> {
+    System.out.println("Java North Big Consumer MAP key : " +K + " value: "+V );
+});
+```
+
+##### 1.3.2 自动义带有Consumer的方法
+
+
+
+
+
+#### 1.4 Supplier 
 
   Supplier没有参数，有一个返回值。
 
