@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Doug Lea 大师的艺术之作CompletableFuture （一）
+title:  Doug Lea 大师的艺术之作CompletableFuture （一）——20211001
 tagline: by 揽月中人
 categories: Thread
 tags:
