@@ -179,7 +179,7 @@ public class MachineConsumer {
 
 Cglib代理可以称为子类代理，是在内存中构建一个子类对象，从而实现对目标对象功能的扩展。
 
-![img](http://www.javanorth.cn/assets/images/2021/lyj\cglibproxy2.jpg)
+![img](http://www.javanorth.cn/assets/images/2021/lyj/cglibproxy2.jpg)
 
 C代理商不仅想代理公司，而且还想代理多个工厂的产品。
 
