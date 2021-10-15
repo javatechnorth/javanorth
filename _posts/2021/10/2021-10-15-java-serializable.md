@@ -26,7 +26,7 @@ Serializable 接口没有定义任何的方法，是一个空接口。为什么�
 
 ### 序列化
 
-将一个对象序列化后保存到文件
+下面例子是将一个 java 对象序列化后保存到文件。
 
 ```java
 import java.io.Serializable;
