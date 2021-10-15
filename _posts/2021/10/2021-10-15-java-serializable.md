@@ -50,7 +50,6 @@ public class Order  implements Serializable {
                 '}';
     }
 }
-
 ```
 
 把一个 Java 对象变为 byte[] 数组，需要使用 ObjectOutputStream。它负责把一个Java 对象写入一个字节流：
