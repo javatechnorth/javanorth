@@ -151,7 +151,7 @@ public class DecoratorConsumer {
 
 Java中InputStream的实现中有用到装饰模式，那么给大家盘一盘。下面为网上比较多的类图关系。
 
-![image](http://www.javanorth.cn/assets/images/2021/lyj/DP-Decorator-java.io.png)
+![image](http://www.javanorth.cn/assets/images/2021/lyj/DP-Decorator-java.png)
 
 Java 中缓存字节流 BufferedInputStream 可以看成是 InputStream 实例的装饰类，对其中的read等方法进行了增强。
 

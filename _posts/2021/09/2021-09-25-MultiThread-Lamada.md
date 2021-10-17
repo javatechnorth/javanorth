@@ -129,7 +129,32 @@ map.forEach((K,V) -> {
 
 ##### 1.3.2 自动义带有Consumer的方法
 
+```java
+public class ConsumerBiConsumerDemo {
+    public static void main(String[] args) {
+        Consumer<String> conString = (x) -> System.out.println(x.toUpperCase());
+        conString.accept("i love java north ");
 
+        BiConsumer<String, String> biCon = (x,y) -> System.out.println (x + y);
+        biCon.accept("i love ","java");
+
+        List<Person> plist = Arrays.asList(new Person("Java"),new Person("North"));
+        acceptAllEmployee(plist,p -> System.out.println(p.name));
+        acceptAllEmployee(plist,person -> {person.name = "unknow";});
+        acceptAllEmployee(plist,person -> System.out.println(person.name));
+    }
+
+    public static void acceptAllEmployee(List<Person> plist, Consumer<Person> con){
+        plist.forEach(person -> {con.accept(person);});
+    }
+}
+class Person{
+    public String name;
+    public Person (String name){
+        this.name = name;
+    }
+}
+```
 
 
 
@@ -150,32 +175,57 @@ public interface Supplier<T> {
 }
 ```
 
-**BiConsumer**
-
-   BiConsumer<T,U>接受两个参数，没有返回值。
+Supplier 通常会用在
 
 ```java
-@FunctionalInterface
-public interface BiConsumer<T, U> {
-    /**
-     * Performs this operation on the given arguments.
-     * @param t the first input argument
-     * @param u the second input argument
-     */
-    void accept(T t, U u);
+public class SupplierDemo {
 
-    default BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after) {
-        Objects.requireNonNull(after);
+    public static void main(String[] args) {
+        SupplierDemo sdemo = new SupplierDemo();
+        Supplier<LocalDateTime> s = () -> LocalDateTime.now();
+        LocalDateTime localDateTime = s.get();
+        System.out.println(s.get());
 
-        return (l, r) -> {
-            accept(l, r);
-            after.accept(l, r);
-        };
+        Supplier<List> listSupplier = sdemo.listSupplier();
+        List list = listSupplier.get();
+
+        Person person = personFactory(Person::new);
+        System.out.println(person);
+
+        Person javaNorth = personFactory(() -> new Person("JavaNorth"));
+        System.out.println(javaNorth);
+    }
+
+    public Supplier<List> listSupplier(){
+        return ArrayList::new;
+    }
+
+
+    public static Person personFactory(Supplier<? extends Person> s){
+        Person person = s.get();
+        if(person.getName() == null)  person.setName("default");
+        person.setAge(18);
+        return person;
+    }
+
+
+    static class Person {
+        String name;
+        int age;
+        public Person() {   }
+        public Person(String name) {
+            this.name = name;
+        }
+       。。。
     }
 }
 ```
 
-**Predicate**
+
+
+#### 1.5 Predicate
+
+主要方法为test，其主要是传入一个参数，返回一个boolean类型的值。
 
 ```
 @FunctionalInterface
