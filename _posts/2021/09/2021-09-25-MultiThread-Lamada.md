@@ -175,7 +175,7 @@ public interface Supplier<T> {
 }
 ```
 
-Supplier 通常会用在
+Supplier 示例如下：
 
 ```java
 public class SupplierDemo {
