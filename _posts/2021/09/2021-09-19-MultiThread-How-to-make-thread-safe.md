@@ -54,7 +54,7 @@ class TicketStation implements Runnable{
 
 运行几遍就有可能会出现下面的错误不预期的结果。一个线程卖完了票，但是另外两个线程都还不知道。
 
-![image-20210926221216385](E:\javaNorth\javanorth\assets\images\2021\lyj\treadSafeTicketResult.jpg)
+![image-20210926221216385](http://www.javanorth.cn/assets/images/2021/lyj/treadSafeTicketResult.jpg)
 
 
 
