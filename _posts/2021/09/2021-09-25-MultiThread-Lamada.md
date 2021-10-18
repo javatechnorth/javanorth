@@ -227,7 +227,7 @@ public class SupplierDemo {
 
 主要方法为test，其主要是传入一个参数，返回一个boolean类型的值。
 
-```
+```java
 @FunctionalInterface
 public interface Predicate<T> {
 
@@ -253,24 +253,102 @@ public interface Predicate<T> {
         Objects.requireNonNull(other);
         return (t) -> test(t) || other.test(t);
     }
+	......
+}
+```
 
-    static <T> Predicate<T> isEqual(Object targetRef) {
-        return (null == targetRef)
-                ? Objects::isNull
-                : object -> targetRef.equals(object);
-    }
+Predicate简单示例：
 
-    @SuppressWarnings("unchecked")
-    static <T> Predicate<T> not(Predicate<? super T> target) {
-        Objects.requireNonNull(target);
-        return (Predicate<T>)target.negate();
+```java
+public class PredicateDemo {
+    public static void main(String[] args) {
+        Predicate<Integer> predicate = (s) -> s > 5;
+        Predicate<Integer> predicate2 = (s) -> s > 8;
+        System.out.println(" 3 大于5 ？ " + predicate.test(3));
+        System.out.println(" 6 大于5 ？ " + predicate.test(6));
+
+        System.out.println("7 大于5 and 大于8 " + predicate.and(predicate2).test(7));
+        System.out.println("7 大于5 or 大于8 " + predicate.or(predicate2).test(7));
+
+        List<Integer> list = Arrays.asList(3,5,6,2,8,4,7,9);
+        List<Integer> collect = list.stream().filter(predicate).collect(Collectors.toList());
+
+        System.out.println(list);
+        System.out.println(collect);
     }
 }
 ```
 
+上述代码运行结果
+
+```javascript
+ 3 大于5 ？ false
+ 6 大于5 ？ true
+7 大于5 and 大于8 false
+7 大于5 or 大于8 true
+[3, 5, 6, 2, 8, 4, 7, 9]
+[6, 8, 7, 9]
+```
+
+
+
 ### 2 常用的Lamada参数特征
 
+Lamada 的一些表达式将方法的一些执行逻辑放到了参数中，使得方法的返回值根据传入的参数的逻辑而变化。从而实现了在一定的方法不变的情况下，使代码执行传入参数相关的逻辑。
+
+常用的一些Lamada使用如下：
+
+
+
+Runnable **无入参，无返回值**。 
+
+```java
+() -> { System.out.println(strF.apply("javaNorth Runnable"));}
+```
+
+
+
+Function **有入参，有返回值**
+
+```java
+Function strF = (s) -> { return s + "javaNorth Function"; };
+System.out.println(strF.apply("TEST "));
+```
+
+
+
+Consumer有入参，无返回值。
+
+```java
+Consumer<String> srtC = (s) -> {System.out.println(s + "javaNorth TEST ");};
+srtC.accept("Hello World");
+```
+
+
+
+Supplier **无入参，有返回值。**
+
+```java
+Supplier<String> srtP = () -> {return "I love avaNorth ";};
+System.out.println(srtP.get());
+```
+
+
+
+Predicate **有入参，返回一个boolean类型的值**
+
+```java
+Predicate<Integer> predicate = (s) -> s > 5;
+System.out.println(" 3 大于5 ？ " + predicate.test(3));
+```
+
+
+
 ### 3 自定义Lamada函数式接口
+
+
+
+
 
 
 ### 总结
