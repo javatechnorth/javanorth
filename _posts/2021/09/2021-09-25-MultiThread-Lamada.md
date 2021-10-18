@@ -19,9 +19,9 @@ Java中可以使用Lamada表达式的接口都有@FunctionalInterface注解。
 
 鉴于常用的一些函数式接口有Function/Consumer/Supplier/Predicate以及Runnable等。本篇介绍这几类接口。
 
-![image-20211010224457887](E:\javaNorth\javanorth\assets\images\2021\lyj\LamadaFunctionClass1.png)
+![image-20211010224457887](http://www.javanorth.cn/assets/images/2021/lyj/LamadaFunctionClass1.png)
 
-![image-20211010224559121](E:\javaNorth\javanorth\assets\images\2021\lyj\LamadaFunctionClass2.png)
+![image-20211010224559121](http://www.javanorth.cn/assets/images/2021/lyj/LamadaFunctionClass2.png)
 
 ####  1.1 Runnable
 
@@ -346,9 +346,28 @@ System.out.println(" 3 大于5 ？ " + predicate.test(3));
 
 ### 3 自定义Lamada函数式接口
 
+结合之前的常用Lamada函数的介绍，下面我们自定义一个简单的函数式接口。
 
+```java
+@FunctionalInterface
+public interface MyFunction<T> {
+   public void print(T t);
+}
 
+public class MyFunctionDemo {
+    public static void printString(String str , MyFunction<String> myF){
+        myF.print(str);
+    }
+    public static void main(String[] args) {
+        printString("I love " , (str) -> {System.out.println(str + "Java North");});
+    }
+}
 
+```
+
+其实很简单，就是展示了一下自定义函数式接口的应用实例而已。
 
 
 ### 总结
+
+ 函数式接口的使用可以简化我们的代码，很大程度上提高代码的可读性。在程序执行上可能性能稍微有所降低，但对开发带来的便捷与好处是大于其性能上的微弱损失的。 除了介绍的几种常见的函数式编程以外，还有许多其他的函数式接口等着我们去利用。听完这些话之后，软软猿妹也对常用的函数式接口有所了解，接下来下定决心要好好学一学函数式接口了。
