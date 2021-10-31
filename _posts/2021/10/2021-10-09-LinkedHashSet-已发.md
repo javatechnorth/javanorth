@@ -7,8 +7,8 @@ tags:
     - IT可乐
 ---
 
-　　哈喽，大家好，我是指北君。  
-　　同 HashSet 与 HashMap 的关系一样，本篇文章所介绍的 LinkedHashSet 和 LinkedHashMap 也是一致的。在 JDK 集合框架中，类似 Set 集合通常都是由对应的 Map 类集合来实现的（TreeSet 和 TreeMap 同理），这里很重要的一个理论就是：Set 类集合是不允许重复的，而 Map 类集合的 key 也是不允许重复的，所以通常很容易就用 Map 类集合实现了 Set 类集合。
+哈喽，大家好，我是指北君。  
+同 HashSet 与 HashMap 的关系一样，本篇文章所介绍的 LinkedHashSet 和 LinkedHashMap 也是一致的。在 JDK 集合框架中，类似 Set 集合通常都是由对应的 Map 类集合来实现的（TreeSet 和 TreeMap 同理），这里很重要的一个理论就是：Set 类集合是不允许重复的，而 Map 类集合的 key 也是不允许重复的，所以通常很容易就用 Map 类集合实现了 Set 类集合。
 <!--more-->
 ### 1、LinkedHashSet 定义
 　　LinkedHashSet 是由 LinkedHashMap 实现的集合。元素有序且不能重复。
