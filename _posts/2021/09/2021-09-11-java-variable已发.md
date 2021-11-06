@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Java 变量
+title: Java 变量——20211031
 tagline: by feng
 categories: Java基础
 tags: 
