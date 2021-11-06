@@ -184,6 +184,8 @@ Exception in thread "main" java.lang.NullPointerException: Cannot invoke "String
         at NPTDemo.main(NPTDemo.java:24)
 ```
 
+上述详情请见如下地址，欢迎来瓢。
+https://github.com/javatechnorth/java-study-note/tree/master/multiThread/src/main/java/org/javanorth/currency/npt
 
 
 ### 总结
