@@ -218,10 +218,6 @@ git rebase -i 4e08572
 
 然后看到rebase成功 
 
-![image-20211109024348934](http://www.javanorth.cn/assets/images/2021/lyj/image-20211109024348934.png)
-
-
-
 查看刚才的log 
 
 ![	e](http://www.javanorth.cn/assets/images/2021/lyj/gitlog.png)
