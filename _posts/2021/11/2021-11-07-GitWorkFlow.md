@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title:  开发人员必知的Git知识总结！--还差一点完成
+title:  开发人员必知的Git技能及Git工作流总结！
 tagline: by 揽月中人
 categories: Git
 tags:
@@ -16,69 +16,243 @@ Git作为最流行的代码版本控制工具，基本上已经成为了程序�
 
 #### 1.1 与仓库相关的操作
 
-git clone  克隆代码仓库到本地，开发必用
+克隆代码仓库到本地，开发必用
 
-git remote -v  查看本地仓库配置了那些对应的远程仓库。
+```shell
+git clone  <url>
+```
 
-git remote add <name><url>  添加远程仓库
+ 查看本地仓库配置了那些对应的远程仓库。
 
-git remote set -url --push <name><newUrl> 更新远程仓库地址
+```shell
+git remote -v 
+```
 
-git pull <remoteName><localBranchName> 拉去远程仓库
+添加远程仓库
 
-git push <remoteName><localBranchName> 退送本地仓库到远程仓库，默认是当前所在branch
+```shell
+git remote add <name><url>
+```
+
+更新远程仓库地址
+
+```shell
+git remote set -url --push <name><newUrl> 
+```
+
+拉取远程仓库
+
+```shell
+git pull <remoteName><localBranchName> 
+```
+
+ 推送本地仓库到远程仓库，默认是当前所在branch
+
+```shell
+git push <remoteName><localBranchName>
+```
 
 
 
-#### 2.2 分支的创建切换等相关操作
+#### 1.2 分支的创建切换等相关操作
 
-git branch 本地分支 / git branch -a 查看所有分支  
+ 查看本地分支/所有分支  
 
-git branch -r 查看远程分支
+```shell
+git branch  / git branch -a
+```
 
-创建分支的几种情况
+查看远程分支
 
-git branch <name> 创建本地分支，
+```
+git branch -r 
+```
 
-git checkout -b <本地分支名> <远程仓库名>/<远程分支名>  本地创建分支并和远程分支关联，再切换到该分支。
+创建本地分支
 
-git branch -b <本地分支名> <远程仓库名>/<远程分支名>  创建本地分支并和远程分支关联，但是不切换到新分支。
+```shell
+git branch <name> 
+```
 
-git fetch <远程仓库名> <远程分支名>:<本地分支名> 根据远程分支创建本地分支，但是不会切换到新分支，需要手动checkout
+本地创建分支并和远程分支关联，再切换到该分支。
+
+```shell
+git checkout -b <本地分支名> <远程仓库名>/<远程分支名>
+git branch -b <本地分支名> <远程仓库名>/<远程分支名>  
+```
+
+ 根据远程分支创建本地分支，但是不会切换到新分支，需要手动checkout
+
+```shell
+git fetch <远程仓库名> <远程分支名>:<本地分支名>
+```
+
+创建新分支并立刻切换到改分支
+
+```shell
+git checkout -b <name> 
+```
+
+创建远程分支： 
+
+```shell
+git push origin <name>
+```
+
+删除远程分支
+
+```shell
+git push origin:heads/<name>
+也可以push一个空的本地分支，那么也将删除远程分支
+```
 
 修改分支名
 
+```shell
 git branch -m <oldName> <newName>
-
 git branch -m <newName>  (修改当前BranchName)
+```
+
+#### 1.3 Tag相关
+
+查看Tag
+
+```shell
+git tag
+```
+
+创建Tag
+
+```shell
+git tag <name>
+```
+
+删除Tag
+
+```shell
+git tag -d <name>
+```
+
+查看远程Tag
+
+```shell
+git tag -r
+```
+
+push Tag到远程仓库
+
+```shell
+git push origin <tagName>
+```
+
+删除远程Tag
+
+```shell
+git push origin:refs/tags/<tagName>
+```
+
+#### 1.4 git 提交相关
+
+先add 然后在提交，不过add大多时候利用开发工具来做比较方便。
+
+```shell
+git add newfile.txt 
+git commit -m "the commit message"
+```
+
+reset相关的命令可以回滚刚才的add或者提交，重设当前分支
+
+```shell
+git reset [--hard|soft|mixed] [<commit>或HEAD]
+```
+
+最后一个参数默认为HEAD，HEAD~2表示上上一个版本，也可以是某一个commit id处。
+
+**常用的三个参数hard/mixed/spft**  
+
+--hard 将之前的提交全部删除stage区清空，
+
+--mixed 将之前的提交删除，但是将改动移动到stage区（也就是index中）。
+
+--soft 提交不改变变，将HEAD指向某commit id，有点像checkout
+
+#### 1.5 合并
+
+合并其他分支到当前的分支
+
+```shell
+git merge <branchName>
+```
+
+合并分支`fixes`和`enhancements`在当前分支的顶部
+
+```shell
+git merge fixes enhancements
+```
+
+将一个commit 合并到当前分支
+
+```
+git cherry-pick <commit id>
+```
+
+合并几个连续的commit
+
+```shell
+git rebase -i 4e08572
+```
+
+下面给出一组Rebase 的详细示例
+
+（1）windows 下，输入上述命令之后, 输入i 进入编辑窗口，更改rebase策略。详细解释都有提示，只需根据提示输入即可。
+
+![image-20211109023846328](http://www.javanorth.cn/assets/images/2021/lyj/rebase1.png)
+
+（2）选好rebase策略之后按Esc推出 输入"：x" 执行 刚才的rebase操作，然后会看到修改提交的信息界面
+
+![image-20211109023928694](http://www.javanorth.cn/assets/images/2021/lyj/rebase-commitmessage.png)
 
 
 
-git checkout
+（3）修改提交信息，按Esc退出，并输入 "：x" 执行rebase操作
 
-git tag 
+然后看到rebase成功 
 
-git merge 
+![image-20211109024348934](http://www.javanorth.cn/assets/images/2021/lyj/image-20211109024348934.png)
 
-git pull 
 
-git fetch
 
-git push
+查看刚才的log 
 
-git commit
+![	e](http://www.javanorth.cn/assets/images/2021/lyj/gitlog.png)
 
-git rm
 
-git reset
 
-git rebase
+以上就是一个简单的rebase操作。
 
-git log
+#### 1.6 log & show
 
-git show
+查看最近的5次提交，按Q就直接退出。
 
-git whatchanged 
+```shell
+git log -5
+```
+
+使用ASCII图形表示分支合并历史
+
+```shell
+git log --graph
+```
+
+显示最近5次提交的详细内容
+
+```shell
+git show -5
+```
+
+
+
+
 
 
 
@@ -124,15 +298,15 @@ GitFlow WorkFlow是一种比较经典的工作模式。
 
 各个Branch的示例关系可以看下图
 
-![Git flow workflow - Hotfix Branches](E:\javaNorth\javanorth\assets\images\2021\lyj\04 Hotfix branches.svg)
+![Git flow workflow - Hotfix Branches](http://www.javanorth.cn/assets/images/2021/lyj/04 Hotfix branches.svg)
 
 我们也可以使用git flow 的一些命令来时用这个工作模式，会有一些既有的命令，使用起来会比较规范，但是也会有一定复杂，项目中可以根据实际情况食用！
 
-![image-20211107115253322](E:\javaNorth\javanorth\assets\images\2021\lyj\GitFlow1.png)
+![image-20211107115253322](http://www.javanorth.cn/assets/images/2021/lyj/GitFlow1.png)
 
 git flow 相关的一些命令
 
-![image-20211108011549169](E:\javaNorth\javanorth\assets\images\2021\lyj\gitFlowCommand.png)
+![image-20211108011549169](http://www.javanorth.cn/assets/images/2021/lyj/gitFlowCommand.png)
 
 #### 2.4 Forking Workflow
 
@@ -148,15 +322,13 @@ Forking WorkFlow 也是比较推荐的一种方式，开发人员push代码之�
 
 
 
-
-
 ### 3 Git 常见问题及处理方法以及建议。
 
 1. 使用Github合并PullRequest的时候，如果代码有冲突，通过网页解决冲突合并之后。Github会进行**双向合并**。
-
-
-
-
+2. 关于Git协作，可以考虑Git Flow与Feature flow 还有Forking flow结合使用，Forking Flow有利于整理提交历史，Feature branch对于代码的管理比较友善。
+3. 本地的代码跑完一次测试的时候就可以提交一版，然后在需要push的时候在rebase合并一次。尽量完善自己的commit信息，写好每一次提交记录。
+4. 如果merge有问题可以使用git merge --abort 解除merge， 然后再重新合并。
+5. 多使用Git命令行来进行日常的提交等工作，有助于更好的理解Git的工作原理，这样在不同的IDE上都能比较容易的使用Git插件了。
 
 
 
