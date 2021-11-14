@@ -1,0 +1,135 @@
+---
+
+layout: post
+title:  Eureka Server 面向接口的方式读取配置文件
+tagline: by 某某白米饭
+categories: erueka
+tags:
+- 某某白米饭
+---
+
+<!--more-->
+
+### eureka sersver 配置环境
+
+在上一篇中已经介绍了，spring boot 是调用 类的 方法启动 Eureka Server 的。
+
+```java
+public void contextInitialized(ServletContextEvent event) {
+    initEurekaEnvironment();
+    initEurekaServerContext();
+
+    // 省略不重要的代码
+}
+```
+
+初始化环境和加载配置文件在方法 initEurekaEnvironment 方法中，一起来看看吧。
+
+```java
+String dataCenter = ConfigurationManager.getConfigInstance().getString(EUREKA_DATACENTER);
+
+// 省略不重要代码
+
+String environment = ConfigurationManager.getConfigInstance().getString(EUREKA_ENVIRONMENT);
+if (environment == null) {
+    ConfigurationManager.getConfigInstance().setProperty(ARCHAIUS_DEPLOYMENT_ENVIRONMENT, TEST);
+    logger.info("Eureka environment value eureka.environment is not set, defaulting to test");
+}
+```
+1. ConfigurationManager 的创建会加载一堆 config，这里不需要去看这一块。
+2. 单例模式其实有很多种，如：饿汉模式、懒汉模式、双重校验锁、静态内部类、枚举等实现方式，这里 getConfigInstance() 方法用的是 volatile + synchronized + double check 双重校验锁模式。
+3. 最后获取 eureka server 的运行环境，没有配置运行环境就用 test 环境。如读取配置文件用：eureka-server-test.properties
+
+
+### 面向接口
+
+#### EurekaServerConfig 接口
+initEurekaServerContext() 方法用于加载 Eureka Server 上下文。这个方法很长，先说他的第一行代码：
+
+```java
+EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
+```
+
+这行代码创建了一个 EurekaServerConfig 对象。EurekaServerConfig 是一个接口。定义了许多配置项的方法。
+
+![](http://www.javanorth.cn/assets/images/2021/eureka/properties/0.png)
+
+这个类的作用就是，如果以后需要用到配置文件里面的数据只要：eurekaServerConfig.getXXX() 就能获取，而不是像平常使用的 Properties。
+ 
+#### DefaultEurekaServerConfig 默认实现类
+
+```java
+public DefaultEurekaServerConfig() {
+    init();
+}
+```
+
+DefaultEurekaServerConfig 是 eurekaServerConfig 的默认实现类。
+
+#### init()
+
+init() 的前面两行是设置环境的名称。
+
+```java
+private void init() {
+    String env = ConfigurationManager.getConfigInstance().getString(
+            EUREKA_ENVIRONMENT, TEST);
+    ConfigurationManager.getConfigInstance().setProperty(
+            ARCHAIUS_DEPLOYMENT_ENVIRONMENT, env);
+
+    String eurekaPropsFile = EUREKA_PROPS_FILE.get();
+
+    //省略try...catch..
+    ConfigurationManager
+                .loadCascadedPropertiesFromResources(eurekaPropsFile); 
+}
+```
+
+
+EUREKA_PROPS_FILE 的定义是用单例工厂模式获取 eureka.server.props 的值，默认值是：eureka-server。
+
+```java
+private static final DynamicStringProperty EUREKA_PROPS_FILE = DynamicPropertyFactory
+            .getInstance().getStringProperty("eureka.server.props",
+                    "eureka-server");
+```
+
+loadCascadedPropertiesFromResources() 方法是用来加载配置文件的。
+
+首先会在 ConfigurationManager.loadCascadedProperties() 方法里面加载 eureka-server.props 配置文件
+
+```java
+String defaultConfigFileName = configName + ".properties";
+// 省略一部分代码
+
+ClassLoader loader = Thread.currentThread().getContextClassLoader();
+URL url = loader.getResource(defaultConfigFileName);
+Properties props = getPropertiesFromFile(url);
+```
+
+然后再加载 configName + "-" + environment + ".properties" 的配置文件。并且下面的配置文件会覆盖上面的配置文件
+
+```java
+String envConfigFileName = configName + "-" + environment + ".properties";
+
+props.putAll(envProps);
+```
+最后将配置文件交给了 ConfigurationManager 管理。
+
+#### eureka.server.properties
+
+eureka.server.properties 的作用就是为配置文件里面的各个选项搞一个默认值。但是它是一个空文件。
+
+![](http://www.javanorth.cn/assets/images/2021/eureka/properties/1.png)
+
+回过头来看 DefaultEurekaServerConfig，它才是真正的默认实现的地方。
+
+![](http://www.javanorth.cn/assets/images/2021/eureka/properties/2.png)
+
+### 总结
+
+1. initEurekaEnvironment() 是读取环境，为下面的加载配置文件做准备。
+2. DefaultEurekaServerConfig 类是 EurekaServerConfig 接口的默认实现，里面就是默认的配置项。
+3. DefaultEurekaServerConfig 的init() 方法先读取 eureka-server.props 后读取 eureka-server-test.properties 配置文件。
+
+
