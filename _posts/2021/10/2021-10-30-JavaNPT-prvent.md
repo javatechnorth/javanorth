@@ -1,3 +1,4 @@
+---
 layout: post
 title:  防止NullPointerException，是程序员的基本修养
 tagline: by 揽月中人
@@ -5,6 +6,7 @@ categories: Java
 tags:
 
 - 揽月中人
+---
 
 <!--more-->
 
