@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 面试官：对比 Exception 和 Error，说说运行时异常与一般异常有什么区别？
+title: 面试官：对比 Exception 和 Error，说说运行时异常与一般异常有什么区别？-- 2021-11-10
 tagline: by feng
 categories: Java基础
 tags: 
