@@ -55,7 +55,7 @@ public void createQrCode(String content, HttpServletResponse response) throws Wr
 
 代码生成结果
 
-![img](https://gitee.com/274904168/image-repo/raw/master/202111192350272.cn)
+![img](https://www.javanorth.cn/assets/images/2021/feng/202111192350272.jpg)
 
 彩色的二维码
 
@@ -95,7 +95,7 @@ public void createQrCode(String content, HttpServletResponse response) throws Wr
 
 
 
-![img](https://gitee.com/274904168/image-repo/raw/master/202111200001133.cn)
+![img](https://www.javanorth.cn/assets/images/2021/feng/202111200001133.jpg)
 
 我们还可以自定义其他个性化的二维码，这里不再举例。
 
