@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 手把手教大家安装 Intellij IDEA
+title: 手把手教大家安装 Intellij IDEA -- 20210917
 tagline: by feng
 categories: JDK
 tags: 

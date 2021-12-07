@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 软软猿妹问我JDK中眼花缭乱的Function/Consumer/Supplier/Predicate？
+title: 软软猿妹问我JDK中眼花缭乱的Function/Consumer/Supplier/Predicate？--20211020
 tagline: by 揽月中人
 categories: Algorithm
 tags:

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 看得懂系列：Spring Boot 启动 Eureka Server 流程 - 2021-11-08
+title: 看得懂系列：Spring Boot 启动 Eureka Server 流程 - 20211108
 tagline: by 某某白米饭
 categories: eureka
 tags: 
