@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Zookeeper基础Paxos算法详解
+title:  Zookeeper基础Paxos算法详解 --20210616
 tagline: by 程序员七哥
 categories: 分布式系统
 tags: 
