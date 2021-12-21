@@ -1,6 +1,6 @@
 ---
  layout: post
-title:  Oracle执行计划
+title: Oracle执行计划
 tagline: by 揽月中人
 categories: Oracle
 tags:
