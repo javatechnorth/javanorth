@@ -48,7 +48,7 @@ keytool -exportcert -keystore serverkeystore.p12 -alias serverkey -storepass pas
 最后，我们将服务器证书添加到客户端的信任存储中。
 
 ```java
-keytool keytool -import -trustcacerts -file server-certificate.pem -keypass password -storepass password -keystore clienttruststore.jks
+keytool -import -trustcacerts -file server-certificate.pem -keypass password -storepass password -keystore clienttruststore.jks
 ```
 
 ### 客户端证书
@@ -60,7 +60,7 @@ keytool -genkey -alias clientkey -keyalg RSA -keysize 2048 -sigalg SHA256withRSA
 
 keytool -exportcert -keystore clientkeystore.p12 -alias clientkey -storepass password -rfc -file client-certificate.pem
 
-keytool keytool -import -trustcacerts -file client-certificate.pem -keypass password -storepass password -keystore servertruststore.jks
+keytool -import -trustcacerts -file client-certificate.pem -keypass password -storepass password -keystore servertruststore.jks
 ```
 
 在最后一条命令中，我们把客户的证书添加到服务器的信任存储中。
