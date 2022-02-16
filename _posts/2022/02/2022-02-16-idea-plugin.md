@@ -18,7 +18,7 @@ tags:
 
 <br />我们这里使用 idea 社区版进行开发，社区版的源码都是开放的，方便我们开发调试。 如果你安装了付费版，开发插件当然也没问题，但是idea 插件开发过程中，还是会自动下载 idea 社区版的源码到本地的。<br />
 <br />社区版下载地址 [https://www.jetbrains.com/idea/download/#section=windows](https://www.jetbrains.com/idea/download/#section=windows)<br />
-![](https:://www.javanorth.cn/assets/images/2022/feng/20220216-1.png)
+![](https://www.javanorth.cn/assets/images/2022/feng/20220216-1.png)
 <br />
 <br />idea 官方建议我们使用最新版本的社区
 >  You can use either IntelliJ IDEA Community Edition or IntelliJ IDEA Ultimate as your IDE (it is highly recommended to use the latest available version). Both include the complete set of plugin development tools.
@@ -28,11 +28,11 @@ tags:
 
 <br />这里简单说一下， 目前创建 idea 插件工程有三种方式， 分别是 Github Template， Gradle ，DevKit 。DevKit 是最早期的开发方式，官方比较推荐 Github Template 和 Gradle。 <br />​
 
-我们这里通过创建 Gradle 项目的方式来开发插件。<br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-2.png)<br />新建项目 -> 选中 Gradle -> 选择项目 SDK 。 注意这里需要选择 JDK 11 版本以上的 JDK 。 我在开发过程中使用 Microsoft 编译的 JDK11 的版本JDK，最后编译生成项目的时候编译报错了。换了 JDK 版本之后就好了，这个问题比较诡异。<br />​
+我们这里通过创建 Gradle 项目的方式来开发插件。<br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-2.png)<br />新建项目 -> 选中 Gradle -> 选择项目 SDK 。 注意这里需要选择 JDK 11 版本以上的 JDK 。 我在开发过程中使用 Microsoft 编译的 JDK11 的版本JDK，最后编译生成项目的时候编译报错了。换了 JDK 版本之后就好了，这个问题比较诡异。<br />​
 
 如果你想使用kotlin 进行开发的话，记得选中画圈中间的 Kotlin/JVM 。 如果想让Gradle  也使用 kotlin ， 那可以选择 kotlin DSL 构建脚本。 <br />
 <br />选择完毕之后，进入下一步。<br />
-<br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-3.png)<br />输入项目名称，包名之后，这个可以创建Java项目一致的。<br />​
+<br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-3.png)<br />输入项目名称，包名之后，这个可以创建Java项目一致的。<br />​
 
 点击完成，等待 idea 下载开发插件所需的依赖。可以需要等待几分钟，具体视网络情况而定。<br />
 
@@ -101,8 +101,8 @@ class HelloAction : DumbAwareAction() {
     }
 }
 ```
-继承实现了 actionPerformed 方法。 弹出一个 Hello Kotlin的提示框。<br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-4.png)<br />
-<br />我们需要对 Action 注册到 plugin.xml ， 可以在 class 上进行操作，进行“注册操作”。<br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-5.png)<br />这种方式比较友好， 如果直接在plugin.xml 编辑的话，容易出错。<br />
-<br />注册完了之后，我们就可以通过 Gradle 的 runIde 进行运行。 注意这里会独立启动一个IDE来运行你开发的插件， 需要注意下电脑的内存情况。 <br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-6.png)<br />运行启动之后，我们能够看到主菜单上 有个 Greeting 的菜单栏，这里和我们在 plugin.xml 中的actions 配置项是一致的。 <br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-7.png)<br />点击 Hello ， 弹出一个Hello Kotlin 的消息框， 这里就是我们 HelloAction 的输出结果。<br />![image.png](https:://www.javanorth.cn/assets/images/2022/feng/20220216-8.png)<br />到这里我们可以算是开发完一个简单的插件了。如果你还想了解更多插件开发的事项，记得继续关注我的文章哦。<br />​<br />
+继承实现了 actionPerformed 方法。 弹出一个 Hello Kotlin的提示框。<br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-4.png)<br />
+<br />我们需要对 Action 注册到 plugin.xml ， 可以在 class 上进行操作，进行“注册操作”。<br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-5.png)<br />这种方式比较友好， 如果直接在plugin.xml 编辑的话，容易出错。<br />
+<br />注册完了之后，我们就可以通过 Gradle 的 runIde 进行运行。 注意这里会独立启动一个IDE来运行你开发的插件， 需要注意下电脑的内存情况。 <br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-6.png)<br />运行启动之后，我们能够看到主菜单上 有个 Greeting 的菜单栏，这里和我们在 plugin.xml 中的actions 配置项是一致的。 <br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-7.png)<br />点击 Hello ， 弹出一个Hello Kotlin 的消息框， 这里就是我们 HelloAction 的输出结果。<br />![image.png](https://www.javanorth.cn/assets/images/2022/feng/20220216-8.png)<br />到这里我们可以算是开发完一个简单的插件了。如果你还想了解更多插件开发的事项，记得继续关注我的文章哦。<br />​<br />
 ### 总结
 从0到1 的演示了如何进行 idea 的插件开发， 如果还需更加深入的学习如何开发插件，可以继续关注哦。
