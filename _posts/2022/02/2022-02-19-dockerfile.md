@@ -1,0 +1,393 @@
+---
+layout: post
+title:  一文彻底弄懂 Dockerfile
+tagline: by IT可乐
+categories: Docker
+tags: 
+    - IT可乐
+---
+
+哈喽，大家好，我是指北君。  
+Dockerfile 简单来说就是一个包含用于组合镜像的命令的文本文档，Docker 通过读取 Dockerfile 中的指令就可以按步骤生成镜像，那么在制作镜像之前，我们先了解一下镜像的原理。
+
+### 1、镜像原理
+
+只有了解镜像的原理，我们才能更清晰的通过 Dockerfile 制作镜像。
+
+前面几篇文章我们简单介绍了docker中的镜像，镜像是只读的文件，提供了运行程序完整的软硬件资源，是应用程序的“集装箱”，包含运行某个软件所需的所有内容，包括代码、运行时环境、所需库、环境变量、配置文件等等。
+
+那么镜像是如何做到这些的呢？
+
+#### 1.1 UnionFS（联合文件系统）
+
+> 联合文件系统（Union File System）：2004 年由纽约州立大学开发，它可以把多个目录内容联合挂载到同一个目录下，而目录的物理位置是分开的。UnionFS可以把只读和可读写文件系统合并在一起，具有写时复制功能，允许只读文件系统的修改可以保存到可写文件系统当中。
+
+UnionFS(Union File System) 一次性加载多个文件系统，但是从外表看起来，只能看到一个文件系统，联合加载会把各层文件系统叠加起来，这样最终的文件系统会包含所有底层的文件和目录。
+
+#### 1.2 Docker 镜像加载原理
+
+Docker 的镜像实际上就是由一层一层的文件系统组成，这里给出 Docker 官方的一张图：
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/5eb1e14f09ab655608000600.png" alt="图片描述"  />
+
+Bootfs(boot file system)：主要包含 bootloader 和 kernel，bootloader 主要是引导加载 kernel，比如 Linux 刚启动时会加载 bootfs 文件系统，在 Docker 镜像的最底层就是 bootfs。这一层与我们典型的 Linux/Unix 系统是一样的，包含 boot 加载器和内核。当 boot 加载完成之后整个内核就都在内存中了，此时内存的使用权已由 bootfs 转交给内核，此时系统也会卸载 bootfs。
+
+Rootfs(root file system)：在 bootfs 之上，中间只读的 rootfs 的集合称为 Docker 镜像，Docker 镜像构建时，会一层层构建，前一层是后一层的基础。每一层构建完就不会再发生改变，后一层上的任何改变只发生在自己这一层。UnionFS 使得镜像的复用、定制变得更为容易。甚至可以用之前构建好的镜像作为基础层，然后进一步添加新的层，以定制自己所需的内容，构建新的镜像。
+
+Container(容器)：**容器 = 镜像 + 读写层**，从文件系统上看，Docker容器比Docker镜像多一层可读写的文件系统挂载层。借助于 UnionFS，容器内部的更改都被保存到了最上面的读写层，而其他层都是只读的，这样中间的只读 rootfs 是可以被多个容器复用的。UnionFS 将文件的更新挂载到老的文件之上，而不去修改那些不更新的内容，这就意味着即使虚拟的文件系统被反复修改，也能保证宿主机空间占用保持一个较低水平。
+
+在 rootfs 的基础上，Docker 公司创新性地提出了使用 UnionFS，多个增量 rootfs 联合挂载一个完整 rootfs 的方案，通过“**分层镜像**”的设计，围绕 Docker 镜像，大家甚至可以协同工作，再加上 Docker 官方提供的镜像仓库，进一步减少了共享镜像的成本，这大大提高了开发部署的效率。
+
+这样你也能理解为什么 docker 启动块，占用资源少了吧。
+
+#### 1.3 实操理解分层概念
+
+这里我们下载一个 Tomcat9.0 镜像：
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-01.png" alt="image-20211031120617204" style="zoom:50%;" />
+
+我们也可以通过上一篇文章讲解的命令查看镜像层结构：
+
+> docker inspect 镜像id
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-20211031121152140.png" alt="image-20211031121152140" style="zoom:50%;" />
+
+
+
+### 2、Dockerfile 的 helloworld
+
+实例：创建一个能访问 Tomcat 首页的容器
+
+#### 2.1 手动创建
+
+通常我们启动一个Tomcat容器，官方镜像是简化版的，在webapps 目录下没有任何内容，所有我们启动之后访问主页也是没有任何内容。
+
+> docker run -d -p 8080:8080 tomcat
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-03.png)
+
+但是官方镜像的 webapps.dist 目录下有首页文件，所以我们将 webapps.dist 目录下的所有文件复制到 webapps ，然后访问首页就有界面了。
+
+> 1、进入启动的容器
+>
+> docker exec -it 容器id /bin/bash
+>
+> 2、将webapps.dist 目录所有文件复制到 webapps 目录下
+>
+> cp -r webapps.dist/* webapps/
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-20211031135744274.png" alt="image-20211031135744274" style="zoom:50%;" />
+
+再次访问首页：
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-05.png)
+
+
+
+#### 2.2 Dockerfile 创建
+
+PS: 不同命令没关系，后面会解释每条命令含义。
+
+①、提前准备好 webapps 目录文件
+
+我这里直接将官方Tomcat容器中的 webapps.dist 目录拷贝到本机的/home/webapps 目录下：
+
+> docker cp 容器ID:/usr/local/tomcat/webapps.dist /home/webapps
+
+②、准备 dockerfile 文件
+
+在本机 /home 目录下新建一个 Dockerfile 文件（可以任意命名，没有后缀），内容如下：
+
+```shell
+FROM tomcat:latest
+MAINTAINER itcoke
+WORKDIR /usr/local/tomcat/webapps
+COPY ./webapps/ /usr/local/tomcat/webapps/
+```
+
+③、构建镜像
+
+> docker build -f Dockerfile -t itcoke/mytomcat:1.0 .
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-06.png)
+
+④、运行镜像
+
+> docker run -d -p 8081:8080 itcoke/mytomcat:1.0
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-07.png)
+
+⑤、访问首页测试
+
+可以看到如下图的首页界面，即构建运行成功。
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-08.png)
+
+
+
+### 3、Dockerfile 指令详解
+
+在上面了我们编写了一个 Dockerfile 文件，内容如下：
+
+```shell
+FROM tomcat:latest
+MAINTAINER itcoke
+WORKDIR /usr/local/tomcat/webapps
+COPY ./webapps/ /usr/local/tomcat/webapps/
+```
+
+那这里面每条指令是什么意思呢？接下来我们揭开这层神秘的面纱。
+
+#### 3.1 编写规范
+
+①、每条指令（每行开头关键字）都必须是大写字母；
+
+②、执行顺序是按照编写顺序从上到下；
+
+③、# 表示注释；
+
+#### 3.2 常用指令介绍
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-09.png)
+
+①、FROM
+
+> FROM centos   #依赖官方基准镜像（centos:lastest）
+>
+> FROM scratch #不依赖任何基准镜像
+>
+> FROM tomcat:9.0-jdk8-openjdk #指定具体版本号
+
+
+
+②、MAINTAINER
+
+通常表示镜像来自哪个机构。类似还有比如 LABEL 标签，展示镜像的一些说明信息，不会对镜像有实际影响。
+
+> LABEL version=“1.0”
+>
+> LABEL description="初版xxx服务"
+
+
+
+③、WORKDIR
+
+> WORKDIR 路径   # WORKDIR /usr/local
+
+指定工作目录，也是我们进入镜像的路径，如果指定路径不存在，该指令也会自动创建该目录。
+
+PS：尽量使用绝对路径，这样更加清晰。
+
+
+
+④、ADD 和 COPY
+
+都是进行文件复制。
+
+ADD 功能更加强大一点，支持压缩包的解压，还支持远程文件的复制。
+
+
+
+⑤、ENV
+
+设置环境常量。
+
+比如：
+
+> ENV JAVA_HOME /usr/local/openjdk8
+>
+> RUN ${JAVA_HOME}/bin/java -jar test.jar
+
+尽量使用环境常量，这样可以提高程序的可维护性。
+
+
+
+#### 3.3  RUN 和 CMD 和 ENTRYPOINT
+
+> RUN: 在镜像构建时执行命令，比如 RUN yum -y install vim；
+>
+> ENTRYPOINT:容器启动时执行的命令；
+>
+> CMD:容器启动后执行默认的命令或参数；
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-23.png)
+
+
+
+①、RUN
+
+构建时运行，有两种命令格式：
+
+> RUN yum install -y vim  #Shell 命令格式
+>
+> RUN ["yum","install","-y","vim"]  #Exec命令格式
+
+官方推荐使用 Exec 命令格式。
+
+
+
+②、ENTRYPOINT
+
+容器启动时执行的命令。
+
+命令格式也是推荐使用 Exec。
+
+**注意：Dockerfile 中只有最后一个 ENTRYPOINT 会被执行。**
+
+
+
+③、CMD
+
+用于设置默认执行的命令。
+
+和ENTRYPOINT 命令一样，也是只有最后一个 CMD 命令会被执行，但是如果容器启动时附加指令，则CMD会被忽略。
+
+CMD ["ps","-ef"]  #推荐使用 Exec 格式。
+
+比如有如下Dockerfile 文件：
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-24.png)
+
+构建，然后启动时（不附加命令），会输出 3：
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-25.png)
+
+如果启动时附加命令，则会执行附加的命令(下图附加 ls 命令)，而不执行Dockerfile 中的CMD 命令：
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-26.png" alt="image-20211104085058681" style="zoom:50%;" />
+
+也就是说 ENTRYPOINT 指令一定会执行，但是 CMD 指令不一定会执行。
+
+#### 3.4 docker build 命令
+
+编写好的 Dockerfile 通过 docker build 构建镜像。
+
+> docker build [OPTIONS] PATH | URL | -
+
+①、-f：指定要使用的 Dockerfile 文件路径。
+
+②、-t（-tag）：镜像的名字和标签，通常是 name:tag。
+
+
+
+### 4、Dockerfile 构建 centos
+
+我们拉取官方的 centos 系统，发现是一个简化版的，常用的一些 vim 命令，ifconfig 命令都无法使用。
+
+<img src="https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-20211101082327112.png" alt="image-20211101082327112" style="zoom:50%;" />
+
+于是我们就编写一个Dockerfilew 文件来构建一个自己的 centos系统，有两个要求：
+
+①、安装好vim以及一些网络命令；
+
+②、设置工作目录为 /usr/local；
+
+按照要求，我们在 /home 目录下新建 Dockerfile_MyCentos 文件，内容如下：
+
+```shell
+FROM centos
+WORKDIR /usr/local
+RUN yum -y install vim
+RUN yum -y install net-tools
+EXPOSE 80
+CMD echo "install successful"
+CMD /bin/bash
+```
+
+通过如下语句构建：
+
+> docker build -f Dockerfile_MyCentos -t mycentos:1.0 .
+
+PS:对于构建命令，加入你新建的 Dockerfile 文件名称就是【Dockerfile】，那可以不加 -f 文件名 来指定，docker 会自动寻找。
+
+构建成功后，就生成了自己的镜像：
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-11.png)
+
+我们运行这个镜像，发现这个centos 系统，vim，ifconfig 等网络命令都可以用了。
+
+
+
+### 5、推送镜像到阿里云
+
+上面我们镜像制作完成，如何推送到阿里云呢？
+
+#### 5.1 登录阿里云
+
+> https://cr.console.aliyun.com/cn-hangzhou/instances
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-12.png)
+
+
+
+#### 5.2 创建命名空间
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-13.png)
+
+
+
+#### 5.3 创建镜像仓库
+
+测试阶段选择本地仓库就行。
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-14.png)
+
+
+
+#### 5.4 推送操作指南
+
+点开创建的镜像仓库，就会看到详细的操作指南。
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-15.png)
+
+看到第 3 点，将镜像推送到 Registry：
+
+```shell
+docker login --username=182****5732 registry.cn-hangzhou.aliyuncs.com
+docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/itcoke/test:[镜像版本号]
+docker push registry.cn-hangzhou.aliyuncs.com/itcoke/test:[镜像版本号]
+```
+
+第一条命令是登录阿里云，输入时需要在此输入密码，如果忘记密码了，可以到【访问凭证】里面重新设置。
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-16.png)
+
+
+
+第二条是设置 tag：
+
+> docker tag e10136600f85 registry.cn-hangzhou.aliyuncs.com/itcoke/test:1.0
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-17.png)
+
+第三条命令是推送到阿里云：
+
+> docker push registry.cn-hangzhou.aliyuncs.com/itcoke/test:1.0
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-18.png)
+
+查看阿里云镜像版本，也能看到我们推送过去的镜像信息：
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-19.png)
+
+点开【层信息】，里面的内容就是我们编写的 Dockerfile 相关信息。
+
+
+
+### 6、从阿里云pull镜像
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-20.png)
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-21.png)
+
+### 7、退出登录
+
+> docker logout
+
+![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/image-05-22.png)
+
+
+
+docker run -p 8082:8080 -it --name tomcat02 4b8ea0a44f9a /bin/bash
+
+
