@@ -1,0 +1,102 @@
+---
+layout: post
+title:  OpenCV教程入门篇
+tagline: by feng
+categories: opencv
+tags: 
+    - feng
+---
+
+大家好，我是指北君。
+
+之前也写过一些 OpenCV 的文章，最近正好在考虑 写一个 OpenCV相关的工具，目前还是在开发过程中，边开发边更新。预计会持续一段时间。目前的想法是把 OpenCV 的 API 在这个工具上都实现一遍。
+​
+<!--more-->
+
+OpenCV 的内容挺多的，而且不使用的话，容易忘记，所以通过制造工具的方式来给自己加深印象，平常要处理图片的时候，就可以用自己的工具直接处理，不需要每次都去重复的写代码。
+
+
+今天我们就来看看，学习 OpenCV 如何加载图片，显示并保存图片。下面的最左边的美女照片想必大家可能都见过吧。 大部分人可能都知道我们平常使用的图片都是使用RGB表示的，但是 OpenCV 中图片颜色的通道顺序稍微有些不同，它是 B - G - R 的通道顺序保存的。平常所说的灰度图是就只有一个通道。
+​
+
+### 目标
+我们来看看今天是目标是什么？
+
+- 加载图片，显示图片，保存图片
+- OpenCV中对应的函数是 Cv2.ImRead() , Cv2.ImShow(), Cv2.ImWrite() 
+
+
+### 加载图片
+使用 Cv2.ImRead() 来读入一张图片：
+```csharp
+Mat sourceImage = Cv2.ImRead(filePath, ImreadModes.Unchanged);
+
+// 定义
+public Mat ImRead(string fileName, ImreadModes flags = ImreadModes.Color)
+
+```
+
+- 参数1：图片的文件名
+   - 如果图片放在当前文件夹下，直接写文件名就行，如'lena.jpg'
+   - 否则需要给出绝对路径，如'D:\xxx\lena.jpg'
+- 参数2：读入方式，省略即采用默认值 比较常用的是以下三个
+```csharp
+	public enum ImreadModes
+    {
+        Unchanged = -1, // 包含透明通道的彩色图
+        Grayscale = 0, // 灰度图
+        Color = 1, // 彩色图
+		...
+    }
+```
+注意：我们加载图片的时候，最好不要使用中文路径，容易入坑。
+### 显示图片
+
+
+使用 Cv2.ImShow() 显示图片，窗口会自适应图片的大小：
+```csharp
+Cv2.ImShow("lena", sourceImage);
+Cv2.WaitKey(0);
+
+// 定义
+public void ImShow(string winName, Mat mat);
+public static int WaitKey(int delay = 0);
+```
+Cv2.ImShow 参数1是窗口的名字，参数2是要显示的图片。不同窗口之间用窗口名区分，所以窗口名相同就表示是同一个窗口，显示结果如下：
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/81b02b624b2eb422ee11fd5710b11636.png)
+
+Cv2.WaitKey() ，从字面上看，等待一个输入的意思 , 参数是等待时间（单位：毫秒ms）。时间一到，会继续执行接下来的程序，传入0的话表示一直等待。当我们需要在根据某个输入推出等待的时候，我们可以使用 k = Cv2.WaitKey(0) ，这样 k 就是我们的输入结果。
+​
+
+另外，我们也可以先用 Cv2.NamedWindow() 创建一个窗口，之后再显示图片：
+
+```csharp
+Cv2.NamedWindow("lena2"
+Cv2.ImShow("lena", sourceImage);
+Cv2.WaitKey(0);
+
+// 定义
+
+public void NamedWindow(string winName, WindowFlags flags = WindowFlags.GuiExpanded)
+```
+
+参数1依旧是窗口的名字，参数2默认是WindowFlags.GuiExpanded，表示窗口展示模式。
+
+### 保存图片
+
+
+使用Cv2.ImWrite保存图片，参数1是包含后缀名的文件名， 参数2 是：
+```csharp
+Cv2.ImWrite("lena.jpg", sourceImage);
+
+// 定义
+public static void ImShow(string winName, Mat mat)
+```
+是不是感觉很简单，OpenCV在图片的基础操作上其实都挺简单的，到后面加上一些应用场景之后就会复杂起来。
+​
+
+### 总结
+
+
+今天指北君带大家使用 Cv2.ImRead() , Cv2.ImShow(), Cv2.ImWrite()  ，对OpenCV 先有个简单的了解。
