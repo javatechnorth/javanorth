@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  OpenCV教程入门篇
+title:  做了个图片压缩的插件
 tagline: by feng
 categories: idea
 tags: 
