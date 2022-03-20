@@ -18,7 +18,7 @@ tags:
 
 > https://kubernetes.io/
 
-![img](/Users/yushuai/Documents/学习笔记/Kubernetes/image/image-00-00.png)
+![](https://gitee.com/YSOcean/typoraimg/raw/master/io/image-00-00.png)
 
 ### 2、什么是 Kubernetes?
 
@@ -42,7 +42,7 @@ tags:
 
 ### 3、部署时代演进
 
-![image-20211117225948120](/Users/yushuai/Documents/学习笔记/Kubernetes/image/image-00-01.png)
+![](https://gitee.com/YSOcean/typoraimg/raw/master/io/image-00-01.png)
 
 #### 3.1 传统部署时代
 
