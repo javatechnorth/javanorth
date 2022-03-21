@@ -2,7 +2,7 @@
 layout: post
 title:  为JVM应用程序添加关闭钩子
 tagline: by feng
-categories: idea
+categories: java
 tags: 
     - feng
 ---
