@@ -1,11 +1,10 @@
 ---
-
 layout: post
 title: SpringCloudStream 集成 Kafka
 tagline: by 揽月中人
 categories: SpringCloudStream
 tags:
-- 揽月中人
+    - 揽月中人
 ---
 
 哈喽，大家好，我是指北君。  
