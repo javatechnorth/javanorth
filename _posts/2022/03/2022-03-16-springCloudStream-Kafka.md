@@ -26,3 +26,21 @@ Kafka是一个分布式发布 - 订阅消息系统，源于LinkedIn的一个项�
 
 ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布式计算提供开源的分布式配置服务、同步服务和命名注册，Kafka的实现同时也依赖于zookeeper。
 
+### 2 Windows搭建简单的Kafka
+
+##### 2.1 启动zookeeper
+
+使用Kafka首先需要启动zookeeper，windows中搭建zookeeper也很简单。以下几步即可完成：
+
+1. 下载zookeeper （本文使用3.7.0版本，下载链接在文章末尾。）
+2. 配置基本环境变量：
+   1. 将conf文件夹下面的 zoo_sample.cfg 重命名zoo.cfg。并修改其工作目录dataDir。
+   2. bin文件夹下面有zkEnv.cmd有zookeeper相关的配置，其中就包括JAVA_HOME，所以系统环境变量需要配置JAVA_HOME，或者直接用Java的路径来替换。
+3. 启动，在bin目录下运行zkServer.cmd脚本启动zookeeper。
+
+默认启动端口2181为。
+
+正常启动如下：
+
+![image-20220321004222780](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-2.gif)
+
