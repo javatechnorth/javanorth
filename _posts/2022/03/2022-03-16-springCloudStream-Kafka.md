@@ -60,7 +60,7 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
 
 3. 在kafka根目录下使用如下命令启动kafka，并在zookeeper中注册。
     ```shell
-    # .\bin\windows\kafka-server-start.bat .\config\server.properties
+     .\bin\windows\kafka-server-start.bat .\config\server.properties
     ```
 4. 创建topic，在bin\windows目录下使用如下命令。创建名称为“test”的topic
 
