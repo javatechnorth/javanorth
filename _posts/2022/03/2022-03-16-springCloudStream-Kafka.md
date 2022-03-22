@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  springCloudStream集成Kafka
+title:  CloudStream集成Kafka
 tagline: by 揽月中人
 categories: kafka
 tags: 
@@ -287,7 +287,7 @@ http://localhost:8100/sendMessage/JavaNorthProducer
 
 我们同时启动一个Kafka console consumer，这里我们使用另一个test1 topic
 
-```sh
+```shell
 kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test1
 ```
 
