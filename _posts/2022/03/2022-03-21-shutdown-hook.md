@@ -19,20 +19,20 @@ tags:
 
 JVM 可以通过两种不同的方式被关闭。
 
-- 一个受控的过程
-- 一种非受控的方式
+1. 一种受控的方式
+2. 一种非受控的方式
 
 一个受控的进程在以下两种情况下关闭 JVM。
 
 - 最后一个非 daemon 线程终止。例如，当主线程退出时，JVM 开始其关闭进程
-- 从操作系统发送一个中断信号。例如，通过按 Ctrl + C 或注销操作系统
-- 从Java代码中调用 System.exit()
+- 从操作系统发送一个中断信号。例如，通过按 `Ctrl + C` 或注销操作系统
+- 从 Java 代码中调用 `System.exit()`
   
 虽然我们都在努力争取优雅的关闭，但有时 JVM 可能会以突然和意外的方式关闭。JVM 会在以下情况下突然关闭。
 
-- 从操作系统发送一个杀戮信号。例如，通过发出kill -9 <jvm_pid> 的信号
-- 从Java代码中调用Runtime.getRuntime().halt()。
-- 主机操作系统意外死亡，例如，在电源故障或操作系统恐慌的情况下
+- 从操作系统发送一个 kill 信号。例如，通过发出 `kill -9 <jvm_pid>` 的信号
+- 从 Java 代码中调用 `Runtime.getRuntime().halt()` 。
+- 主机操作系统意外关闭，例如，在电源故障或操作系统崩溃的情况下
 
 ### shutdown hook
 
@@ -52,7 +52,8 @@ Runtime.getRuntime().addShutdownHook(printingHook);
 在这里，我们只是在JVM自行关闭之前向标准输出端打印一些东西。如果我们像下面这样关闭JVM。
 
 ```java
-> System.exit(123);
+System.exit(123);
+
 我要关闭了
 ```
 
@@ -102,9 +103,9 @@ assertThat(Runtime.getRuntime().removeShutdownHook(willNotRun)).isTrue();
 JVM 只在正常终止的情况下运行关闭钩子。因此，当外部力量突然杀死JVM进程时，JVM将没有机会执行关闭钩子。此外，从Java代码中停止JVM也会产生同样的效果。
 
 ```java
-Thread haltedHook = new Thread(() -> System.out.println("Halted abruptly"));
+Thread haltedHook = new Thread(() -> System.out.println("强行终止"));
 Runtime.getRuntime().addShutdownHook(haltedHook);
-        
+
 Runtime.getRuntime().halt(123);
 ```
 

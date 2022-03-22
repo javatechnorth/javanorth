@@ -11,7 +11,7 @@ tags:
 
 在本教程中，我们将讲讲如何将一个 InputStream 转换为一个字符串。
 
-我们将从使用普通的 Java 开始，包括 `Java8+` 的解决方案，然后也会研究使用 `Guava` 和 `Apache Commons IO` 库。
+我们将从使用普通的 Java 开始，包括 `Java 8+` 的解决方案，然后也会研究使用 `Guava` 和 `Apache Commons IO` 库。
 
 <!--more-->
 
@@ -21,9 +21,8 @@ tags:
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(DEFAULT_SIZE);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     StringBuilder textBuilder = new StringBuilder();
@@ -45,7 +44,7 @@ Java 8 给 BufferedReader 带来了一个新的 lines() 方法。让我们看看
 ```java
 @Test
 public void convertingAnInputStreamToAString() {
-    String originalString = randomAlphabetic(DEFAULT_SIZE);
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     String text = new BufferedReader(
@@ -63,14 +62,14 @@ public void convertingAnInputStreamToAString() {
 
 我们也可以使用 Collectors.join(System.lineSeparator()) ，在这种情况下，输出结果取决于系统设置。
 
-### 用 Java 9 进行转换 - InputStream.readAllBytes()
+### 用 Java 9+ 进行转换 - InputStream.readAllBytes()
 
 如果我们在 Java 9 或以上版本，我们可以利用一个新的 readAllBytes 方法添加到 InputStream 中。
 
 ```java
 @Test
 public void convertingAnInputStreamToAString() throws IOException {
-    String originalString = randomAlphabetic(DEFAULT_SIZE);
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -87,9 +86,8 @@ public void convertingAnInputStreamToAString() throws IOException {
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(8);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     String text = null;
@@ -103,8 +101,7 @@ public void convertingAnInputStreamToAString()
 
 请注意，InputStream 将被关闭的 Scanner 关闭。
 
-同样值得澄清的是 useDelimiter("\A") 的作用。这里我们传递了'\A'，它是一个边界标记重码，表示输入的开始。本质上，这意味着next()调用读取了整个输入流。
-
+同样值得澄清的是 `useDelimiter("\A")` 的作用。这里我们传递了'\A'，它是一个边界标记重码，表示输入的开始。本质上，这意味着 next() 调用读取了整个输入流。
 
 ### 使用 ByteArrayOutputStream 进行转换
 
@@ -112,9 +109,8 @@ public void convertingAnInputStreamToAString()
 
 ```java
 @Test
-public void convertingAnInputStreamToString()
-  throws IOException {
-    String originalString = randomAlphabetic(8);
+public void convertingAnInputStreamToString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -140,9 +136,8 @@ public void convertingAnInputStreamToString()
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(DEFAULT_SIZE);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     Path tempFile = 
@@ -154,7 +149,7 @@ public void convertingAnInputStreamToAString()
 }
 ```
 
-这里我们使用 java.nio.file.Files 类来创建一个临时文件，同时将 InputStream 的内容复制到文件中。然后用同一个类用 readAllBytes() 方法将文件内容转换为一个字符串。
+这里我们使用 `java.nio.file.Files` 类来创建一个临时文件，同时将 InputStream 的内容复制到文件中。然后用同一个类用 readAllBytes() 方法将文件内容转换为一个字符串。
 
 ### 用Guava进行转换
 
@@ -164,7 +159,7 @@ public void convertingAnInputStreamToAString()
 @Test
 public void convertingAnInputStreamToAString() 
   throws IOException {
-    String originalString = randomAlphabetic(8);
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     ByteSource byteSource = new ByteSource() {
@@ -180,19 +175,18 @@ public void convertingAnInputStreamToAString()
 }
 ```
 
-让我们来看看这些步骤。
+让我们来看看这些步骤
 
-- 首先，我们把我们的InputStream包装成一个ByteSource，就我们所知，这是最简单的方法。
-- 然后，我们把ByteSource看作是一个具有UTF8字符集的CharSource。
-- 最后--我们使用CharSource将其作为一个字符串来读取。
+- 首先，我们把我们的 InputStream 包装成一个 ByteSource.
+- 其次，我们把 ByteSource 看作是一个具有 UTF8 字符集的 CharSource。
+- 最后，我们使用 CharSource 将其作为一个字符串来读取。
 
-一个更简单的转换方法是使用Guava，但需要明确地关闭流；我们可以简单地使用try-with-resources语法来处理这个问题。
+一个更简单的转换方法是使用 Guava，但需要明确地关闭流, 我们可以简单地使用 try-with-resources 语法来处理这个问题。
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(8);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
  
     String text = null;
@@ -206,15 +200,14 @@ public void convertingAnInputStreamToAString()
 
 ### 用 Apache Commons IO 进行转换
 
-现在让我们来看看如何用Commons IO库来做这个。
+现在让我们来看看如何用 Commons IO 库来做这个。
 
-一个重要的注意事项是，与Guava不同的是，这些例子都不会关闭InputStream。
+一个重要的注意事项是，与 Guava 不同的是，这些例子都不会关闭 InputStream。
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(8);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     String text = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
@@ -226,9 +219,8 @@ public void convertingAnInputStreamToAString()
 
 ```java
 @Test
-public void convertingAnInputStreamToAString() 
-  throws IOException {
-    String originalString = randomAlphabetic(8);
+public void convertingAnInputStreamToAString() throws IOException {
+    String originalString = randomString(8);
     InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
 
     StringWriter writer = new StringWriter();

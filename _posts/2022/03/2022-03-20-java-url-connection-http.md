@@ -2,7 +2,7 @@
 layout: post
 title:  使用 HttpUrlConnection 在Java中做一个简单的HTTP请求
 tagline: by feng
-categories: idea
+categories: java
 tags: 
     - feng
 ---
@@ -30,7 +30,7 @@ HttpUrlConnection 类通过将 requestMethod 属性设置为get, post, head, opt
 让我们使用GET方法创建一个与给定URL的连接:
 
 ```java
-URL url = new URL("http://example.com");
+URL url = new URL("https://www.javanorth.cn");
 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 con.setRequestMethod("GET");
 ```
@@ -209,4 +209,4 @@ if (status > 299) {
 
 ### 总结
 
-在这篇文章中，我们展示了如何使用HttpUrlConnection类来执行HTTP请求。
+在这篇文章中，我们展示了如何使用 HttpUrlConnection 类来执行HTTP请求。
