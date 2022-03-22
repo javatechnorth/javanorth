@@ -2,7 +2,7 @@
 layout: post
 title:  springCloudStream集成Kafka
 tagline: by 揽月中人
-categories: SpringCloudStream
+categories: kafka
 tags: 
     - 揽月中人
 ---
