@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  SpringCloudStream集成Kafka
+title:  springCloudStream集成Kafka
 tagline: by 揽月中人
 categories: SpringCloudStream
 tags: 
