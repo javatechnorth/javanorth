@@ -56,7 +56,7 @@ public void convertingAnInputStreamToAString() {
 }
 ```
 
-值得一提的是，lines() 使用的是 readLine() 方法。readLine() 假定一行是由换行（"\n"）、回车（"\r"）或回车后立即换行中的任何一种结束符。换句话说，它支持所有常见的行结束方式。
+值得一提的是，`lines()` 使用的是 `readLine()` 方法。`readLine()` 假定一行是由换行`（"\n"）`、回车`（"\r"）`或回车后立即换行中的任何一种结束符。换句话说，它支持所有常见的行结束方式。
 
 另一方面，当我们使用 Collectors.join() 时，我们需要明确决定我们要为创建的 String 使用哪种类型的结束符。
 
@@ -101,7 +101,7 @@ public void convertingAnInputStreamToAString() throws IOException {
 
 请注意，InputStream 将被关闭的 Scanner 关闭。
 
-同样值得澄清的是 `useDelimiter("\A")` 的作用。这里我们传递了'\A'，它是一个边界标记重码，表示输入的开始。本质上，这意味着 next() 调用读取了整个输入流。
+同样值得澄清的是 `useDelimiter("\A")` 的作用。这里我们传递了`'\A'`，它是一个边界标记重码，表示输入的开始。本质上，这意味着 `next()` 调用读取了整个输入流。
 
 ### 使用 ByteArrayOutputStream 进行转换
 
@@ -181,7 +181,7 @@ public void convertingAnInputStreamToAString()
 - 其次，我们把 ByteSource 看作是一个具有 UTF8 字符集的 CharSource。
 - 最后，我们使用 CharSource 将其作为一个字符串来读取。
 
-一个更简单的转换方法是使用 Guava，但需要明确地关闭流, 我们可以简单地使用 try-with-resources 语法来处理这个问题。
+一个更简单的转换方法是使用 Guava，但需要明确地关闭流, 我们可以简单地使用 `try-with-resources` 语法来处理这个问题。
 
 ```java
 @Test
