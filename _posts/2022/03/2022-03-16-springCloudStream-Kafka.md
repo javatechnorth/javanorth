@@ -49,14 +49,6 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
 本地使用kafka同样也是如下的几个步骤：
 
 1. 下载Kafka（本文使用2.11版本，下载链接见文章末尾）
-2. 环境变量配置：
-   1. 查看config文件下面的 server.properties配置文件中的zookeeper的配置
-   
-   2. bin/windows文件夹下面kafka-run-class.bat文件中有JAVA_HOME的配置，同样也可以直接改成系统的Java路径.
-3. 在kafka根目录下使用如下命令启动kafka，并在zookeeper中注册。
-   
-4. 创建topic，在bin\windows目录下使用如下命令。创建名称为“test”的topic
-      
-5. 使用windows命令窗口的producer和consumer，在bin\windows目录下使用如下命令
+
 
 
