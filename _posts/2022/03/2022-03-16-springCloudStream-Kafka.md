@@ -59,22 +59,241 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
    - 在bin/windows文件夹下面kafka-run-class.bat文件中有JAVA_HOME的配置，同样也可以直接改成系统的Java路径.
 
 3. 在kafka根目录下使用如下命令启动kafka，并在zookeeper中注册。
-```shell
-# .\bin\windows\kafka-server-start.bat .\config\server.properties
-```
+    ```shell
+    # .\bin\windows\kafka-server-start.bat .\config\server.properties
+    ```
 4. 创建topic，在bin\windows目录下使用如下命令。创建名称为“test”的topic
 
-```shell
-kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
-```
+    ```shell
+    kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+    ```
 
 5. 使用windows命令窗口的producer和consumer，在bin\windows目录下使用如下命令
 
-```shell
-#test topic的消息生产者
-kafka-console-producer.bat --broker-list localhost:9092 --topic test
-#test topic的消息消费者
-kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test
-#test topic的消息消费者（从头消费）
-kafka-console-consumer.bat --bootstrap-server localhost:9092 --from-beginning --topic 
+    ```shell
+    #test topic的消息生产者
+    kafka-console-producer.bat --broker-list localhost:9092 --topic test
+    #test topic的消息消费者
+    kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test
+    #test topic的消息消费者（从头消费）
+    kafka-console-consumer.bat --bootstrap-server localhost:9092 --from-beginning --topic 
+    ```
+
+kafka启动windows界面如下
+
+![image-20220321010941740](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-3.gif)
+
+#### 3 SpringCloudStream集成Kafka
+
+#### 3.1 引入依赖
+
+由于我们直接使用Spring Cloud Stream 继承Kafka，官方也已经有现成的starter。
+
+```xml
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-stream-kafka</artifactId>
+   <version>2.1.0.RELEASE</version>
+</dependency>
 ```
+
+#### 3.2 关于kafka的配置
+
+```yaml
+spring:
+  application:
+    name: shop-server
+  cloud:
+    stream:
+      bindings:
+        #配置自己定义的通道与哪个中间件交互
+        input: #MessageChannel里Input和Output的值
+          destination: test #目标主题 相当于kafka的topic
+        output:
+          destination: test1 #本例子创建了另外一个topic （test1）用于区分不同的功能区分。
+      default-binder: kafka #默认的binder是kafka
+  kafka:
+    binder:
+      zk-nodes: localhost:2181
+    bootstrap-servers: localhost:9092 #kafka服务地址，集群部署的时候需要配置多个，
+    consumer:
+      group-id: consumer1 
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      client-id: producer1
+server:
+  port: 8100
+```
+
+
+
+#### 3.3 消费者示例
+
+首先需要定义SubscribableChannel 接口方法使用Input注解。
+
+```java
+public interface Sink {
+    String INPUT = "input";
+
+    @Input("input")
+    SubscribableChannel input();
+}
+```
+
+
+
+然后简单的使用 StreamListener 监听某一通道的消息。
+
+```java
+@Service
+@EnableBinding(Sink.class)
+public class MessageSinkHandler {
+
+    @StreamListener(Sink.INPUT)
+    public void handler(Message<String> msg){
+        System.out.println(" received message : "+msg);
+
+    }
+}
+```
+
+
+
+cloud stream配置中绑定了对应的Kafka topic，如下
+
+```properties
+cloud:
+  stream:
+    bindings:
+      #配置自己定义的通道与哪个中间件交互
+      input: #SubscribableChannel里Input值
+        destination: test #目标主题
+```
+
+
+
+我们使用Kafka console producer 生产消息。
+
+```sh
+kafka-console-producer.bat --broker-list localhost:9092 --topic test
+```
+
+同时启动我们的示例SpringBoot项目,使用producer推送几条消息。
+
+![image-20220321230035733](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-4.gif)
+
+
+
+我们同时启动一个Kafka console consumer 
+
+```properties
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test
+```
+
+消费结果如下：
+
+![image-20220321233121615](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-51.gif)
+
+Spring Boot 项目消费消息如下：
+
+![image-20220321225951269](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-6.gif)
+
+
+
+#### 3.4 生产者示例
+
+首先需要定义生产者MessageChannel，这里会用到Output注解
+
+```java
+public interface KafkaSource {
+    String OUTPUT = "output";
+
+    @Output(KafkaSource.OUTPUT)
+    MessageChannel output();
+}
+```
+
+
+
+使用MessageChannel 发送消息。
+
+```java
+@Component
+public class MessageService {
+
+    @Autowired
+    private KafkaSource source;
+
+    public Object sendMessage(Object msg) {
+        source.output().send(MessageBuilder.withPayload(msg).build());
+        return msg;
+    }
+```
+
+
+
+定义一个Rest API 来触发消息发送
+
+```java
+@RestController
+public class MessageController {
+
+    @Autowired
+    private MessageService messageService;
+
+    @GetMapping(value = "/sendMessage/{msg}")
+    public String sendMessage(@PathVariable("msg") String msg){
+        messageService.sendMessage("messageService send out : " + msg + LocalDateTime.now());
+        return "sent message";
+    }
+}
+```
+
+
+
+配置中关于producer的配置如下
+
+```properties
+cloud:
+  stream:
+    bindings:
+      input: 
+        destination: test 
+      output:
+        destination: test1 #目标topic
+```
+
+
+
+启动SpringBoot App， 并触发如下API call
+
+http://localhost:8100/sendMessage/JavaNorthProducer
+
+
+
+我们同时启动一个Kafka console consumer，这里我们使用另一个test1 topic
+
+```shell
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test1
+```
+
+console consumer消费消息如下：
+
+![image-20220321232711620](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-7.gif)
+
+
+
+### 总结
+
+本章初步介绍了Spring Cloud Stream 集成Kafka的简单示例，实现了简单的发布-订阅功能。但是Spring Cloud Stream肯定还有更多的功能，我们后续还将继续深入学习更多Stream的功能。
+
+
+
+*以上示例仓库:https://github.com/javatechnorth/java-study-note/tree/master/kafka*
+
+*下载链接：*
+
+*https://dlcdn.apache.org/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz*
+
+*https://kafka.apache.org/downloads*
