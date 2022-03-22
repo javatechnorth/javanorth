@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  CloudStream集成Kafka
+title:  SpringCloudStream集成Kafka
 tagline: by 揽月中人
 categories: kafka
 tags: 
@@ -19,5 +19,10 @@ tags:
 
 SpringCloudStream是一个构建高扩展性的事件消息驱动的微服务框架。简单点说就是帮助你操作MQ，可以与底层MQ框架解耦。将来想要替换MQ框架的时候会比较容易。
 
+![查看源图像](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-1.gif)
 
+
+Kafka是一个分布式发布 - 订阅消息系统，源于LinkedIn的一个项目，2011年成为开源Apache项目。
+
+ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布式计算提供开源的分布式配置服务、同步服务和命名注册，Kafka的实现同时也依赖于zookeeper。
 
