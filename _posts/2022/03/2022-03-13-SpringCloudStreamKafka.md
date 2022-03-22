@@ -206,7 +206,7 @@ kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test
 
 消费结果如下：
 
-![image-20220321233121615](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-5.gif)
+![image-20220321233121615](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-51.gif)
 
 Spring Boot 项目消费消息如下：
 
