@@ -73,6 +73,3 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
       kafka-console-consumer.bat --bootstrap-server localhost:9092 --from-beginning --topic 
       ```
 
-kafka启动windows界面如下
-
-![image-20220321010941740](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-3.gif)
