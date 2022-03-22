@@ -44,3 +44,45 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
 
 ![image-20220321004222780](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-2.gif)
 
+##### 2.2 搭建Kafka
+
+本地使用kafka同样也是如下的几个步骤：
+
+1. 下载Kafka（本文使用2.11版本，下载链接见文章末尾）
+
+2. 环境变量配置：
+
+   1. 查看config文件下面的 server.properties配置文件中的zookeeper的配置
+
+      ```properties
+      zookeeper.connect=localhost:2181
+      ```
+
+   2. bin/windows文件夹下面kafka-run-class.bat文件中有JAVA_HOME的配置，同样也可以直接改成系统的Java路径，
+
+   3. 在kafka根目录下使用如下命令启动kafka，并在zookeeper中注册。
+
+      ```sh
+      .\bin\windows\kafka-server-start.bat .\config\server.properties
+      ```
+
+   4. 创建topic，在bin\windows目录下使用如下命令。创建名称为“test”的topic
+
+      ```sh
+      kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+      ```
+
+   5. 使用windows命令窗口的producer和consumer，在bin\windows目录下使用如下命令
+
+      ```sh
+      #test topic的消息生产者
+      kafka-console-producer.bat --broker-list localhost:9092 --topic test
+      #test topic的消息消费者
+      kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test
+      #test topic的消息消费者（从头消费）
+      kafka-console-consumer.bat --bootstrap-server localhost:9092 --from-beginning --topic 
+      ```
+
+kafka启动windows界面如下
+
+![image-20220321010941740](https://www.javanorth.cn/assets/images/2022/lyj/springCloudStream1-3.gif)
