@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  将Java InputStream转为字符串
+title:  将Java InputStream转为字符串1
 tagline: by feng
 categories: java
 tags: 
