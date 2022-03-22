@@ -51,14 +51,12 @@ ZooKeeper 是 Apache 软件基金会的一个软件项目，它为大型分布�
 1. 下载Kafka（本文使用2.11版本，下载链接见文章末尾）
 2. 环境变量配置：
 
-   1. 查看config文件下面的 server.properties配置文件中的zookeeper的配置
+   - 查看config文件下面的 server.properties配置文件中的zookeeper的配置
 
       ```properties
       zookeeper.connect=localhost:2181
       ```
-   2. bin/windows文件夹下面kafka-run-class.bat文件中有JAVA_HOME的配置，同样也可以直接改成系统的Java路径.
+   - 在bin/windows文件夹下面kafka-run-class.bat文件中有JAVA_HOME的配置，同样也可以直接改成系统的Java路径.
+
 3. 在kafka根目录下使用如下命令启动kafka，并在zookeeper中注册。
-      ```sh
-      .\bin\windows\kafka-server-start.bat .\config\server.properties
-      ```   
 
