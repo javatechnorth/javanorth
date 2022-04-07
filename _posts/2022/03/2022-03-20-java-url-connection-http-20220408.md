@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  使用 HttpUrlConnection 在Java中做一个简单的HTTP请求
+title:  使用 HttpUrlConnection 在Java中做一个简单的HTTP请求 20220408
 tagline: by feng
 categories: java
 tags: 

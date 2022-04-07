@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  SpringCloudStream集成Kafka
+title:  SpringCloudStream集成Kafka-20220406
 tagline: by 揽月中人
 categories: kafka
 tags: 
