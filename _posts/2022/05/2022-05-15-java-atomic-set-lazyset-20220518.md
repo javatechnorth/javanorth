@@ -10,7 +10,7 @@ tags:
 大家好，我是指北君。
 
 在本教程中，我们将研究 Java atomic 类（如 `AtomicInteger` 和 `AtomicReference` ）的方法 `set()` 和 `lazySet()` 之间的区别。
-
+<!--more-->
 ### 原子变量
 
 Java中的原子变量使我们能够轻松地对类的引用或字段进行线程安全的操作，而不需要添加监视器或互斥等并发原语。
