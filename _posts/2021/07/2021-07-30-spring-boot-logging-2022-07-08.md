@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Spring Boot logging
+title:  Spring Boot logging 2022-07-08
 tagline: by feng
 categories: "Spring-Boot"
 tags: 
