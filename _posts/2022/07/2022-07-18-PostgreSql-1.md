@@ -1,0 +1,83 @@
+---
+layout: post
+title: 招聘需求上出现了PostgreSql
+tagline: by 揽月中人
+categories: PostgreSql
+tags:
+- 揽月中人
+---
+
+哈喽，大家好，我是指北君。
+
+近几年PostgreSql一直处于增长状态，国内的一些公司也开始逐渐使用PG 了。甚至也会出现再一些招聘需求上。那么我们今天带大家一起了解一下PostgreSql数据库。
+
+<!--more-->
+
+### 世界上最先进的开源关系型数据库
+
+> PostgreSQL: The World's Most Advanced Open Source Relational Database
+
+PostgreSql官方网站上打出的口号就是上面这句：“**世界上最先进的开源关系型数据库**”。
+
+PostgreSQL是以加州大学伯克利分校计算机系开发的POSTGRES， 版本 4.2为基础的对象关系型数据库管理系统（ORDBMS）。
+
+PostgreSql是一个开源项目，其拥有很好的扩展性，功能丰富。也许就是其复杂的功能，导致流行度没有MySql高。 
+
+
+
+曾经有博主在十年前就提出过相关的问题，我们看一下截图：
+
+![image-20220717234040732](https://www.javanorth.cn/assets/images/2022/lyj/PostgreSql1-01.png)
+
+
+
+不过从流行排行来看，PostgreSql一直在上升，其流行度的上升必然会挤占其他关系型数据库的市场，
+
+![image-20220717234520154](https://www.javanorth.cn/assets/images/2022/lyj/PostgreSql1-02.png)
+
+
+
+如今的互联网业务更加复杂，需求也更广泛，MySql被Oracle收购，其使用协议对公司来说并不是很友好。而PostgreSql是一个完全开源的产品，某些公司甚至可以直接使用。
+
+再者目前很多公司都将其大型服务服务逐渐拆解成微服务，原来的数据库也会逐步进行拆解。然而相比于Oracle，PostgreSql由于其开源属性，综合成本会低很多。而且可以兼容大部分的关系型数据库使用场景。所以一些公司会选择PostgreSql作为其数据库的一个选择，同时PostgreSql的丰富功能也可以提供更多的使用场景，何乐而不为呢。
+
+Oracel大行其道，但是成本颇高，MySql又被Oracle收购，其开源协议令人不爽。PostgreSql显然成为了一些非核心业务数据库首选，可以有效地降低企业的成本。这年头谁还和钱过不去呢！
+
+
+
+### PostgreSql的一些特点
+
+#### 1 PostgreSql是通用型数据库
+
+PostgreSql提供了丰富的数据类型
+
+- 基本数据（整数，数字，字符，布尔值）
+- 结构化数据（日期/时间，数组，多范围，UUID）  
+- 文档数据类型  (JSON/JSONB,XML,Key-Value)
+- 几何类型 （点，线，圆，多边形等）
+- 网络地址类型 cidr，inet，macaddr
+- 可自定义  （复合类型数据，自定义类型）
+
+其可以存储并计算大多数场景的业务数据，可以在高可用的前提下提供高可用性，适合一些复杂的业务逻辑。
+
+#### 2 PostgreSql具有丰富的扩展性
+
+即有Oracle绝大部分的功能，也提供了许多扩展功能。如PostGIS，可以直接在数据库中进行GIS地理数据的存储和计算等。另外还有pg_stat_statements，pg_trgm，pgcrypto等丰富的插件
+
+#### 3 大多数共有云支持
+
+如今的大多数公有云服务均推出自己的RDS产品， AWS,阿里，腾讯，华为云等均有对应的PostgreSql产品。
+
+#### 4 开源免费
+
+PostgreSql是开源软件，我们可以自由选择，自由使用，自由扩展，自由部署，而且并不会被软件厂商左右。 
+
+与Oracle相比，PostgreSql的0成本难道还不够吸引你么？
+
+![image-20220719010845143](https://www.javanorth.cn/assets/images/2022/lyj/PostgreSql1-03.png)
+
+### 总结
+
+PostgreSql已经走过了30多个年头，相信其可靠性已经得到足够多的证明。未来足够多的使用场景下肯定会有一席之地，而其自由地开源协议也会推动其成为主流数据库之一。开源产品的繁荣会为广大程序员以及社会带来不少的便利，至少未来我们可以多一种选择！
+
+那么，如果是你，有机会的话，会选择PostgreSql麽？
