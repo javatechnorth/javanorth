@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Java record vs lombok -20220719
+title:  Java record vs lombok -20220720
 tagline: by feng
 categories: java
 tags: 

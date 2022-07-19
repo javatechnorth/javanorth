@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Java 截取字符串的几种操作
+title:  Java 截取字符串的几种操作 - 20220718
 tagline: by feng
 categories: java
 tags: 
