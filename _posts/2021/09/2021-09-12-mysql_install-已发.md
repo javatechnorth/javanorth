@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  mysql安装
+title:  mysql安装——20220801
 tagline: by 24只羊
 categories: mysql
 tags: 
