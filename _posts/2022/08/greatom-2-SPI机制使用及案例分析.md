@@ -1,0 +1,151 @@
+---
+layout: post
+title: SPI机制使用及案例分析
+tagline: by Greatom
+categories: SPI
+tags: Greatom
+---
+
+哈喽，大家好，我是指北君。又是奋斗的一天，先来段经典语录鼓舞下自己。
+> 凡事欲其成功，必要付出代价：奋斗。 ——爱默生
+
+打好“鸡血”后，接下来就开始新的学习
+
+### 1、前言
+
+在之前的[JVM 分析系列之类加载]()提到过 **Java SPI** 机制，主要是类加载器反双亲委派的实现（第三方包不在指定jdk路径，一般类加载器无法加载，需要特殊的ContextClassLoader加载以便使用）。本次将对 SPI机制进行详解，并结合案例介绍其在实际场景中具体使用。
+
+
+`提示：以下是本篇文章正文内容，案例仅供对比参考`
+
+### 2、什么是SPI机制？
+
+- SPI（全称：Service Provider Interface），是jdk内置的一种服务提供发现接口机制，旨在由第三方服务实现或扩展为组件，方便开发人员快速集成指定扩展组件满足指定的需求。这对于应用或平台扩展来说，无疑是一种成本较低、动态灵活的方案。
+- SPI机制调度过程（业务调用方可根据加载的扩展实现类实现功能）
+- 调用流程 ![class.png](./assets/images/2022/greatom/class.png)
+
+### 3、实现方式及使用场景
+> 鉴于目前实际项目涉及范围，总结出的常见应用场景。
+#### 3.1 接口全限定文件名方式
+- 即在resource文件下创建META/services/目录，并在此目录下新建文件，文件名称为接口类权限定文件名，如 com.lgy.spidemo.serviceway.SpiService。（不好理解就是接口类的package地址 + 接口类名）
+> 使用场景一：
+- 场景描述：不同部门类型的员工需要从不同的考勤应用获取出勤信息，如职能部门仅拉取钉钉考勤，业务部门需要拉取钉钉考勤的基础上再结合自研考勤模块数据汇总出勤结果。
+- 实现方式：抽象通用拉取考勤接口，定义不同部门人员考勤统计实现类。
+- 直接上代码：
+- 通用接口：
+```
+	package com.lgy.spidemo.serviceway;
+
+	/**
+	 * @description: 考勤接口
+	 **/
+	public interface AttendanceService {
+		void pullAttendanceInfos();
+	}
+```
+- 职能部门考勤实现类
+```
+	/**
+	 * @description: 职能部门考勤实现
+	 **/
+	public class FunctionAttendanceServiceImpl implements AttendanceService  {
+		@Override
+		public void pullAttendanceInfos() {
+			System.out.println(" FunctionAttendanceService implements ...");
+			// 逻辑忽略
+		}
+	}
+```
+- 销售部门考勤实现
+```
+	/**
+	 * @description: 销售部门考勤实现
+	 **/
+	public class SaleAttendanceServiceImpl implements AttendanceService  {
+		@Override
+		public void pullAttendanceInfos() {
+			System.out.println(" SaleAttendanceService implements ...");
+			// 逻辑忽略
+		}
+	}
+```
+- 测试类
+```
+	/**
+	 * 1、项目的\src\main\resources\下创建\META-INF\services目录
+	 * 2、META-INF\services的目录下再增加一个配置文件，这个文件必须以接口的全限定类名保持一致 (com.lgy.spidemo.service.SpiService)
+	 * 3、在配置文件中写入具体实现类的全限定类名，如有多个便换行写入 com.lgy.spidemo.service.impl.SaleAttendanceServiceImpl
+	com.lgy.spidemo.service.impl.FunctionAttendanceServiceImpl
+	 **/
+	public class AttendanceServiceTest {
+		public static void main(String[] args) {
+			ServiceLoader<AttendanceService> services =
+					 ServiceLoader.load(AttendanceService.class);
+			// 省略判断人员部门类型逻辑
+			// 测试输出结果，展示实现接口已加载
+			for (AttendanceService service : services) {
+				service.pullAttendanceInfos();
+			}
+		}
+	}
+```
+- 测试结果如下
+ ```
+	  // 两个实现类均被加载成功，在实际使用时，可根据需要去调用不同的实现。
+	  FunctionAttendanceService implements ...
+	  SaleAttendanceService implements ...
+ ```
+- 实现类不要标注任何注解，不然Spring在初始化过程中扫描并加载，无法测试。
+> 结合场景一分析：
+- 此场景可以通过自定义实现类很快实现业务需求，以配置的方式比较灵活的管理场景所需，对出快速迭代过程有很好的的管理帮助。
+- 考虑公司组织架构比较复杂，部门职责分的比较细，后续扩展几率比较大，比如职能部门行政类和运营类标准细分，很可能会增加除了考勤之外的各种考核指标等，借鉴此方案可能简单实现并比较方便集成，使得业务间减少依赖，实现解耦的设计模式，因此个人是比较偏向用此方案。
+- 其它应用：如项目中常用的日志也是采用SPI机制，常见的common-logging的LogFatory就是标准SPI接口，有兴趣的可以自行研究。
+#### 3.2 spring.factories方式
+- 和上面一样，需要在resource文件下创建META/services/目录，并在此目录下新建文件，区别在于文件名为 ***spring.factories***。
+> 使用场景二
+- 场景描述：针对于不同的开发端使用习惯展示不同的接口文档，比如APP端习惯于[Swagger](https://swagger.io/)，JAVA端喜欢[dateway](https://my.oschina.net/ta8210/blog/3234639)风格，就在不同实例展示不同接口文档。此场景是我臆想出来。
+- 实现方式：构建两种版本的jar包，比如 1.0.0-swagger 、2.0.0-dataway，再对应的包内配置spring.factories内的config配置类。
+- 代码如下：
+```
+	package com.lgy.spidemo.factoriesway;
+
+	import org.springframework.boot.autoconfigure.AutoConfigurationImportEvent;
+	import org.springframework.boot.autoconfigure.AutoConfigurationImportListener;
+
+	/**
+	 * @description: 自动配置swagger
+	 **/
+	public class SwaggetAutoConfiguration {
+		public SwaggetAutoConfiguration() {
+			System.out.println(" SwaggetAutoConfiguration init ...");
+		}
+		// 配置内容省略
+	}
+
+	/**
+	 * @description: 自动配置dataway
+	 **/
+	public class DataWayAutoConfiguration {
+		public DataWayAutoConfiguration() {
+			System.out.println(" DataWayAutoConfiguration init ...");
+		}
+		// 配置内容省略
+	}
+
+	/**
+	* resource/META-INFO/spring.factories 文件内容 *
+	* org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+	  com.lgy.spidemo.factoriesway.SwaggetAutoConfiguration
+	* 输出结果： SwaggetAutoConfiguration init ...
+	**/
+```
+- 根据spring.factories内配置的类，在springboot启动初始化过程中会自动加载对应的配置，实现所需的接口文档。
+> 结合场景二分析：
+- spring.factories实现机制与上述方式一致，只是实现方式不同，本质目的是通过抽象化类的方式，实现解耦，最终便于扩展
+- 其它使用场景：如spring-boot-autoconfigure-x.x.x.RELEASE.jar，就是通过此方式完成初始化加载。
+---
+
+### 4、总结
+- 本次讲解的两种方式均是基于SPI机制，可见是多么受开发追捧。当然，还有很多种实现方式，我个人觉得最主要的还是能够在自己的掌控范围内去使用，毕竟有问题可以通过自己的学习理解去解决。
+- 最后说一句，没有更好的技术知识，只有更适合的技术应用，结合实际，检出真理。
+

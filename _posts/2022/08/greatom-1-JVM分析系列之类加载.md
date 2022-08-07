@@ -1,0 +1,122 @@
+---
+layout: post
+title: JVM分析系列之类加载
+tagline: by Greatom
+categories: JVM
+tags: Greatom
+---
+
+哈喽，大家好，我是指北君。又是新的一周，那就继续迎接美好的生活，首先给大家分享一段语录。
+
+> 今天是你搬来的一块砖，虽然朴素不足道，却垫起了你明天的一段高度。——鲍尔吉·原野
+
+美好过后，接下来就是本次分享的内容，请认真查收！！！
+
+
+### 1、前言
+
+JVM内部架构包含类加载器、内存区域、执行引擎等。日常开发中，我们编写的java文件被编译成class文件后，jvm会进行加载并运行使用类。本次仅对JVM加载部分进行分析，了解并掌握加载机制。
+
+
+### 2、类加载是什么？
+
+类加载是一种过程，是将class文件加载到jvm内存的过程。当代码逻辑中需要引用类时，通过类加载器加载引用类对象并存放堆中，以供代码调用。
+
+
+
+### 3、类加载过程
+`注：类加载过程包含 加载、链接（验证、准备、解析）、初始化`
+#### 3.1 加载
+- 加载：将类的class字节码文件读到内存，将其存放到运行时数据区的方法区，然后在堆区生成class对象，封装类在方法区内的数据结构。（方法区-》数据结构，堆区-》class对象）
+- 过程：java文件-》通过java c编译成字节码.class文件-》引导类加载器（装载核心类库）-》扩展类加载器（将指定目录jar包装载至工作库）-》系统类加载器（将指定目录的类和jar包装载至工作库，常用）-》自定义类加载器（实现加载指定类或自定义加密等操作）
+- 缓存：类加载到jvm后，会缓存一段时间（不管是否被引用），待jvm执行垃圾回收时才会回收未使用的缓存类，释放空间。
+- 类加载器：
+	- 启动类加载器：Bootstrap ClassLoader由C/C++实现，嵌套在JVM中，java程序无法直接操作；负责加载Java核心类库（$JAVA_HOME中jre/lib目录下或-Xbootclasspath参数指定的路径目录下，如java.*开头的类）的class文件。
+	- 扩展类加载器：Extension ClassLoader由Java编写，由sun.misc.Launcher$ExtClassLoader实现。加载java平台扩展的jar包，负责加载（java.ext.dirs目录或$JAVA_HOME中jre/lib/ext目录，如javax.开头的类）的class文件。
+	- 应用程序类加载器：Application ClassLoader由Java编写，由sun.misc.Launcher$AppClassLoader实现。负责加载用户类路径（classpath）的class文件，java程序一般默认使用应用程序类加载器。
+	- 自定义类加载器：一般情况下java程序使用上面三种类加载器就满足了，一些特殊情况下，我们需要自定义加载指定路径的类时，就需要继承java.lang.ClassLoader类，重写find Class或loadClass均可实现。（[类隔离]()实践中就采用此方案）
+- 类加载机制
+	- 全盘负责：当加载器加载某个class时，该class所引用的其他class也一并被加载（自定义加载class除外）；
+	- 缓存机制：所有加载过的class均被缓存，当程序中使用某个class时，优先从缓存区中获取，如果缓存区不存在，才会读取该class的字节码文件，加载为class对象，并存入缓存区，以便后续使用。（修改class后，需要重启jvm才会生效）
+	- 双亲委派：是一种类加载安全机制，当类加载器需要加载某个class文件时，会优先把加载委托给父类加载器处理，如果加载成功则返回，否则继续向上委托直至最顶层类加载器，当父类加载器在加载范围内均没有找到所需class文件，即表示无法完成加载，此时子加载器才会去加载。（先向上委托父类加载器处理，都失败后在自己再加载）
+	- 反向委派：主要是用于第三方包加载，第三方包的类不在jdk/lib目录，所以Bootstrap ClassLoader引导类加载器无法直接加载SPI（Service Provider Interface,服务提供者接口）的实现类，双亲委派机制中定义无法反向委托Application Classloader系统加载器加载，因此需要一种特殊的ContextClassLoader线程上下文类加载器来加载第三方的类库。（*** 此处SPI接口后续文章分析 ***）
+- 加载实现方式
+```c
+	/*
+	 * 类加载方式
+	 * 1、类加载器，此方式加载的class对象还没有完成链接阶段
+	 * 2、java.lang.Class，此方式加载的class对象是完成初始化的
+	 * */
+	ClassLoader classLoader = ClassSegregationTest.class.getClassLoader();
+	classLoader.loadClass("com.lgy.example.class_segregation.SegregationTestA");
+	// 默认初始化class对象
+	Class.forName("com.lgy.example.class_segregation.SegregationTestA");
+	// 默认不初始化，并且指定类加载器进行加载
+	Class.forName("com.lgy.example.class_segregation.SegregationTestA", false, classLoader);
+```
+
+#### 3.2 链接
+- 链接是将java二进制代码合并至jvm运行的过程。
+- 链接过程可分为 验证、准备、解析 三个阶段。
+- 验证
+	- 保证正确加载类，包括文件格式验证（Class文件格式的规范）、元数据验证（Java语言规范）、字节码验证（通过数据流和控制流分析）、符号引用验证。
+- 准备
+	- 在方法区为静态变量（static修饰）分配内存，并设置类变量初始值（通常是数据类型默认的零值，如0,0L,null,false等）。
+	- 显示赋值是在类对象实例化时处理（即 public static int x=10，准备阶段初始值为0，在对象实例化时，才被赋值10）
+- 解析
+	- 虚拟机中将常量池的符号引用（常量名）替换为直接引用（目标的指针地址）的过程；
+	- 符号引用的目标不一定在内存中，但常量名（或称字面量）是明确定义再jvm规范的class文件格式中。
+	- 直接引用是指向目标的指针地址、相对偏移量或间接定位到目标的句柄，是肯定在内存中。
+
+#### 3.3 初始化
+- 执行每个类的构造方法init()的过程，init()方法是java编译器自动收集、合并所有类变量的赋值动作和静态代码块语句，完成初始化。
+- 初始化步骤
+	- 类未被加载或链接，则程序先加载并链接该类
+	- 优先初始化直接父类，再执行子类初始化
+	- 依次执行类中的初始化语句
+- 初始化条件（只有对类主动使用时才会初始化类）
+	- 创建类实例（new Class）
+	- 类或接口静态变量的引用或赋值
+	- 类静态方法的调用
+	- 反射加载（Class.forName('')）
+	- 子类被初始化，其父类也会被初始化
+	- jvm启动时被标记启动类的类，或直接java.exe命令运行指定类
+- 演示代码如下:
+
+```c
+	/**
+	* 定义父类与子类
+	*/
+	class Parent {
+		public static int a = 10;
+		static {
+			System.out.println(" 父类初始化 ");
+		}
+	}
+	class Children extends Parent{
+		public static int a = 100;
+		static {
+			System.out.println(" 子类初始化 ");
+		}
+	}
+	public static void main(String[] args) throws Exception {
+		// 子类没有定义变量a （ public static int a = 100;）
+	   System.out.println(Children.a); // 输出 --  父类初始化 -- 10 
+	   // 主动调用时才会执行类的静态块
+	   -----------------------------------------
+	   // 子类定义变量a 
+	   System.out.println(Children.a); // 输出 -- 父类初始化 -- 子类初始化  -- 100 
+		// 子类被初始化时，优先初始化父类，所以父类静态块执行；调用变量a属于子类定义，属于主动调用，所以子类静态块执行
+	}
+```
+
+- 调试输出加载对象（**VM options 中添加 -XX:+TraceClassLoading**）
+	- [Loaded com.lgy.example.class_segregation.Parent from file:/E:/dataway-demo/example/target/classes/]
+	- [Loaded com.lgy.example.class_segregation.Children from file:/E:/dataway-demo/example/target/classes/]
+- 仅在首次主动使用才会被初始化。
+
+
+### 4、总结
+- 以上就是关于自定义类加载器、加载过程的全部内容。
+- 本文是针对于[类隔离实现之自定义类加载器](https://blog.csdn.net/qq_39486758/article/details/125487016)的扩展，对于应用中类加载阶段的进一步分析。
+- 通过本文的分析可以了解到类加载过程及涉及到的jvm中的模块，在整理过程中发现有些细节还需要扩展，所以还尚未成功，还需持续跟进。
