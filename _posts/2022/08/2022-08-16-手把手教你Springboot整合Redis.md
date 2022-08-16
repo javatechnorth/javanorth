@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  手把手教你SpringBoot整合Reids
+title:  手把手教你SpringBoot整合Redis
 tagline: by IT可乐
 categories: redis
 tags: 
