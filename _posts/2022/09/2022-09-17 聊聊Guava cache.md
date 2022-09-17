@@ -1,0 +1,264 @@
+---
+layout: post
+title:  聊聊Guava Cache
+tagline: by 沉浮
+categories: 缓存 guava
+tags: 沉浮
+---
+
+缓存技术被认为是减轻服务器负载、降低网络拥塞、增强Web可扩展性的有效途径之一，其基本思想是利用客户访问的时间局部性（Temproral Locality）原理，
+将客户访问过的内容在Cache中存放一个副本，当该内容下次被访问时，不必连接到驻留网站，而是由Cache中保留的副本提供。
+
+在企业Web应用中，通过缓存技术能够提高请求的响应速度；减少系统IO开销；降低系统数据读写压力...
+
+**Guava Cache**是一个相对比较简单并且容易理解的本地缓存框架，今天主要以此为开端来认识并学习如何使用缓存
+
+### 缓存的意义
+
+首先我们要知道，在我们开发过程中，为什么要使用缓存，缓存能够为我们带来哪些好处！
+
+> 优点
+ + 通过缓存承载系统压力，减少对系统或网络资源访问而引起的性能消耗，在流量较大时能够很好地减少系统拥塞
+ + 缓存一般都是使用存取非常快的组件实现，通过缓存能够快速响应客户端请求，从而降低客户访问延迟，提审系统响应速度
+ + 在配备负载均衡的应用架构中，通过缓存静态资源能够有效减少服务器负载压力
+ + 当下游应用故障时，通过返回缓存数据能够在一定程度上增强应用容错性
+
+> 缺点
+ + 缓存数据与实际数据不一致问题问题
+ + 高并发场景时存在缓存击穿、缓存穿透、缓存雪崩等问题
+
+*总的来说，缓存主要是针对高频访问但低频更新的数据，从而加快服务器响应与原资源访问压力*
+
+### Guava Cache特色
+
+ 本地缓存我们可以简单的理解为Map，将数据保存到Map（内存）中，下次使用该数据时，通过key直接从Map中取即可。但是使用Map会有一些几个问题需要考虑：
+
+ 1. 缓存的容量。不可能无限制的对数据进行缓存，当数据较大时占用系统资源会导致主业务受影响
+ 2. 缓存的清理。有些缓存使用频率很低，如果一直占用资源也是一种浪费
+ 3. 并发访问时的效率问题。缓存更新时瞬时对系统、网络资源的访问导致故障
+ 4. 缓存使用情况评估
+
+当然以上问题我们通过我们对Map包装下即可实现，当然Guava Cache也就是基于这种思想，底层原理则是基于Map实现，我们看下其有哪些特色：
+
+ + 缓存过期和淘汰机制
+
+通过设置Key的过期时间，包括访问过期和创建过期；
+设置缓存容量大小，采用LRU的方式，选择最近最久的缓存进行删除。
+
+ + 并发处理能力
+
+Cache主要基于CurrentHashMap实现线程安全；
+通过对key的计算，基于分段锁，提高缓存读写效率，降低锁的粒度，提升并发能力
+
+ + 更新锁定
+
+在缓存中查询某个key，如果不存在，则查源数据，并回填缓存。
+在高并发下会出现，多次查询元数据并重复回填缓存，可能会造成系统故障，最明显的DB服务器宕机，性能下降等。
+GuavaCache通过在CacheLoader调用load方法时，对同一个key同一时刻只会有一个请求去读源数据并回填缓存，后面的请求则直接继续从缓存读取，有效阻断并发请求对资源服务的影响。
+
+ + 集成数据源
+
+一般我们在业务中操作缓存，都会操作缓存和数据源两部分GuavaCache的get可以集成数据源，在从缓存中读取不到时可以从数据源中读取数据并回填缓存
+
+ + 监控统计
+
+ 监控缓存加载次数、命中率、失误率以及数据加载时长等
+
+### API介绍
+
++ 缓存构建
+
+  - ManualCache
+
+    此时Cache相当于一个Map，对数据进行CRUD操作时，需要同步操作缓存Map;
+ 高并发情况时，可以使用get(k,loader)读缓存，通过Cache锁机制，防止对系统资源（DB）的并发访问
+ 通过put方法实现缓存的存入与更新；   
+
+  - LoadingCache
+
+    此时构建的是一个实现了Cache接口的LoadingCache，相比ManualCache，提供了缓存回填机制，即当缓存不存在时，会基于CacheLoader查询数据并将结果回填到缓存，
+在高并发时，可以有效地基于缓存锁减少对系统资源的调用。
+ 此时仅需要关注缓存的使用，缓存的更新与存入都是基于CacheLoader实现；
+
++ 缓存获取
+
+   - get(k)           
+    根据key查询，没有则触发load；如果load为空则抛出异常
+   - getUnchecked(k)   
+   缓存不存在或返回为null会抛出检查异常
+   - get(k,loader)    
+    根据key查询，没有则调用loader方法，且对结果缓存；如果loader返回null则抛出异常，此时不会调用默认的load方法
+   - getIfPresent(k)  
+    有缓存则返回，否则返回null，不会触发load
+
++ 缓存更新
+
+   - put(k,v)         
+   如果缓存已经存在，则会先进行一次删除
+
++ 缓存删除
+
+   - invalidate(k)  
+     根据key使缓存失效
+   - 过期   
+     通过配置的过期参数，比如expireAfterAccess、expireAfterWrite、refreshAfterWrite
+   - 过载   
+     当缓存数据量超过设置的最大值时，根据LRU算法进行删除
+   - 引用   
+     构建缓存时将键值设置为弱引用、软引用，基于GC机制来清理缓存
+
++ 统计
+
+  - hitRate()   
+    缓存命中率；
+  - hitMiss()   
+  缓存失误率；
+  - loadCount() 
+  加载次数；
+  - averageLoadPenalty()    
+  加载新值的平均时间，单位为纳秒；
+  - evictionCount() 
+  缓存项被回收的总数，不包括显式清除。
+
+### Builder配置
+
+| 配置                | 描述                                 |
+|:------------------|:-----------------------------------|
+| expireAfterAccess | 多久没有读写则过期                          |
+| expireAfterWrite  | 写入后多久没更新自动过期，先删除，后load             |
+| refreshAfterWrite | 上一次更新后多久自动刷新，先reload后删除，并发时会取到老的数据 |
+| removalListener   | 设置缓存删除监听                           |
+| initialCapacity   | 缓存初始化大小                            |
+| concurrencyLevel  | 最大的并发数，可以理解为并发线程数量                 |
+| maximumSize       | 最大缓存数量，超过时会根据策略清除                  |
+| maximumWeight     | 最大权重容量数，仅用于确定缓存是否超过容量              |
+| recordStats       | 缓存命中统计                             |
+
+### 简单示例
+
++ ManualCache模式
+
+  下面以用户服务为例，我们看下如何在增删改查方法中使用缓存：
+```java
+private Cache<String, User> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(3, TimeUnit.SECONDS)//写入多久没更新自动过期，先删除，后load
+            .removalListener(new RemovalListener<Object, Object>() {
+                @Override
+                public void onRemoval(RemovalNotification<Object, Object> notification) {
+                    LOGGER.info("{} remove {}",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),notification.getKey());
+                }
+            })
+            .initialCapacity(20) //初始化容量
+            .concurrencyLevel(10) // 并发
+            .maximumSize(100) //最多缓存数量
+            .recordStats() // 开启统计
+            .build();
+
+@Override
+    public User getUser(String id){
+//        缓存不存在时，通过LocalCache锁机制，防止对数据库的高频访问
+       User user;
+       try {
+           user = cache.get(id,()-> {
+               LOGGER.info("缓存不存在,从loader加载数据");
+               return userDao.get(id);
+           });
+       } catch (ExecutionException e) {
+           throw new RuntimeException(e);
+       }
+        return user;
+    }
+
+    @Override
+    public User saveOrUpdateUser(User user){
+        userDao.saveOrUpdate(user);
+        cache.put(user.getId(),user);
+        return user;
+    }
+
+    @Override
+    public void removeUser(String id){
+        userDao.remove(id);
+        cache.invalidate(id);
+    }
+```
+
++ LoadingCache模式
+  
+```java
+private LoadingCache<String, User> cache = CacheBuilder.newBuilder()
+            // 省略
+            .build(new CacheLoader<String, User>() {
+                @Override
+                public User load(String key) throws Exception {
+                    LOGGER.info("{} load {}",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),key);
+                    return userDao.get(key);
+                }
+
+                @Override
+                public ListenableFuture<User> reload(String key, User oldUser) throws Exception {
+                    LOGGER.info("{} reload {}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),key);
+                    ListenableFutureTask<User> listenableFutureTask = ListenableFutureTask.create(() -> userDao.get(key));
+                    CompletableFuture.runAsync(listenableFutureTask);
+                    return listenableFutureTask;
+                }
+            });
+
+    @SneakyThrows
+    @Override
+    public User getUser(String id){
+        // 缓存不存在或返回为null会抛出异常
+        try {
+            return cache.getUnchecked(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public User saveOrUpdateUser(User user){
+        cache.invalidate(user.getId());
+        return userDao.saveOrUpdate(user);
+    }
+
+    @Override
+    public void removeUser(String id){
+        cache.invalidate(id);
+        userDao.remove(id);
+    }
+
+```
+
+### 其他：
+
+ + weight (权重)	
+ 如果设置了maximumWeight值，则当Cache中weight和超过了该值时，就会引起evict操作。
+ 
+ + 回收策略LRU
+
+> 总结：
+> 
+ 第一种写法更像是前面说到的Map，在对数据进行CRUD操作时，需要用户手动对缓存进行同步的更新或删除操作，所以叫ManualCache（手动），当然Guava Cache对Map的加强依然有效，比如过期清除，缓存容量限制。
+
+ 第二种方式写法差不多，主要是引入了CacheLoader接口，在读数据时缓存数据不存在时，通过CacheLoader的load方法先写缓存后返回数据
+
+### 注意
+
++ expireAfterWrite、refreshAfterWrite的区别
+
+在refreshAfterWrite导致缓存失效时，并不会因为更新缓存而阻塞缓存数据的返回，只不过是返回老的数据
+
++ 不能缓存null
+
+有时候为了将值为null的数据统一缓存，这样就不会因为没有缓存数据而访问数据库造成压力
+
++ 读写时才进行删除
+
+Guava Cache的缓存数据删除是在更新或写入时才会触发，没有单独的调度服务完成这一工作
+
+### 本地缓存
+
+类似的本地缓存还有，有兴趣的可以自己尝试，其实实现思想应该也差不多
+
++ Ehcache
++ caffeine
