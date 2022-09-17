@@ -229,17 +229,9 @@ private LoadingCache<String, User> cache = CacheBuilder.newBuilder()
 
 ```
 
-### 其他：
-
- + weight (权重)	
- 如果设置了maximumWeight值，则当Cache中weight和超过了该值时，就会引起evict操作。
- 
- + 回收策略LRU
-
 > 总结：
 > 
  第一种写法更像是前面说到的Map，在对数据进行CRUD操作时，需要用户手动对缓存进行同步的更新或删除操作，所以叫ManualCache（手动），当然Guava Cache对Map的加强依然有效，比如过期清除，缓存容量限制。
-
  第二种方式写法差不多，主要是引入了CacheLoader接口，在读数据时缓存数据不存在时，通过CacheLoader的load方法先写缓存后返回数据
 
 ### 注意
