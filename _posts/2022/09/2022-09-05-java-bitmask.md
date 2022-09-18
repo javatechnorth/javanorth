@@ -1,0 +1,155 @@
+---
+layout: post
+title:  如何在Java中用位操作符进行位掩码操作？
+tagline: by feng
+categories: java
+tags: 
+    - feng
+---
+
+大家好，我是指北君。
+
+在本文中，我们来看看如何使用位操作符实现低级别的位掩码。我们将看到我们如何将一个单一的`int`变量作为一个单独的数据容器。
+
+<!--more-->
+
+### 位掩码
+
+位掩码允许我们在一个数字变量中存储多个值。我们不再把这个变量看作一个整数，而是把它的每一个比特当作一个独立的值。
+
+因为一个比特可以等于 0 或 1，我们也可以把它看成是 false 或 true 。我们也可以把一组比特切开，把它们当作一个较小的数字变量甚至是一个`String`。
+
+#### 举个例子
+
+假设我们有一个最小的内存空间，并且需要在一个`int`变量中存储所有关于用户账户的信息。前八位（来自32个可用位）将存储`boolean`信息，如 "该账户是否激活？"或 "该账户是否溢价？"
+
+至于剩下的24位，我们将把它们转换成三个字符，作为用户的标识符。
+
+#### 编码
+
+我们的用户将有一个标识符 "AAA"，他将有一个活跃的高级账户（存储在前两个比特）。在二进制表示中，它将看起来像。
+
+```java
+String stringRepresentation = "01000001010000010100000100000011";
+```
+
+使用内置的`Integer#parseUnsignedInt`方法，可以很容易地将其编码为一个`int`变量。
+
+```java
+int intRepresentation = Integer.parseUnsignedInt(stringRepresentation, 2);
+assertEquals(intRepresentation, 1094795523);
+```
+
+#### 解码
+
+这个过程也可以用 `Integer#toBinaryString` 方法来反转。
+
+```java
+String binaryString = Integer.toBinaryString(intRepresentation);
+String stringRepresentation = padWithZeros(binaryString);
+assertEquals(stringRepresentation, "01000001010000010100000100000011");
+```
+
+### 提取一个比特
+
+#### 第一比特
+
+如果我们想检查我们账户变量的第一位，我们只需要使用顺位 `and` 运算符和数字 `1` 作为掩码。因为数字 `1`在二进制形式中只有第一位被设置为1，其余的都是0，它将从我们的变量中删除所有的位，只留下第一个完整的位。
+
+```java
+10000010100000101000001000000011
+00000000000000000000000000000001
+-------------------------------- &
+00000000000000000000000000000001
+```
+
+然后我们需要检查产生的值是否不等于零。
+
+```java
+intRepresentation & 1 != 0
+```
+
+#### 任意位置的位
+
+如果我们想检查其他的位，我们需要创建一个适当的掩码，这个掩码需要在给定的位置上有一个位设置为1，其余的设置为0。最简单的方法是对我们已有的掩码进行移位。
+
+```java
+1 << (position - 1)
+```
+
+上面这行代码的位置变量设置为3，将把我们的掩码从 `00000000000000000000000000000001` 变成
+
+```java
+00000000000000000000000000000100
+```
+
+因此，现在，比特方程将看起来像这样。
+
+```java
+10000010100000101000001000000011
+00000000000000000000000000000100
+-------------------------------- &
+00000000000000000000000000000000
+```
+
+把所有这些放在一起，我们可以写一个方法来提取给定位置上的单个比特。
+
+```java
+private boolean extractValueAtPosition(int intRepresentation, int position) {
+    return ((intRepresentation) & (1 << (position - 1))) != 0;
+}
+```
+
+为了达到同样的效果，我们也可以将`intRepresentation`变量向相反方向移动，而不是改变掩码。
+
+### 提取多个比特
+
+我们可以用类似的方法从一个整数中提取多个比特。让我们提取我们的用户帐户变量的最后三个字节，并将其转换为一个字符串。首先，我们需要通过将变量向右移动来摆脱前八位的影响。
+
+```java
+int lastThreeBites = intRepresentation >> 8;
+String stringRepresentation = getStringRepresentation(lastThreeBites);
+assertEquals(stringRepresentation, "00000000010000010100000101000001");
+```
+
+我们仍然有32位，因为`int`总是有32位。然而，现在我们只对前24位感兴趣，其余的都是零，会很容易被忽略。我们创建的`int`变量可以很容易地用作整数ID，但是因为我们想有一个字符串ID，所以我们还有一个步骤要做。
+
+我们将把二进制的字符串表示法分成8个字符的组，把它们解析成`char`变量，然后把它们连接成一个最终的`String`。
+
+为了方便起见，我们还将忽略空字节。
+
+```java
+Arrays.stream(stringRepresentation.split("(?<=\\G.{8})"))
+  .filter(eightBits -> !eightBits.equals("00000000"))
+  .map(eightBits -> (char)Integer.parseInt(eightBits, 2))
+  .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+  .toString();
+```
+
+### 应用一个比特掩码
+
+我们也可以创建一个掩码来同时检查许多位，而不是提取和检查单个位的值。我们想检查我们的用户是否有一个活跃的高级账户，所以他的变量的前两个比特都设置为1。
+
+我们可以用以前的方法分别检查它们，但创建一个掩码来选择它们，会更快。
+
+```java
+int user = Integer.parseUnsignedInt("00000000010000010100000101000001", 2);
+int mask = Integer.parseUnsignedInt("00000000000000000000000000000011", 2);
+int masked = user & mask;
+```
+
+因为我们的用户有一个活跃的账户，但它不是高级账户，所以被屏蔽的值将只有第一个比特被设置为1。
+
+```java
+assertEquals(getStringRepresentation(masked), "00000000000000000000000000000001");
+```
+
+现在，我们可以轻松而廉价地断言一个用户是否符合我们的条件。
+
+```java
+assertFalse((user & mask) == mask);
+```
+
+### 总结
+
+在本教程中，我们学习了如何使用位运算符来创建位掩码，并应用它们来从整数中提取二进制信息。

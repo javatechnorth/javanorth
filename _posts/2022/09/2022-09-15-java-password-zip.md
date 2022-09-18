@@ -1,0 +1,128 @@
+---
+layout: post
+title:  如何在Java中加密和解密zip文件
+tagline: by feng
+categories: java
+tags: 
+    - feng
+---
+
+大家好，我是指北君。
+
+在本文中，我们来学习如何用[Zip4j](https://github.com/srikanth-lingala/zip4j)库创建受密码保护的压缩文件并将其解压。
+
+<!--more-->
+
+### 依赖
+
+让我们先把 [`zip4j`](https://search.maven.org/search?q=g:%20net.lingala.zip4j%20a:zip4j) 依赖关系添加到我们的 `pom.xml` 文件中。
+
+```xml
+<dependency>
+    <groupId>net.lingala.zip4j</groupId>
+    <artifactId>zip4j</artifactId>
+    <version>2.9.0</version>
+</dependency>
+```
+
+### 压缩一个文件
+
+首先，我们将使用`ZipFile addFile()`方法将一个名为`aFile.txt`的文件压缩到一个名为`compressed.zip`的有密码保护的 zip 文件。
+
+```java
+ZipParameters zipParameters = new ZipParameters();
+zipParameters.setEncryptFiles(true);
+zipParameters.setCompressionLevel(CompressionLevel.HIGHER);
+zipParameters.setEncryptionMethod(EncryptionMethod.AES);
+
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+zipFile.addFile(new File("aFile.txt"), zipParameters);
+```
+
+`setCompressionLevel`一行是可选的。我们可以从`FASTEST`到`ULTRA`级别中选择（默认是`NORMAL`）。
+
+在这个例子中，我们使用了AES加密。如果我们想使用Zip标准加密，我们只需用`ZIP_STANDARD`替换`AES`。
+
+注意，如果文件 "aFile.txt "在磁盘上不存在，该方法将抛出一个异常。`net.lingala.zip4j.exception.ZipException File does not exist: …`
+
+为了解决这个问题，我们必须确保该文件是手动创建并放置在项目文件夹中，或者我们必须从Java中创建它。
+
+```java
+File fileToAdd = new File("aFile.txt");
+if (!fileToAdd.exists()) {
+    fileToAdd.createNewFile();
+}
+```
+
+另外，在我们完成了新的`ZipFile`之后，需要及时关闭资源：
+
+```java
+zipFile.close();
+```
+
+### 压缩多个文件
+
+让我们修改一下代码，以便我们能够一次压缩多个文件。
+
+```java
+ZipParameters zipParameters = new ZipParameters();
+zipParameters.setEncryptFiles(true);
+zipParameters.setEncryptionMethod(EncryptionMethod.AES);
+
+List<File> filesToAdd = Arrays.asList(
+  new File("aFile.txt"),
+  new File("bFile.txt")
+);
+
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+zipFile.addFiles(filesToAdd, zipParameters);
+```
+
+我们不使用`addFile`方法，而是使用`addFiles()`并传入一个`List`的文件。
+
+### 压缩一个目录
+
+我们可以简单地用`addFolder`代替`addFile`方法来压缩一个文件夹。
+
+```java
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+zipFile.addFolder(new File("/users/folder_to_add"), zipParameters);
+```
+
+### 创建一个分割的压缩文件
+
+我们可以通过使用`createSplitZipFile`和`createSplitZipFileFromFolder`方法，``将压缩文件分割成几个文件。
+
+```java
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+int splitLength = 1024 * 1024 * 10; //10MB
+zipFile.createSplitZipFile(Arrays.asList(new File("aFile.txt")), zipParameters, true, splitLength);
+```
+
+```java
+zipFile.createSplitZipFileFromFolder(new File("/users/folder_to_add"), zipParameters, true, splitLength);
+```
+
+`splitLength`的单位是字节。
+
+### 提取所有文件
+
+提取文件也同样简单。我们可以用`extractAll()`方法从我们的`compressed.zip`中提取所有文件。
+
+```java
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+zipFile.extractAll("/destination_directory");
+```
+
+### 提取单个文件
+
+如果我们只想从`compressed.zip`中提取一个文件，我们可以使用`extractFile()`方法。
+
+```java
+ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
+zipFile.extractFile("aFile.txt", "/destination_directory");
+```
+
+### 总结
+
+综上所述，我们已经学会了如何用Zip4j库在Java中创建受密码保护的压缩文件并将其解压。

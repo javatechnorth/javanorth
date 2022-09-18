@@ -1,0 +1,128 @@
+---
+layout: post
+title:  查找连接到服务器的客户的IP地址
+tagline: by feng
+categories: java
+tags: 
+    - feng
+---
+
+大家好，我是指北君。
+
+在本文中，我们来学习下如何找到连接到服务器的客户端计算机的IP地址。 我们将创建一个简单的客户端-服务器场景，让我们探索用于TCP/IP通信的`java.net` API。
+
+<!--more-->
+
+### 背景
+
+Java应用程序使用套接字在互联网上进行通信和发送数据。Java为客户端应用程序提供了`java.net.Socket`类。
+
+`java.net.ServerSocket`类用于TCP/IP的服务器端套接字实现。我们平时只关注TCP/IP的应用层面。
+
+### 使用示例
+
+让我们假设我们的系统上有一个应用服务器在运行。这个服务器向客户发送问候信息。在这种情况下，服务器使用一个TCP套接字进行通信。
+
+该应用服务器被绑定到一个特定的TCP端口。它的套接字地址是该端口和本地网络接口的IP地址的组合。由于这个原因，客户应该使用这个特定的套接字地址来连接服务器。
+
+### 应用例子
+
+现在我们已经定义了我们的用例，让我们开始构建服务器。
+
+#### 应用服务器
+
+首先，我们需要实例化一个`ServerSocket`，用于监听进入的连接请求。`ServerSocket`类的构造函数需要一个端口号作为参数。
+
+```java
+public class ApplicationServer {
+
+    private ServerSocket serverSocket;
+    private Socket connectedSocket;
+  
+    public void startServer(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
+        connectedSocket = serverSocket.accept();
+        //...
+```
+
+#### 获取客户端的IP地址
+
+现在我们已经为进入的客户端建立了`Socket`，让我们看看如何获得客户端的IP地址。`Socket`实例包含了远程客户端的套接字地址。我们可以使用`getRemoteSocketAddress`方法来检查这个。
+
+The`getRemoteSocketAddress`方法返回一个类型为`SocketAddress`的对象。这是一个抽象的Java类。在这个例子中，我们知道它是一个TCP/IP连接，所以我们可以把它转换为`InetSocketAddress`。
+
+```java
+InetSocketAddress socketAddress = (InetSocketAddress) connectedSocket.getRemoteSocketAddress();
+```
+
+正如我们已经看到的，一个套接字地址是一个IP地址和端口号的组合。我们可以使用`getAddress`来获得IP地址。这返回一个`InetAddress`对象。然而，我们也可以使用`getHostAddress`来获得IP地址的字符串表示。
+
+```java
+String clientIpAddress = socketAddress.getAddress()
+    .getHostAddress();
+```
+
+#### 向客户发送问候信息
+
+现在，服务器和客户端可以交换问候信息。
+
+```java
+String msg = in.readLine();
+System.out.println("Message received from the client : " + msg);
+PrintWriter out = new PrintWriter(connectedSocket.getOutputStream(), true);
+out.println("Hello Client !!");
+```
+
+### 测试应用程序
+
+现在让我们建立一个客户端应用程序来测试我们的代码。这个客户端将在一个单独的计算机上运行并连接到我们的服务器。
+
+#### 建立一个客户端应用程序
+
+首先，我们需要使用IP地址和端口号与服务建立一个`Socket`连接。
+
+```java
+public class ApplicationClient {
+    public void connect(String ip, int port) throws IOException {
+        clientSocket = new Socket(ip, port);
+    }
+}
+```
+
+与服务器应用程序类似，我们将使用`BufferedReader`和`PrintWriter`来从套接字中读取和写入。为了向服务器发送消息，让我们创建一个方法来向连接的套接字写入。
+
+```java
+public void sendGreetings(String msg) throws IOException {
+    out.println(msg);
+    String reply = in.readLine();
+    System.out.println("Reply received from the server :" + reply);
+}
+```
+
+#### 运行应用程序
+
+接下来，让我们运行客户端应用程序，为它选择一个不常用的端口
+
+之后，我们需要从另一台电脑上启动客户端应用程序。在这个例子中，我们假设服务器机器的IP地址是`192.168.0.100`，端口5000是不常用的，不会影响其他的服务。
+
+```java
+java -cp com.javanorth.clientaddress.ApplicationClient 192.168.0.100 5000 Hello
+```
+
+这里，我们假设客户机和服务器在同一个网络上。在客户端与服务器建立成功的连接后，客户端的IP地址将被打印在服务器控制台。
+
+例如，如果客户端的IP地址是192.168.0.102，我们应该能在控制台中看到它。
+
+```java
+    IP address of the connected client: 192.168.0.102
+```
+
+#### 在后台发生了什么？
+
+一般来说，当应用服务器被启动时，`ServerSocket`使用给定的端口号和通配符IP地址实例化一个套接字对象。之后，它将其状态改为`监听`，以接收连接请求。然后，当客户端发送一个连接请求时，`ServerSocket`通过调用`accept`方法实例化一个新的套接字。
+
+新创建的套接字实例包含服务器的IP地址和端口，以及远程客户端。对于服务器的IP地址，`ServerSocket`类使用本地网络接口的IP地址，它通过该接口收到传入的请求。然后，为了获得远程客户端的IP地址，它对收到的TCP数据包的IP头进行解码并使用源地址。
+
+### 总结
+
+在这篇文章中，我们定义了一个客户机-服务器用例，并使用Java套接字编程来查找连接到服务器的客户机的IP地址。
