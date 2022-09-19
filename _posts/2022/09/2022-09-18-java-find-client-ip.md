@@ -62,7 +62,7 @@ String clientIpAddress = socketAddress.getAddress()
     .getHostAddress();
 ```
 
-#### 向客户发送问候信息
+#### 向客户端发送消息
 
 现在，服务器和客户端可以交换问候信息。
 
