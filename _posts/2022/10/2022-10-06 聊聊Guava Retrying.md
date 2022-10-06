@@ -90,7 +90,7 @@ public void retryWhenResultOnFailure() throws ExecutionException, RetryException
 
 ### 执行流程
 
-![执行流程](../doc/images/guava-retry.jpg)
+![执行流程](/assets/images/2022/sucls/10_06/guava-retry.jpg)
 
 通过RetryerBuilder构建Retryer，调用Retryer#call，封装业务代码为其回到函数
 1. 开始循环执行
