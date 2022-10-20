@@ -3,7 +3,8 @@ layout: post
 title:  聊聊Guava Collect -20221012
 tagline: by 沉浮
 categories: Guava 集合
-tags: 沉浮
+tags: 
+- 沉浮
 ---
 
 集合操作是编程中使用频率非常高的，所有有一款针对集合的操作工具是非常有必要的。
