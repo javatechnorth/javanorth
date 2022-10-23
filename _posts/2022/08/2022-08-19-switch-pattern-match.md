@@ -11,6 +11,8 @@ tags:
 
 Java 17 引入了针对 `switch` 表达式和语句的模式匹配（[JEP 406](https://openjdk.java.net/jeps/406)）。模式匹配在 `switch` 条件定义时提供了更多的灵活性。在模式匹配之前，`switch` 只支持精确匹配一个常量值的选择器表达式。在本文中，我们来看看三种可以在`switch`语句中应用的不同模式类型。
 
+<!--more-->
+
 ### Switch 表达式
 
 我们在 Java 中使用`switch` 来做一些策略的选择，哪个语句被选中取决于 `switch` 表达式的值。
