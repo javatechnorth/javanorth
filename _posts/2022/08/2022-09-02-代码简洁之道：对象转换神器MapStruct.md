@@ -3,7 +3,7 @@ title: 代码简洁之道：对象转换神器MapStruct -- 2022-09-02
 date: 2022-09-02 08:15:00
 author: gotanks广楠
 categories: gotanks广楠
-tags: ["MapStruct", "规范"]
+tags: ["MapStruct", "规范", "gotanks广楠"]
 ---
 
 > 其实很多时候, 写代码更像是在创造艺术。 —— 指北君
