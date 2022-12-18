@@ -46,7 +46,7 @@ public void testSelectWrapper(){
 
 Mybatis Plus 提供的几种条件构造器，关系如下：
 
-![](https://gitee.com/YSOcean/typoraimg/raw/master/image%5Cdocker/mybatisplus-02-00.png)
+![](http://www.javanorth.cn/assets/images/2022/itcoke/mybatisplus/mybatisplus-02-00.png)
 
 我们主要通过 QueryWrapper 和 UpdateWrapper 进行条件构造，这两个和 LambdaQueryWrapper、LambdaUpdateWrapper 差不多是等价的，只不过后者采用了 JDK1.8 提供的lambda 语法，使用起来更简洁。
 
