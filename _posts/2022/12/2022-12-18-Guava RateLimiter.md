@@ -8,6 +8,10 @@ tags: 沉浮
 
 哈喽，大家好，我是指北君。  
 
+今天我们继续看看Guava，比较常用的限流工具RateLimiter
+
+<!--more-->
+
 ## Guava RateLimiter
 
 *有没有搞错，别人都在提升系统的访问并发量，你却在这搞限制？*
