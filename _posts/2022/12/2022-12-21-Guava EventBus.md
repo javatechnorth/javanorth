@@ -1,0 +1,125 @@
+---
+layout: post
+title:  2022-12-21 Guava EventBus
+tagline: by 沉浮
+categories: Guava EventBus
+tags: 沉浮
+---
+
+哈喽，大家好，我是指北君。  
+
+今天我们继续看看Guava，比较好用的事件驱动工具EventBus
+
+<!--more-->
+## Guava Bus
+
+EventBus是Guava的事件处理机制，是设计模式中观察者模式（生产/消费者编程模型）的优雅实现。对于事件监听和发布订阅模式，EventBus使用非常简单便捷。
+
+![event-listener](/assets/images/2022/sucls/12_21/event-listener.png)
+
+如果你做过CS的开发，下面这段代码可能会比较熟悉。
+
+```
+Button button = new Button("确定");
+
+button.addListener( new Listener(){
+    ...
+    public void onClick(Event event){
+        // 
+    }
+    ...
+} );
+```
+为按钮注册事件监听，当按钮被点击时，则触发监听中相应的回调。
+在上面的代码中，有三个角色事件（Event），事件源（Button），监听（Listener），按钮作为事件源，当点击行为触发时，会将该行为封装成对应的点击事件，并根据行为类型将事件传递到响应的监听器上，
+这也就是我们常说的监听器模式。
+
+### 使用场景
+
++ 通过事件驱动业务执行，通过异步执行机制实现代码非阻塞执行
++ 扩展主线外的业务，减少代码的侵入，比如各个环节的消息通知
+
+### 示例
++ 订单支付时的消息发送
+
+```
+// 商品
+public class ProductOrder {
+    private String user; // 用户
+    private String product; // 商品
+    private double amount; // 金额
+    @Override
+    public String toString() {
+        return String.format("用户：%s购买了商品：%s，总金额：%s", user, product, amount);
+    }
+}
+// 事件
+    @Data
+    @AllArgsConstructor
+    public static class CreateOrderEvent implements OrderEvent{
+        private ProductOrder order;
+    }
+// 监听
+    public static class CreateOrderListener{
+        @Subscribe
+        public void onEvent(CreateOrderEvent event) {
+            log.info("创建订单:{}", event.getOrder());
+        }
+    }
+```
+测试:
+我们可以定义各种事件，比如订单创建、订单取消、订单支付...
+只需要简单的三个步骤即可：
+```
+// 1. 创建事件总线
+    EventBus eventBus = new EventBus( ProductOrder.class.getName() );
+// 2. 注册事件监听
+    eventBus.register( new CreateOrderListener() );
+    eventBus.register( new PayOrderListener() );
+    eventBus.register( new CancelOrderListener() );
+    eventBus.register( new RenewOrderListener() );
+// 3. 发送事件通知
+    eventBus.post(new ProductOrder.CreateOrderEvent(order));
+    TimeUnit.SECONDS.sleep(1);
+    eventBus.post(new ProductOrder.CancelOrderEvent(order));
+    TimeUnit.SECONDS.sleep(1);
+    eventBus.post(new ProductOrder.RenewOrderEvent(order));
+    TimeUnit.SECONDS.sleep(1);
+    eventBus.post(new ProductOrder.PayOrderEvent(order));
+    TimeUnit.SECONDS.sleep(5);
+    eventBus.post(new ProductOrder.ReturnOrderEvent(order));
+```
+同时我们可以通过AsyncEventBus建立事件异步总线，这样在事件被触发时，可以异步通知监听者完成事件回调，以此来提高响应速度。
+
+### 核心
++ EventBus
+
+    事件总线，可以理解为事件与监听器的上下文，主要实现事件的注册、事件的分发、以及监听器的回调，主要提供的方法包括：
+
+  - register 注册监听，将监听器注册到事件总线，通过注解@Subscribe通知其监听的事件类型（第一个方法参数类型）
+  - unregister 卸载监听，从事件总线移除监听
+  - post 发送事件通知，根据post事件类型，找到所有订阅了该类型事件的监听器，并将事件推送到监听器对应的监听方法
+
++ Subscribe
+
+    通过@Subscribe标识监听器所关注的事件类型
+
++ Event
+
+    可以是任何对象，当然不建议将基础类型或String作为事件类型，这样就没法做到按类型区分了
+
+![event-bus](/assets/images/2022/sucls/12_21/event-bus.png)
+
+通过上面的图就可以很清楚各个各个组件的职责，以及如何通过事件总线完成事件向监听的传播，最终基于事件回调机制完成消息传递。基于事件驱动的服务模型
+	
+上面这种结构的图形是不是在很多位置都见过，这是一种经典的设计模式。试想一下，我们不通过事件驱动行为时，一般你们怎么写代码，通过ifelse？或者其他有着异曲同工的
+实现方法，目的最后都是一样。基于Guava提供的工具，我们不仅在使用时只需要简单的三个步骤就能实现，同样，当需要屏蔽该功能时只需要去掉register一行即可，对整体功能
+也没有任何的影响。
+
+>>
+在我们引入某种设计模式，某种架构模型时，总的目的都是为了降低代码模块间的耦合度，提升代码整体的可读性，最终让代码能够易于维护性，或者有一定的复用性。
+
+### 总结
+
+    事件监听模式、观察者模式、发布订阅模式，都是非常的相似，通过建立事件与监听器、观察者与被观察者、生产者与消费者者间消息传递媒介（示例中的事件总线EventBus），
+不仅能够使消息的发起者与接收者之间进行解耦，最主要的是通过消息传递渠道实现消息异步传播，提升系统效率
