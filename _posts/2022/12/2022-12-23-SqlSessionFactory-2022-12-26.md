@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Mybatis核心类SqlSessionFactory，看完我悟了
+title:  Mybatis核心类SqlSessionFactory，看完我悟了-2022-12-26已发
 tagline: by IT可乐
 categories: mybatis
 tags: 
