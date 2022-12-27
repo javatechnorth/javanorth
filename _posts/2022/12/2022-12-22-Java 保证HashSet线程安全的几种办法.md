@@ -1,0 +1,139 @@
+---
+layout: post
+title:  Java 保证HashSet线程安全的几种方法
+tagline: by feng
+categories: java
+tags: 
+    - feng
+---
+
+
+大家好，我是指北君。
+
+线程安全的问题，真的算是老生常谈了。这几天看到一个 HashSet 线程安全的骚操作，在这里分享给大家。 在本文中，我们将分享如何构造线程安全的HashSet的几种方法。
+
+<a name="Lr3sT"></a>
+### 使用ConcurrentHashMap工厂方法构造线程安全的HashSet
+
+首先, 我们来看看_ConcurrentHashMap_暴露出来的静态方法 -- `newKeySet()`。此方法返回一个Set的实例，等同于实现了 _java.util.Set _接口，而且能够使用Set的一些常用操作，比如 add(), contains() 等。
+<!--more-->
+举个例子：
+```java
+Set<Integer> threadSafeUniqueNumbers = ConcurrentHashMap.newKeySet();
+threadSafeUniqueNumbers.add(23);
+threadSafeUniqueNumbers.add(45);
+```
+
+这里返回的Set，其实有点类似于 HashSet，因为两者都是基于Hash算法实现的，另外，线程同步逻辑带来的额外开销也很小，因为它最终还是 _ConcurrentHashMap 的一部分。_
+
+不过，这个只能在 Java 8 以上版本才可以使用，我想大部分公司应该至少 Java 8 了吧。直接拿来用就行。
+
+现在，我们已经了解了可以用 `ConcurrentHashMap#newKeySet()`构建类似于线程安全的HashSet，在 ConcurrentHashMap 其实被定义为 `KeySetView`,。ConcurrentHashMap 其实还有两个实例方法可以用于构建 KeySetView, 一个是 `keySet()` 另外一个就是` keySet(defaultValue) `,  我这里就简写一下了， 大家可以在IDE中直接打出来看看。
+
+这两个方法都可以创建KeySetView的实例，KeySetView 与 Map 是一个连接的关系。 我们每次向Map中添加新的键值对的时候，Set中的数据也在相应的添加，我们通过几个例子来看看这两种方法有哪些区别。
+<a name="DQz7V"></a>
+#### KeySet() 方法
+keySet() 方法 和 keySet(defaultValue) ，最大的区别就是不能直接往Set中添加数据。直接添加的话，会抛出 nsupportedOperationException 异常，源码中的定义如下。
+```java
+public KeySetView<K,V> keySet() {
+    KeySetView<K,V> ks;
+    if ((ks = keySet) != null) return ks;
+    return keySet = new KeySetView<K,V>(this, null);
+}
+// add
+public boolean add(K e) {
+    V v;
+    if ((v = value) == null)
+        throw new UnsupportedOperationException();
+    return map.putVal(e, v, true) == null;
+}
+```
+所以我们只能通过如下的方式使用。
+```java
+ConcurrentHashMap<Integer,String> numbersMap = new ConcurrentHashMap<>();
+Set<Integer> numbersSet = numbersMap.keySet();
+
+numbersMap.put(1, "One");
+numbersMap.put(2, "Two");
+numbersMap.put(3, "Three");
+
+System.out.println("Map before remove: "+ numbersMap);
+System.out.println("Set before remove: "+ numbersSet);
+
+numbersSet.remove(2);
+
+System.out.println("Set after remove: "+ numbersSet);
+System.out.println("Map after remove: "+ numbersMap);
+```
+输出结果如下。
+```java
+Map before remove: {1=One, 2=Two, 3=Three}
+Set before remove: [1, 2, 3]
+
+Set after remove: [1, 3]
+Map after remove: {1=One, 3=Three}
+```
+<a name="hCT1L"></a>
+#### KeySet(defaultValue) 方法
+keySet(defaultValue) ,由于有设置默认的value，可以在添加的时候不会报错，JDK 源码纵定义如下：
+```java
+public KeySetView<K,V> keySet(V mappedValue) {
+    if (mappedValue == null)
+        throw new NullPointerException();
+    return new KeySetView<K,V>(this, mappedValue);
+}
+```
+所以我们可以通过如下的方式使用。
+```java
+ConcurrentHashMap<Integer,String> numbersMap = new ConcurrentHashMap<>();
+Set<Integer> numbersSet = numbersMap.keySet("SET-ENTRY");
+
+numbersMap.put(1, "One");
+numbersMap.put(2, "Two");
+numbersMap.put(3, "Three");
+
+System.out.println("Map before add: "+ numbersMap);
+System.out.println("Set before add: "+ numbersSet);
+
+numbersSet.addAll(asList(4,5));
+
+System.out.println("Map after add: "+ numbersMap);
+System.out.println("Set after add: "+ numbersSet);
+```
+
+输出结果如下：
+
+```java
+Map before add: {1=One, 2=Two, 3=Three}
+Set before add: [1, 2, 3]
+Map after add: {1=One, 2=Two, 3=Three, 4=SET-ENTRY, 5=SET-ENTRY}
+Set after add: [1, 2, 3, 4, 5]
+```
+
+<a name="HagLL"></a>
+### 使用Collections的来创建线程安全的 Set
+`java.util.Collections ` 中有一个线程同步的方法可以用于创建，示例代码如下。
+
+```java
+Set<Integer> syncNumbers = Collections.synchronizedSet(new HashSet<>());
+syncNumbers.add(1);
+```
+
+这个方法的性能并没有ConcurrentHashMap的那个效率高，由于使用了同步锁，增加了一些额外的开销。
+<a name="ieKCU"></a>
+### 使用CopyOnWriteArraySet构建线程安全的 Set
+用CopyOnWriteArraySet 创建线程安全的 set 也是非常简单的。示例代码如下
+
+```
+Set<Integer> copyOnArraySet = new CopyOnWriteArraySet<>();
+copyOnArraySet.add(1);
+```
+这个方法从性能的角度上来看，也不是很理想，CopyOnWriteArraySet 背后的实现是CopyOnWriteArrayList, 最终使用了数组来存储数据，也就意味着 contains() 或者 remove() 操作，具有 O(n) 的复杂度，而使用HashMap 复杂度为 O(1) 。
+
+建议使用此实现时，_设置_大小通常保持较小，只读操作占大多数。
+
+<a name="R6oJA"></a>
+### 总结
+在本文中，我们看到了不同的创建线程安全的Set的方式，也比较了他们之间的差异性。 所以大家以后使用的时候，可以有限考虑使用ConcurrentHashMap创建的Set。
+
+
