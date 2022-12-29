@@ -61,7 +61,7 @@ docker run -id --hostname my-rabbit \
 
 看到此页面代表安装成功
 
-![image-20221229173313501](../../../assets/images/2022/fu/image-20221229173313501.png)
+![image-20221229173313501](http://www.javanorth.cn/assets/images/2022/fu/image-20221229173313501.png)
 
 准备就绪，先写个Hello World
 
@@ -156,7 +156,7 @@ docker run -id --hostname my-rabbit \
 
    3. 可以看到消费者的控制台打印出 生产者传递的消息
 
-      ![image-20221229181731610](../../../assets/images/2022/fu/image-20221229181731610.png)
+      ![image-20221229181731610](http://www.javanorth.cn/assets/images/2022/fu/image-20221229181731610.png)
 
 
 
