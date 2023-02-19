@@ -1,0 +1,78 @@
+---
+layout: post
+title:  使用 protobuf 遇到的一个坑
+tagline: by feng
+categories: java
+tags: 
+    - feng
+---
+
+最近我们在项目中，通过使用 protobuf 格式作为存储数据的一个载体。一个不小心就给自己埋了个大坑，还是过了好久才发现。
+
+### 怎么发现的？
+
+在我们的新项目中，我们通过使用 protobuf 格式来存储项目运行的数据。这样我们在调试过程中，可能根据现场录制的数据进行本地的调试。
+
+```protobuf
+
+message ImageData {
+// ms
+int64 timestamp = 1;
+int32 id = 2;
+Data mat = 3;
+}
+
+message PointCloud {
+// ms
+int64 timestamp = 1;
+int32 id = 2;
+PointData pointcloud = 3;
+}
+
+message State {
+  // ms
+  int64 timestamp = 1;
+  string direction = 2;
+}
+
+message Sensor {
+repeated PointCloud point_data = 1;
+repeated ImageData image_data = 2;
+repeated State vehicle_data = 3;
+}
+```
+
+我们定义了这样一组数据， 然后存储的时候，因为Sensor 这3个数据源的帧率不一样，因此存储的时候，单个 Sensor 中其实只包含了一组数据，另外两个类型的数据并没有包含进去。
+
+当我们只录制单个 pack 的时候，我们并没有遇到问题。直到我们觉得单个包，不能长时间录制，我们需要找一种解决方法来分割包 。
+
+当时觉得这个一定是很简单的，我们就设定了一个包达到 500M 的时候，我们就让后面的数据存到新的包中。很顺利的写完，然后放到现场进行数据录制。录制一段时间之后，我们把包拿回来进行模拟测试我们的新程序。发现有些包的数据解析出来是有问题的。程序运行到一半会卡在那里不动。经过多次测试，发现是部分包有这个问题。
+
+我们一开始怀疑的是，判断文件大小的方式不对，影响到了分包。因为判断文件大小的时候，会去打开文件。但是经过好几种其他的不打开文件的方式判断，从而进行分割。还是遇到了部分录制的包有问题。
+
+这时我才怀疑到 protobuf 对存储数据会有一些特殊的要求。后来看了一些文章，了解到 protobuf 存储多组数据到一个文件需要有标志符。要不然后面从文件解析回来的时候，protobuf 因为不知道单个数据的停止符在哪里，导致数据解析出错。
+
+到这里，这个坑出现了。**我们存储了一系列的数据到单个包中，没有做任何分隔符的操作。protobuf在解析的时候，把文件中所有的内容都解析成了单个Sensor。Sensor 中包含里所有数据， protobuf 主动合并了所有存储的数据。**
+
+在这时，我才发现以前单包录制的时候，数据都是对的，那真的是我运气好。protobuf恰好解析成功了。
+
+### 怎么解决呢？
+
+既然知道 protobuf 会这么操作，那我们就只要知道 protobuf 怎么分割就行了。这个方法还真不好找，因为像我们这样使用的人太少了。中文搜索完全搜不到这一块的内容，可能大家都不会使用protobuf来存储数据吧，大家使用的方式应该都是多个服务中进行交互的场景吧。
+
+最终通过stackoverflow上的一些回答找到了答案，从回答中得知，这个解决办法在 protobuf 3.3 的时候，才正式被合并进去。 看起来这个功能真的很少用啊。
+
+```cpp
+bool SerializeDelimitedToOstream(const MessageLite& message,
+                                                 std::ostream* output);
+bool ParseDelimitedFromZeroCopyStream(
+    MessageLite* message, io::ZeroCopyInputStream* input, bool* clean_eof);
+```
+
+通过这一对方法，可以对文件进行按照数据流一个一个的存储读取。再也不用担心数据被合并读取。 
+
+当然通过这种方式存储的数据，不能被原来的解析方式所解析，存储的而进行格式完全变了。 这种方式会先存储二进制数据的大小，再存储二进制数据。
+
+### 结束语
+
+经过一番折腾，终于搞定了这个分割的坑。 使用场景可能比较小众，导致了很多资料根本找不到。靠自己看源码才发现这些问题。C++ 的源码真不好读，有很多的模板方法、模板类容易错过一些细节。最后还是看的C#的代码，才完全确认的。
