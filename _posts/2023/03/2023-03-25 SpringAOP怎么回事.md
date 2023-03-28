@@ -15,21 +15,42 @@ tags: 沉浮
 
     spring 5.x版本
 
+  AOP面向切面编程，通过预编译方式和运行期间动态代理实现程序功能的统一维护的一种技术。AOP是OOP的延续，从另一视角扩展了对面向对象编程的形式。
+利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。
+
+  Spring AOP与IOC作为整个Spring框架最为核心的两个部分，其意义不言而喻。
+
+### 概念
+
+Aspect（切面）： Aspect声明类似于Java中的类声明，在Aspect中会包含着一些Pointcut以及相应的 Advice。
+
+JointPoint（连接点）：表示在程序中明确定义的点，典型的包括方法调用，对类成员的访问以及异常处理程序块的执行等等，它自身还可以嵌套其它joint point。
+
+Pointcut（切点）：按规则匹配的JointPoint，这些JointPoint或是通过逻辑关系组合起来，或是通过通配、正则表达式等方式集中起来，它定义了相应的Advice执行的具体地方。
+
+Advice（通知）：Advice定义了在Pointcut里面定义的程序点具体要做的操作，它通过before、after和around来区别是在每个JointPoint之前、之后还是代替执行的代码。
+
+Target（目标对象）：将Advice织入到目标对象.。
+
+Weaving（织入）：将Aspect和其他对象连接起来, 并创建增强（代理）对象的过程
+
+![concept](/assets/images/2023/sucls/03_25/concept.png)
+
 ### XML
 
-1. 基于aspect
+1. 基于aspect配置AOP
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
-
+    <!-- 业务类 -->
     <bean id="queryService" class="com.sucl.blog.springaop.service.QueryService"/>
-
+    <!-- 定义Aspect，aop:method 的来源  -->
     <bean id="logAspect" class="com.sucl.blog.springaop.aspect.LogAspect"/>
     
-    <!-- 基于Aspect -->
+    <!-- 基于Aspect-->
     <aop:config>
         <aop:aspect ref="logAspect">
             <aop:pointcut id="pointcut" expression="execution(* com.sucl.blog.springaop.service..*(..))"/>
@@ -44,7 +65,7 @@ tags: 沉浮
 </beans>
 ```
 
-1. 基于advice
+1. 基于advice配置AOP
 
 ```xml
 
@@ -67,16 +88,9 @@ tags: 沉浮
 
 ### 注解
 
-基于注解实现，记得使用@EnableAspectJAutoProxy
+基于注解@Aspect定义切面来增强目标对象，记得使用@EnableAspectJAutoProxy
 
 ```java
-package com.sucl.blog.springaop.aspect;
-
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
-
 @Slf4j
 @Aspect
 public class LogAspect {
@@ -141,11 +155,11 @@ public class LogAspect {
 
 ### 执行顺序
 
-spring 5.2.7之后的执行顺序已经调整
+spring 5.2.7之后的执行顺序：
 
 ![执行流程](/assets/images/2023/sucls/03_25/execution-flow.png)
 
-### 表达式标签
+### 表达式标签（AspectJ）
 
 execution：用于匹配方法执行的连接点
 
@@ -166,6 +180,7 @@ args：用于匹配当前执行的方法传入的参数为指定类型的执行�
 @annotation：用于匹配当前执行方法持有指定注解的方法
 
 bean：Spring AOP扩展的，AspectJ没有对于指示符，用于匹配特定名称的Bean对象的执行方法
+
 
 ### 基于@Bean
 
@@ -244,6 +259,28 @@ public class LogAdvice implements MethodInterceptor {
 
 4. 其父类AbstractAutoProxyCreator中，postProcessAfterInitialization -> wrapIfNecessary -> createProxy -> ProxyFactory -> getProxy 到这里，Bean的代理对象也就生成了，
 当然省略了各种判断以及加工过程。
+
+### 代理方式
+
++ Cglib和JDK Proxy
+
+  Spring AOP主要是通过这两个代理框架来实现代理的。一般情况下，基于接口代理时使用JDK动态代理，否则使用Cglib.
+    - Java动态代理只能够对接口进行代理，不能对普通的类进行代理(因为所有生成的代理类的父类为Proxy，Java类继承机制不允许多重继承)。而CGLIB能够代理普通类
+    - Java动态代理使用Java原生的反射API进行操作，在生成类上比较高效；CGLIB使用ASM框架直接对字节码进行操作，在类的执行过程中比较高效
+
+> 下面是网上Spring AOP与AspectJ的比对
+
+| Spring AOP                                                                                                    | AspectJ                                                                                                                                      |
+|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| Implemented in pure Java-- 用纯Java实现                                                                           | 	Implemented using extensions of Java programming language-- 使用Java编程语言的扩展实现                                                                 |
+| No need for separate compilation process-- 无需单独的编译过程                                                          | 	Needs AspectJ compiler (ajc) unless LTW is set up-- 除非设置了LTW，否则需要AspectJ编译器（ajc）                                                            |
+| Only runtime weaving is available-- 仅需运行时编织                                                                   | 	Runtime weaving is not available. Supports compile-time, post-compile, and load-time Weaving-- 运行时编织不可用。支持编译时，后编译和加载时编织                     |
+| Less Powerful – only supports method level weaving-- 不足–仅支持方法级编织                                              | 	More Powerful – can weave fields, methods, constructors, static initializers, final class/methods, etc…–更强大–可以编织字段，方法，构造函数，静态初始值设定项，最终类/方法等 |
+| Can only be implemented on beans managed by Spring container-- 只能在Spring容器管理的bean上实现                          | 	Can be implemented on all domain objects-- 可以在所有领域对象上实施                                                                                     |
+| Supports only method execution pointcuts-- 仅支持方法执行切入点                                                         | 	Support all pointcuts-- 支持所有切入点                                                                                                             |
+| Proxies are created of targeted objects, and aspects are applied on these proxies-- 代理是针对目标对象创建的，并且方面已应用于这些代理 | 	Aspects are weaved directly into code before application is executed (before runtime)–在应用程序执行之前（运行时之前）将方面直接编织到代码中                           |
+| Much slower than AspectJ-- 比AspectJ慢得多                                                                        | 	Better Performance-- 更好的性能                                                                                                                  |
+| Easy to learn and apply-- 易于学习和应用                                                                             | 	Comparatively more complicated than Spring AOP-- 比Spring AOP复杂得多                                                                            |
 
 ### 结束语
 
