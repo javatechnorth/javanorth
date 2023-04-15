@@ -1,0 +1,159 @@
+---
+layout: post
+title:  SpringBoot如何执行异步任务？
+tagline: by IT可乐
+categories: Spring
+tags: 
+    - IT可乐
+---
+
+哈喽，大家好，我是了不起。  
+Spring Boot 提供了多种方式来实现异步任务，这里介绍三种主要实现方式。
+<!--more-->
+
+Spring Boot 提供了多种方式来实现异步任务，这里介绍三种实现方式。
+
+### 1、基于注解 @Async
+
+@Async 注解是 Spring 提供的一种轻量级异步方法实现方式，它可以标记在方法上，用来告诉 Spring 这个方法是一个异步方法，Spring 会将这个方法的执行放在异步线程中进行。使用 @Async 注解需要满足以下条件：
+
+1. 需要在 Spring Boot 主类上添加 @EnableAsync 注解启用异步功能；
+2. 需要在异步方法上添加 @Async 注解。
+
+示例代码如下：
+
+```java
+@SpringBootApplication
+@EnableAsync
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+@Service
+public class AsyncService {
+    @Async
+    public void asyncTask() {
+        // 异步任务执行的逻辑
+    }
+}
+```
+
+
+
+### 2、使用 CompletableFuture 实现异步任务
+
+CompletableFuture 是 Java 8 新增的一个异步编程工具，它可以方便地实现异步任务。使用 CompletableFuture 需要满足以下条件：
+
+1. 异步任务的返回值类型必须是 CompletableFuture 类型；
+2. 在异步任务中使用 CompletableFuture.supplyAsync() 或 CompletableFuture.runAsync() 方法来创建异步任务；
+3. 在主线程中使用 CompletableFuture.get() 方法获取异步任务的返回结果。
+
+示例代码如下：
+
+```java
+@Service
+public class AsyncService {
+    public CompletableFuture<String> asyncTask() {
+        return CompletableFuture.supplyAsync(() -> {
+            // 异步任务执行的逻辑
+            return "异步任务执行完成";
+        });
+    }
+}
+```
+
+
+
+### 3、使用 TaskExecutor 实现异步任务
+
+TaskExecutor 是 Spring 提供的一个接口，它定义了一个方法 execute()，用来执行异步任务。使用 TaskExecutor 需要满足以下条件：
+
+1. 需要在 Spring 配置文件中配置一个 TaskExecutor 实例；
+2. 在异步方法中调用 TaskExecutor 实例的 execute() 方法来执行异步任务。
+
+示例代码如下：
+
+```java
+@Configuration
+@EnableAsync
+public class AsyncConfig implements AsyncConfigurer {
+    @Bean(name = "asyncExecutor")
+    public TaskExecutor asyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("async-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Override
+    public Executor getAsyncExecutor() {
+        return asyncExecutor();
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return new SimpleAsyncUncaughtExceptionHandler();
+    }
+}
+
+@Service
+public class AsyncService {
+    @Autowired
+    @Qualifier("asyncExecutor")
+    private TaskExecutor taskExecutor;
+
+    public void asyncTask() {
+        taskExecutor.execute(() -> {
+            // 异步任务执行的逻辑
+        });
+    }
+}
+```
+
+
+
+### 4、优缺点总结
+
+这三种实现异步任务的方法各有优缺点，具体如下：
+
+1. 基于注解的方式
+
+优点：
+
+- 简单易用，只需要在方法上添加@Async注解即可。
+- 依赖Spring框架，集成度高，可以与其他Spring组件无缝协作。
+
+缺点：
+
+- 方法必须是public，否则异步执行无效。
+- 不能直接获取异步执行结果，需要使用Future或CompletableFuture等类型。
+
+1. 实现AsyncConfigurer接口的方式
+
+优点：
+
+- 更加灵活，可以配置线程池等异步执行的相关参数。
+- 可以通过实现AsyncUncaughtExceptionHandler接口来捕获异步执行中的异常。
+
+缺点：
+
+- 需要在代码中手动创建线程池，相对比较繁琐。
+- 方法必须返回Future或CompletableFuture等类型，否则无法异步执行。
+
+1. 基于ThreadPoolTaskExecutor的方式
+
+优点：
+
+- 基于Spring内置的线程池实现，省去手动配置线程池的繁琐过程。
+- 可以设置队列容量和拒绝策略，控制异步任务的执行顺序和并发量。
+
+缺点：
+
+- 略微复杂，需要手动创建ThreadPoolTaskExecutor实例，并将其注入到需要异步执行的方法中。
+
+综上所述，每种实现异步任务的方式各有优缺点，需要根据具体需求和场景来选择适合的方法。
