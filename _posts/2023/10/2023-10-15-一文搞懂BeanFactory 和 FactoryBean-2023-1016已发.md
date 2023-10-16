@@ -1,10 +1,19 @@
-## 一文搞懂BeanFactory 和 FactoryBean
+---
+layout: post
+title:  一文搞懂BeanFactory 和 FactoryBean
+tagline: by 付义帆
+categories: Spring
+tags:
+- Spring
+---
 
 
 
 在Spring框架中，BeanFactory和FactoryBean是两个关键的概念，它们都与创建和管理Bean有关，但它们在功能和作用上有很大的区别。
 
 以下是关于它们的详细解释，以及它们之间的区别。
+
+<!--more-->
 
 ### BeanFactory
 
