@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  2023-07-07 proxyBeanMethods为false时的配置类
+title:  2023-07-07 proxyBeanMethods为false时的配置类-已发
 tagline: by 沉浮
 categories: 
 tags: 沉浮
