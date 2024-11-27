@@ -23,7 +23,7 @@ Session、Cookie、JWT、Token、SSO和OAuth 2.0 这些都是什么，在我们�
 
 找到一张图，形象的展示他们的作用。
 
-![image-20240220215307192](D:\JavaNorth\javanorth\assets\images\2024\wuhua\0220-01.png)
+![image-20240220215307192](https://www.javanorth.cn/assets/images/2024/wuhua/0220-01.png)
 
 
 

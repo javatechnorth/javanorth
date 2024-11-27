@@ -237,13 +237,13 @@ public class TestController {
 
 启动后我们发送消息测试：
 
-![image-20240109221243225](D:\JavaNorth\javanorth\assets\images\2024\wuhua\0109-redis-topic1.png)
+![image-20240109221243225](https://www.javanorth.cn/assets/images/2024/wuhua/0109-redis-topic1.png)
 
 
 
 两个消费者都接到了消息：
 
-![image-20240109221403712](D:\JavaNorth\javanorth\assets\images\2024\wuhua\0109-redis-topic2.png)
+![image-20240109221403712](https://www.javanorth.cn/assets/images/2024/wuhua/0109-redis-topic2.png)
 
 
 
